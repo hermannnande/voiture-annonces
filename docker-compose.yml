@@ -1,0 +1,105 @@
+version: '3.8'
+
+services:
+  # Base de données PostgreSQL
+  postgres:
+    image: postgres:15-alpine
+    container_name: voiture_db
+    restart: unless-stopped
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_DB: voiture_db
+      POSTGRES_USER: voiture_user
+      POSTGRES_PASSWORD: voiture_pass
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - voiture_network
+
+  # Redis pour cache et queues
+  redis:
+    image: redis:7-alpine
+    container_name: voiture_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - voiture_network
+
+  # MailDev pour les emails de test
+  maildev:
+    image: maildev/maildev
+    container_name: voiture_maildev
+    restart: unless-stopped
+    ports:
+      - "1080:1080"
+      - "1025:1025"
+    networks:
+      - voiture_network
+
+  # Backend NestJS
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: voiture_backend
+    restart: unless-stopped
+    ports:
+      - "3001:3001"
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: postgresql://voiture_user:voiture_pass@postgres:5432/voiture_db
+      REDIS_URL: redis://redis:6379
+      JWT_SECRET: votre-secret-jwt-super-securise-changez-moi-en-prod
+      JWT_REFRESH_SECRET: votre-secret-refresh-super-securise-changez-moi-en-prod
+      SMTP_HOST: maildev
+      SMTP_PORT: 1025
+      FRONTEND_URL: http://localhost:3000
+    depends_on:
+      - postgres
+      - redis
+      - maildev
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+      - uploads:/app/uploads
+    networks:
+      - voiture_network
+    command: npm run start:dev
+
+  # Frontend Next.js
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: voiture_frontend
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      NODE_ENV: development
+      NEXT_PUBLIC_API_URL: http://localhost:3001/api
+      NEXT_PUBLIC_WS_URL: ws://localhost:3001
+    depends_on:
+      - backend
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+      - /app/.next
+    networks:
+      - voiture_network
+    command: npm run dev
+
+volumes:
+  postgres_data:
+  uploads:
+
+networks:
+  voiture_network:
+    driver: bridge
+
+
+
+
+

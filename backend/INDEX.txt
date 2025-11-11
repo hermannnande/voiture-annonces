@@ -1,0 +1,305 @@
+╔══════════════════════════════════════════════════════════════════╗
+║                                                                  ║
+║           📚 INDEX COMPLET - DÉPLOIEMENT annonceauto.ci         ║
+║                                                                  ║
+╚══════════════════════════════════════════════════════════════════╝
+
+🎯 PAR OÙ COMMENCER ?
+═══════════════════════════════════════════════════════════════════
+
+Si vous ne savez pas par où commencer, lisez ceci :
+
+1️⃣  DEMARRAGE_RAPIDE.md
+    👉 COMMENCEZ ICI ! Guide ultra-simplifié, étape par étape
+    📄 Temps de lecture : 5 minutes
+    ✨ Le meilleur point de départ pour déployer rapidement
+
+2️⃣  README_DEPLOIEMENT_FTP.md
+    👉 Guide complet du déploiement FTP avec explications détaillées
+    📄 Temps de lecture : 15 minutes
+    🔧 Pour comprendre chaque étape en profondeur
+
+3️⃣  STRUCTURE_COMPLETE.txt
+    👉 Vue d'ensemble de l'architecture et de la structure
+    📄 Temps de lecture : 5 minutes
+    🏗️ Pour comprendre comment tout s'articule
+
+═══════════════════════════════════════════════════════════════════
+
+📖 DOCUMENTATION COMPLÈTE
+═══════════════════════════════════════════════════════════════════
+
+┌──────────────────────────────────────────────────────────────────┐
+│ 🚀 GUIDES DE DÉPLOIEMENT                                         │
+├──────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│ 📄 DEMARRAGE_RAPIDE.md                                          │
+│    └─ Guide rapide et concis, parfait pour démarrer             │
+│    └─ Format : étapes numérotées simples                        │
+│    └─ Audience : débutants                                      │
+│                                                                  │
+│ 📄 README_DEPLOIEMENT_FTP.md                                    │
+│    └─ Guide complet du déploiement via FTP                      │
+│    └─ Format : tutoriel détaillé avec explications              │
+│    └─ Audience : tous niveaux                                   │
+│                                                                  │
+│ 📄 GUIDE_DEPLOIEMENT.md                                         │
+│    └─ Documentation technique complète                          │
+│    └─ Format : guide de référence approfondi                    │
+│    └─ Audience : utilisateurs avancés                           │
+│                                                                  │
+└──────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────┐
+│ 🏗️  ARCHITECTURE & STRUCTURE                                     │
+├──────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│ 📄 STRUCTURE_COMPLETE.txt                                       │
+│    └─ Vue d'ensemble de l'architecture                          │
+│    └─ Structure des dossiers sur le serveur                     │
+│    └─ Diagrammes ASCII explicatifs                              │
+│                                                                  │
+│ 📄 FICHIERS_A_TRANSFERER.txt                                    │
+│    └─ Liste exacte des fichiers à transférer                    │
+│    └─ Fichiers à exclure                                        │
+│    └─ Astuces pour optimiser le transfert                       │
+│                                                                  │
+└──────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────┐
+│ 🛠️  SCRIPTS & OUTILS                                             │
+├──────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│ 📜 prepare-deploy.ps1 (Windows)                                 │
+│    └─ Script PowerShell de préparation                          │
+│    └─ Compile backend et frontend                               │
+│    └─ Crée les fichiers .env nécessaires                        │
+│    └─ Usage : .\prepare-deploy.ps1                              │
+│                                                                  │
+│ 📜 prepare-deploy.sh (Linux/Mac)                                │
+│    └─ Script Bash de préparation                                │
+│    └─ Compile backend et frontend                               │
+│    └─ Crée les fichiers .env nécessaires                        │
+│    └─ Usage : chmod +x prepare-deploy.sh && ./prepare-deploy.sh │
+│                                                                  │
+│ 📜 verify-before-deploy.ps1 (Windows)                           │
+│    └─ Vérifie que tout est prêt avant le déploiement            │
+│    └─ Détecte les fichiers manquants                            │
+│    └─ Usage : .\verify-before-deploy.ps1                        │
+│                                                                  │
+│ 📜 verify-before-deploy.sh (Linux/Mac)                          │
+│    └─ Vérifie que tout est prêt avant le déploiement            │
+│    └─ Détecte les fichiers manquants                            │
+│    └─ Usage : chmod +x verify-before-deploy.sh && ./verify-...  │
+│                                                                  │
+│ 📜 install-server.sh                                            │
+│    └─ Script d'installation sur le serveur VPS                  │
+│    └─ Installe Node.js, PM2, Nginx, etc.                        │
+│    └─ Configure tout automatiquement                            │
+│    └─ Usage (sur le serveur) : chmod +x install-server.sh &&... │
+│                                                                  │
+└──────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────┐
+│ ⚙️  CONFIGURATION                                                 │
+├──────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│ 📄 backend/ENV_PRODUCTION.txt                                   │
+│    └─ Variables d'environnement du backend                      │
+│    └─ À renommer en .env avant le transfert                     │
+│    └─ Contient : DATABASE_URL, JWT_SECRET, etc.                 │
+│                                                                  │
+│ 📄 frontend/ENV_PRODUCTION.txt                                  │
+│    └─ Variables d'environnement du frontend                     │
+│    └─ À renommer en .env.production avant le transfert          │
+│    └─ Contient : NEXT_PUBLIC_API_URL, etc.                      │
+│                                                                  │
+│ 📄 nginx.conf                                                   │
+│    └─ Configuration Nginx pour le reverse proxy                 │
+│    └─ Gère le routage frontend/backend                          │
+│    └─ Configure les CORS et les timeouts                        │
+│                                                                  │
+│ 📄 backend/ecosystem.config.js                                  │
+│    └─ Configuration PM2 pour le backend                         │
+│    └─ Gestion du processus Node.js                              │
+│    └─ Logs et redémarrage automatique                           │
+│                                                                  │
+│ 📄 frontend/ecosystem.config.js                                 │
+│    └─ Configuration PM2 pour le frontend                        │
+│    └─ Gestion du processus Next.js                              │
+│    └─ Logs et redémarrage automatique                           │
+│                                                                  │
+└──────────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════
+
+🎯 PARCOURS RECOMMANDÉS
+═══════════════════════════════════════════════════════════════════
+
+┌──────────────────────────────────────────────────────────────────┐
+│ 🚀 DÉPLOIEMENT RAPIDE (débutant)                                │
+├──────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│ 1. Lire INDEX.txt (ce fichier) ............................ 5 min│
+│ 2. Lire DEMARRAGE_RAPIDE.md ............................ 5 min│
+│ 3. Exécuter verify-before-deploy.ps1 (ou .sh) ........... 1 min│
+│ 4. Exécuter prepare-deploy.ps1 (ou .sh) ............... 10 min│
+│ 5. Suivre DEMARRAGE_RAPIDE.md étape par étape ....... 60-90 min│
+│                                                                  │
+│ ⏱️  Temps total estimé : 1h30 - 2h00                             │
+│                                                                  │
+└──────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────┐
+│ 🔧 DÉPLOIEMENT COMPLET (intermédiaire/avancé)                   │
+├──────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│ 1. Lire STRUCTURE_COMPLETE.txt ....................... 10 min│
+│ 2. Lire README_DEPLOIEMENT_FTP.md .................... 20 min│
+│ 3. Lire GUIDE_DEPLOIEMENT.md ......................... 30 min│
+│ 4. Exécuter verify-before-deploy.ps1 (ou .sh) ......... 1 min│
+│ 5. Exécuter prepare-deploy.ps1 (ou .sh) .............. 10 min│
+│ 6. Configurer et personnaliser les fichiers .......... 15 min│
+│ 7. Suivre le guide de déploiement ................... 60 min│
+│ 8. Configuration avancée (SSL, optimisations) ....... 30 min│
+│                                                                  │
+│ ⏱️  Temps total estimé : 2h30 - 3h00                             │
+│                                                                  │
+└──────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────┐
+│ 🆘 DÉPANNAGE                                                     │
+├──────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│ Si quelque chose ne fonctionne pas :                            │
+│                                                                  │
+│ 1. Consulter la section DÉPANNAGE de README_DEPLOIEMENT_FTP.md │
+│ 2. Vérifier les logs : pm2 logs                                │
+│ 3. Vérifier Nginx : systemctl status nginx                     │
+│ 4. Consulter GUIDE_DEPLOIEMENT.md section "Dépannage"          │
+│                                                                  │
+└──────────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════
+
+📋 CHECKLIST DE DÉPLOIEMENT
+═══════════════════════════════════════════════════════════════════
+
+Avant de déployer, assurez-vous d'avoir :
+
+☐ Lu au moins DEMARRAGE_RAPIDE.md
+☐ Exécuté verify-before-deploy (ps1 ou sh)
+☐ Exécuté prepare-deploy (ps1 ou sh)
+☐ Un client FTP/SFTP installé (FileZilla recommandé)
+☐ Les informations de connexion sous la main
+☐ Accès SSH au serveur (PuTTY pour Windows)
+☐ Le domaine configuré (ou prêt à l'être)
+☐ Environ 2 heures de temps disponible
+
+═══════════════════════════════════════════════════════════════════
+
+🔐 INFORMATIONS DE CONNEXION
+═══════════════════════════════════════════════════════════════════
+
+Ces informations sont répétées dans tous les guides pour votre
+commodité. Gardez-les à portée de main pendant le déploiement.
+
+┌──────────────────────────────────────────────────────────────────┐
+│ 🖥️  SERVEUR FTP/SSH                                              │
+├──────────────────────────────────────────────────────────────────┤
+│ Hôte         : vps116108.serveur-vps.net                        │
+│ Utilisateur  : root                                              │
+│ Mot de passe : U9p0j2o8Y2h2C7C                                  │
+│ Port SSH     : 22                                                │
+│ Port FTP     : 21 (SFTP port 22 recommandé)                     │
+└──────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────┐
+│ 🗄️  BASE DE DONNÉES MySQL                                        │
+├──────────────────────────────────────────────────────────────────┤
+│ Hôte         : localhost (ou vps116108.serveur-vps.net)         │
+│ Nom          : c0ann5434                                         │
+│ Utilisateur  : c0ann5434                                         │
+│ Mot de passe : $J-ZFr!Huo))_                                    │
+│ Port         : 3306                                              │
+└──────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────┐
+│ 🔧 PHPMYADMIN                                                    │
+├──────────────────────────────────────────────────────────────────┤
+│ URL          : https://vps116108.serveur-vps.net:8080/...      │
+│ Utilisateur  : root                                              │
+│ Mot de passe : U9p0j2o8Y2h2C7C                                  │
+└──────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────┐
+│ 📧 EMAIL                                                         │
+├──────────────────────────────────────────────────────────────────┤
+│ Email        : admin@annonceauto.ci                             │
+│ Mot de passe : Y_LrJsjuYMOlN                                    │
+│ Webmail      : https://vps116108.serveur-vps.net/webmail       │
+│ SMTP Host    : vps116108.serveur-vps.net                       │
+│ SMTP Port    : 587                                               │
+└──────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────┐
+│ 🌐 DOMAINE                                                       │
+├──────────────────────────────────────────────────────────────────┤
+│ Domaine      : annonceauto.ci                                   │
+│ Frontend     : https://annonceauto.ci                           │
+│ Backend API  : https://api.annonceauto.ci/api                  │
+└──────────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════
+
+📞 BESOIN D'AIDE ?
+═══════════════════════════════════════════════════════════════════
+
+Si vous êtes bloqué à une étape :
+
+1. 📖 Consultez la section DÉPANNAGE du README_DEPLOIEMENT_FTP.md
+2. 🔍 Vérifiez les logs sur le serveur : pm2 logs
+3. 🌐 Vérifiez Nginx : systemctl status nginx
+4. 🗄️  Vérifiez la base de données via PhpMyAdmin
+5. 📋 Relisez le guide correspondant à l'étape bloquée
+
+═══════════════════════════════════════════════════════════════════
+
+✅ MODIFICATIONS EFFECTUÉES
+═══════════════════════════════════════════════════════════════════
+
+Les fichiers suivants ont été modifiés/créés pour votre déploiement :
+
+✓ backend/prisma/schema.prisma
+  └─ Changé de PostgreSQL à MySQL
+
+✓ backend/ENV_PRODUCTION.txt
+  └─ Configuration production avec vos identifiants
+
+✓ frontend/ENV_PRODUCTION.txt
+  └─ Configuration production avec vos URLs
+
+✓ backend/ecosystem.config.js
+  └─ Configuration PM2 pour le backend
+
+✓ frontend/ecosystem.config.js
+  └─ Configuration PM2 pour le frontend
+
+✓ Tous les guides et scripts de déploiement
+  └─ Documentation complète personnalisée
+
+═══════════════════════════════════════════════════════════════════
+
+🎉 PRÊT À DÉPLOYER !
+═══════════════════════════════════════════════════════════════════
+
+Vous avez maintenant tout ce dont vous avez besoin pour déployer
+votre site annonceauto.ci sur votre serveur VPS !
+
+👉 Commencez par lire DEMARRAGE_RAPIDE.md
+
+Bon déploiement ! 🚀
+
+═══════════════════════════════════════════════════════════════════
+
+

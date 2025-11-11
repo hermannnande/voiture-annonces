@@ -1,0 +1,65 @@
+# 📋 LISTE DES FICHIERS À TRANSFÉRER SUR LE VPS LWS
+
+## ✅ DOSSIER BACKEND (Transférer TOUT le dossier)
+
+📁 backend/
+  ├── dist/                 (sera regénéré)
+  ├── node_modules/         (NE PAS transférer - sera installé sur le serveur)
+  ├── prisma/
+  │   ├── schema.prisma     ✅ IMPORTANT
+  │   ├── seed.ts           ✅ IMPORTANT
+  │   └── migrations/       ✅ SI ELLES EXISTENT
+  ├── src/                  ✅ TOUT LE DOSSIER
+  ├── uploads/              ✅ (vide au départ)
+  ├── .gitignore
+  ├── nest-cli.json
+  ├── package.json          ✅ IMPORTANT
+  ├── package-lock.json     ✅ IMPORTANT
+  ├── tsconfig.json
+  └── ENV_PRODUCTION_LWS.txt   ✅ À renommer en .env
+
+## ✅ DOSSIER FRONTEND (Transférer TOUT le dossier)
+
+📁 frontend/
+  ├── .next/                (sera regénéré)
+  ├── node_modules/         (NE PAS transférer - sera installé sur le serveur)
+  ├── public/               ✅ IMPORTANT
+  ├── src/                  ✅ TOUT LE DOSSIER
+  │   ├── app/
+  │   ├── components/
+  │   ├── lib/
+  │   └── stores/
+  ├── .gitignore
+  ├── next.config.js        ✅ IMPORTANT
+  ├── package.json          ✅ IMPORTANT
+  ├── package-lock.json     ✅ IMPORTANT
+  ├── postcss.config.js
+  ├── tailwind.config.js    ✅ IMPORTANT
+  ├── tsconfig.json
+  └── ENV_PRODUCTION_LWS.txt   ✅ À renommer en .env.local
+
+## ❌ NE PAS TRANSFÉRER
+
+- node_modules/ (trop lourd, sera installé sur le serveur)
+- dist/ (sera regénéré)
+- .next/ (sera regénéré)
+- *.db (base de données locale)
+- .git/ (historique Git)
+- *.log (fichiers de log)
+
+## 📝 ORDRE DE TRANSFERT RECOMMANDÉ
+
+1. Créez d'abord le dossier /var/www/annonceauto.ci/ sur le serveur
+2. Transférez le dossier backend/ complet
+3. Transférez le dossier frontend/ complet
+4. Renommez ENV_PRODUCTION_LWS.txt en .env dans chaque dossier
+5. Suivez le guide DEPLOIEMENT_VPS_LWS.md pour l'installation
+
+## 💡 ASTUCE
+
+Si vous utilisez FileZilla, vous pouvez :
+- Cliquer droit sur un dossier > "Upload"
+- FileZilla transférera automatiquement tout le contenu
+- Temps estimé : 10-15 minutes selon votre connexion
+
+

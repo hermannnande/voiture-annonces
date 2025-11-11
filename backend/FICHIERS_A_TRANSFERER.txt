@@ -1,0 +1,70 @@
+### 📁 FICHIERS À NE PAS TRANSFÉRER PAR FTP ###
+# Ce fichier liste les éléments à EXCLURE du transfert
+
+# Fichiers locaux de développement
+.env.local
+.env.development
+
+# Fichiers temporaires
+*.log
+*.tmp
+*.temp
+.DS_Store
+Thumbs.db
+
+# Dossiers de développement
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Fichiers de test
+*.test.js
+*.spec.js
+__tests__/
+coverage/
+
+# Documentation locale
+README.md (le README de développement, pas celui de déploiement)
+
+---
+
+### 📦 FICHIERS À TRANSFÉRER OBLIGATOIREMENT ###
+
+✅ Backend :
+- dist/ (dossier compilé)
+- node_modules/ (ou réinstaller sur le serveur)
+- prisma/
+- package.json
+- package-lock.json
+- .env (créé à partir de ENV_PRODUCTION.txt)
+- ecosystem.config.js
+
+✅ Frontend :
+- .next/ (dossier compilé)
+- node_modules/ (ou réinstaller sur le serveur)
+- public/
+- package.json
+- package-lock.json
+- .env.production (créé à partir de ENV_PRODUCTION.txt)
+- next.config.js
+- ecosystem.config.js
+
+✅ Scripts :
+- install-server.sh
+
+---
+
+### 💡 ASTUCE : Transférer sans node_modules ###
+
+Pour gagner du temps, vous pouvez :
+1. Ne PAS transférer les dossiers node_modules/
+2. Une fois sur le serveur, exécuter :
+   ```bash
+   cd /home/annonceauto/backend && npm install
+   cd /home/annonceauto/frontend && npm install
+   ```
+
+Cela sera plus rapide que de transférer des milliers de petits fichiers !
+
+

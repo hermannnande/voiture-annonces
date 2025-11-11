@@ -1,0 +1,254 @@
+┌─────────────────────────────────────────────────────────────────┐
+│                                                                 │
+│          🚀 DÉPLOIEMENT annonceauto.ci - RÉSUMÉ COMPLET       │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+
+📊 ARCHITECTURE DU DÉPLOIEMENT
+═══════════════════════════════════════════════════════════════════
+
+┌─────────────────┐     ┌──────────────────┐     ┌────────────────┐
+│   Utilisateurs  │────▶│  Nginx (Port 80) │────▶│   Frontend     │
+│   Internet      │     │  Reverse Proxy   │     │  (Port 3000)   │
+└─────────────────┘     │  + SSL (443)     │     └────────────────┘
+                        └──────────────────┘              │
+                                 │                        │
+                                 │                        ▼
+                                 │             ┌────────────────┐
+                                 └────────────▶│    Backend     │
+                                               │  (Port 3001)   │
+                                               └────────────────┘
+                                                        │
+                                                        ▼
+                                               ┌────────────────┐
+                                               │  MySQL/MariaDB │
+                                               │    c0ann5434   │
+                                               └────────────────┘
+
+═══════════════════════════════════════════════════════════════════
+
+📁 STRUCTURE DES FICHIERS SUR LE SERVEUR
+═══════════════════════════════════════════════════════════════════
+
+/home/annonceauto/
+│
+├── backend/
+│   ├── dist/                    ← Code compilé NestJS
+│   │   ├── src/
+│   │   ├── prisma/
+│   │   └── main.js
+│   │
+│   ├── node_modules/            ← Dépendances Node.js
+│   │
+│   ├── prisma/                  ← Configuration base de données
+│   │   ├── schema.prisma
+│   │   ├── migrations/
+│   │   └── seed.ts
+│   │
+│   ├── uploads/                 ← Images téléchargées
+│   │
+│   ├── logs/                    ← Logs PM2
+│   │
+│   ├── .env                     ← Variables d'environnement
+│   ├── package.json
+│   ├── package-lock.json
+│   └── ecosystem.config.js      ← Configuration PM2
+│
+├── frontend/
+│   ├── .next/                   ← Build Next.js
+│   │   ├── static/
+│   │   ├── server/
+│   │   └── cache/
+│   │
+│   ├── node_modules/            ← Dépendances Node.js
+│   │
+│   ├── public/                  ← Fichiers statiques
+│   │   ├── images/
+│   │   └── favicon.ico
+│   │
+│   ├── logs/                    ← Logs PM2
+│   │
+│   ├── .env.production          ← Variables d'environnement
+│   ├── package.json
+│   ├── package-lock.json
+│   ├── next.config.js
+│   └── ecosystem.config.js      ← Configuration PM2
+│
+└── install-server.sh            ← Script d'installation
+
+═══════════════════════════════════════════════════════════════════
+
+🔐 INFORMATIONS DE CONNEXION
+═══════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────────┐
+│ SSH / FTP                                                       │
+├─────────────────────────────────────────────────────────────────┤
+│ Hôte        : vps116108.serveur-vps.net                        │
+│ Utilisateur : root                                              │
+│ Mot de passe: U9p0j2o8Y2h2C7C                                  │
+│ Port SSH    : 22                                                │
+│ Port FTP    : 21 (ou 22 pour SFTP - recommandé)               │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│ BASE DE DONNÉES MySQL                                           │
+├─────────────────────────────────────────────────────────────────┤
+│ Hôte        : localhost (ou vps116108.serveur-vps.net)         │
+│ Base        : c0ann5434                                         │
+│ Utilisateur : c0ann5434                                         │
+│ Mot de passe: $J-ZFr!Huo))_                                    │
+│ Port        : 3306                                              │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│ PHPMYADMIN                                                      │
+├─────────────────────────────────────────────────────────────────┤
+│ URL         : https://vps116108.serveur-vps.net:8080/...      │
+│ Utilisateur : root                                              │
+│ Mot de passe: U9p0j2o8Y2h2C7C                                  │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│ EMAIL                                                           │
+├─────────────────────────────────────────────────────────────────┤
+│ Email       : admin@annonceauto.ci                             │
+│ Mot de passe: Y_LrJsjuYMOlN                                    │
+│ Webmail     : https://vps116108.serveur-vps.net/webmail       │
+│ SMTP Host   : vps116108.serveur-vps.net                       │
+│ SMTP Port   : 587                                               │
+└─────────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════
+
+🎯 ÉTAPES DE DÉPLOIEMENT (RÉSUMÉ)
+═══════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────────┐
+│ 1️⃣  PRÉPARATION LOCALE                                          │
+├─────────────────────────────────────────────────────────────────┤
+│ ✓ Exécuter prepare-deploy.ps1 (Windows)                       │
+│   ou prepare-deploy.sh (Linux/Mac)                             │
+│ ✓ Compiler backend et frontend                                 │
+│ ✓ Créer les fichiers .env                                      │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│ 2️⃣  TRANSFERT FTP                                               │
+├─────────────────────────────────────────────────────────────────┤
+│ ✓ Installer FileZilla                                          │
+│ ✓ Se connecter au serveur (SFTP port 22)                      │
+│ ✓ Créer /home/annonceauto/backend/ et frontend/               │
+│ ✓ Transférer tous les fichiers nécessaires                    │
+│   (voir FICHIERS_A_TRANSFERER.txt)                            │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│ 3️⃣  CONFIGURATION SERVEUR (SSH)                                 │
+├─────────────────────────────────────────────────────────────────┤
+│ ✓ Se connecter en SSH                                          │
+│ ✓ Exécuter install-server.sh                                   │
+│ ✓ Le script installe tout automatiquement                     │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│ 4️⃣  SSL & DNS                                                   │
+├─────────────────────────────────────────────────────────────────┤
+│ ✓ Configurer les DNS (A records)                              │
+│ ✓ Installer SSL avec Certbot                                   │
+│ ✓ Vérifier que tout fonctionne                                │
+└─────────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════
+
+📚 DOCUMENTATION DISPONIBLE
+═══════════════════════════════════════════════════════════════════
+
+📄 DEMARRAGE_RAPIDE.md
+   └─▶ Guide ultra-simplifié, étape par étape
+
+📄 README_DEPLOIEMENT_FTP.md
+   └─▶ Guide complet avec toutes les explications
+
+📄 GUIDE_DEPLOIEMENT.md
+   └─▶ Documentation technique détaillée
+
+📄 FICHIERS_A_TRANSFERER.txt
+   └─▶ Liste exacte des fichiers à transférer
+
+📄 install-server.sh
+   └─▶ Script d'installation automatique sur le serveur
+
+═══════════════════════════════════════════════════════════════════
+
+🌐 URLS FINALES
+═══════════════════════════════════════════════════════════════════
+
+┌─────────────────────────────────────────────────────────────────┐
+│ Frontend (Site web)                                            │
+│ https://annonceauto.ci                                         │
+│ https://www.annonceauto.ci                                     │
+└─────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────┐
+│ Backend API                                                     │
+│ https://api.annonceauto.ci/api                                 │
+└─────────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════
+
+⚡ COMMANDES UTILES
+═══════════════════════════════════════════════════════════════════
+
+🔍 Vérifier le statut :
+   pm2 status
+
+📊 Voir les logs :
+   pm2 logs
+   pm2 logs annonceauto-backend
+   pm2 logs annonceauto-frontend
+
+🔄 Redémarrer :
+   pm2 restart all
+   pm2 restart annonceauto-backend
+   pm2 restart annonceauto-frontend
+
+🛑 Arrêter :
+   pm2 stop all
+
+🔧 Nginx :
+   systemctl status nginx
+   systemctl restart nginx
+   nginx -t
+
+🗄️ Base de données :
+   npx prisma studio
+   npx prisma migrate deploy
+
+═══════════════════════════════════════════════════════════════════
+
+⚠️  POINTS IMPORTANTS
+═══════════════════════════════════════════════════════════════════
+
+✓ Le schema.prisma a été modifié pour utiliser MySQL au lieu de PostgreSQL
+✓ Les fichiers .env contiennent les bonnes informations de connexion
+✓ PM2 va gérer automatiquement le redémarrage des applications
+✓ Nginx sert de reverse proxy et gère les requêtes
+✓ SSL/HTTPS sera configuré avec Let's Encrypt (gratuit)
+✓ Le firewall UFW protège le serveur
+
+═══════════════════════════════════════════════════════════════════
+
+🎉 FÉLICITATIONS !
+═══════════════════════════════════════════════════════════════════
+
+Vous avez maintenant tous les outils et la documentation nécessaires
+pour déployer votre site annonceauto.ci sur votre serveur VPS !
+
+Suivez simplement le guide DEMARRAGE_RAPIDE.md pour commencer.
+
+Bon déploiement ! 🚀
+
+═══════════════════════════════════════════════════════════════════
+
+
