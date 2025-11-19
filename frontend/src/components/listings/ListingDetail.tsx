@@ -8,6 +8,7 @@ import {
   Phone, MessageCircle, Share2, Heart 
 } from 'lucide-react';
 import { formatPrice, formatDate, getWhatsAppLink, getPhoneLink } from '@/lib/utils';
+import { getImageUrl } from '@/lib/imageUtils';
 import { useAuthStore } from '@/stores/authStore';
 import api from '@/lib/api';
 
@@ -80,7 +81,7 @@ export default function ListingDetail({ listing }: ListingDetailProps) {
             <div className="relative h-96 bg-gray-200">
               {listing.images && listing.images.length > 0 ? (
                 <Image
-                  src={listing.images[selectedImage]?.url}
+                  src={getImageUrl(listing.images[selectedImage]?.url)}
                   alt={listing.title}
                   fill
                   className="object-cover"
@@ -115,7 +116,7 @@ export default function ListingDetail({ listing }: ListingDetailProps) {
                     }`}
                   >
                     <Image
-                      src={image.url}
+                      src={getImageUrl(image.url)}
                       alt={`Image ${index + 1}`}
                       fill
                       className="object-cover"

@@ -145,10 +145,9 @@ export default function EditListingPage() {
         for (const image of images) {
           const formDataImg = new FormData();
           formDataImg.append('file', image);
-          formDataImg.append('type', 'listing');
 
           try {
-            const uploadResponse = await api.post('/uploads', formDataImg, {
+            const uploadResponse = await api.post('/uploads/listing-image', formDataImg, {
               headers: {
                 'Content-Type': 'multipart/form-data',
               },

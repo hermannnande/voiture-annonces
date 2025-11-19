@@ -2,6 +2,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { MapPin, Fuel, Calendar, Gauge, Pin } from 'lucide-react';
 import { formatPrice } from '@/lib/utils';
+import { getImageUrl } from '@/lib/imageUtils';
 
 interface ListingCardProps {
   listing: {
@@ -28,7 +29,7 @@ interface ListingCardProps {
 }
 
 export default function ListingCard({ listing }: ListingCardProps) {
-  const imageUrl = listing.images?.[0]?.url || '/images/placeholder-car.jpg';
+  const imageUrl = getImageUrl(listing.images?.[0]?.url);
   
   // Vérifier si l'annonce a un boost actif
   const now = new Date();
