@@ -7,6 +7,7 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import api from '@/lib/api';
 import { formatPrice } from '@/lib/utils';
+import { getImageUrl } from '@/lib/imageUtils';
 import { TrendingUp, Zap, Star, Crown, ArrowLeft, Wallet, CreditCard, Check, X } from 'lucide-react';
 import Link from 'next/link';
 
@@ -220,7 +221,7 @@ Je souhaite promouvoir cette annonce. Merci de me contacter pour finaliser le pa
                 {listing.images?.[0]?.url && (
                   <div className="w-24 h-24 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
                     <img
-                      src={listing.images[0].url}
+                      src={getImageUrl(listing.images[0].url)}
                       alt={listing.title}
                       className="w-full h-full object-cover"
                     />

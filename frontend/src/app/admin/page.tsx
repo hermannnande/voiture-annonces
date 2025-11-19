@@ -7,6 +7,7 @@ import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import api from '@/lib/api';
 import { formatPrice, formatDate } from '@/lib/utils';
+import { getImageUrl } from '@/lib/imageUtils';
 import {
   Package,
   Users,
@@ -278,7 +279,7 @@ export default function AdminPage() {
                           <div className="w-full md:w-48 h-36 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
                             {listing.images?.[0]?.url ? (
                               <img
-                                src={listing.images[0].url}
+                                src={getImageUrl(listing.images[0].url)}
                                 alt={listing.title}
                                 className="w-full h-full object-cover"
                               />

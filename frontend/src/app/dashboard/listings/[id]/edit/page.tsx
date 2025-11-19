@@ -6,6 +6,7 @@ import { useAuthStore } from '@/stores/authStore';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import api from '@/lib/api';
+import { getImageUrl } from '@/lib/imageUtils';
 import { Upload, X, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 
@@ -518,7 +519,7 @@ export default function EditListingPage() {
                     {existingImages.map((img, index) => (
                       <div key={`existing-${index}`} className="relative group">
                         <img
-                          src={img.url}
+                          src={getImageUrl(img.url)}
                           alt={`Existing ${index + 1}`}
                           className="w-full h-32 object-cover rounded-lg"
                         />
