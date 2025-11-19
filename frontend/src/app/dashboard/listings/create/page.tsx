@@ -96,10 +96,33 @@ export default function CreateListingPage() {
     setLoading(true);
 
     try {
-      // Pour la démo, on simule l'upload d'images
-      // En production, il faudrait uploader les vraies images
-      const imageUrls = images.map((_, index) => `/uploads/demo/listing-${Date.now()}-${index}.jpg`);
+      // Upload des images d'abord
+      const imageUrls: string[] = [];
+      
+      if (images.length > 0) {
+        // Upload chaque image vers le backend
+        for (const image of images) {
+          const formDataImg = new FormData();
+          formDataImg.append('file', image);
+          formDataImg.append('type', 'listing');
 
+          try {
+            const uploadResponse = await api.post('/uploads', formDataImg, {
+              headers: {
+                'Content-Type': 'multipart/form-data',
+              },
+            });
+            
+            // Ajouter l'URL de l'image uploadée
+            imageUrls.push(uploadResponse.data.url);
+          } catch (uploadErr) {
+            console.error('Erreur lors de l\'upload d\'une image:', uploadErr);
+            // Continuer même si une image échoue
+          }
+        }
+      }
+
+      // Créer l'annonce avec les URLs des images uploadées
       const listingData = {
         ...formData,
         priceFcfa: parseInt(formData.priceFcfa),
