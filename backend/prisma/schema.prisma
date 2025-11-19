@@ -1,0 +1,363 @@
+// Schéma Prisma pour le site d'annonces de véhicules
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-musl-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Énumérations
+enum UserRole {
+  SELLER
+  SUPER_ADMIN
+}
+
+enum ListingState {
+  NEUF
+  OCCASION
+}
+
+enum FuelType {
+  ESSENCE
+  DIESEL
+  HYBRIDE
+  ELECTRIQUE
+}
+
+enum GearboxType {
+  MANUELLE
+  AUTOMATIQUE
+}
+
+enum ListingStatus {
+  BROUILLON
+  EN_ATTENTE
+  APPROUVEE
+  REFUSEE
+  VENDU
+}
+
+// Modèle Utilisateur
+model User {
+  id           String   @id @default(uuid())
+  role         UserRole @default(SELLER)
+  name         String
+  email        String   @unique
+  phone        String?
+  passwordHash String   @map("password_hash")
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  listings                    Listing[]
+  sentMessages                Message[]            @relation("SentMessages")
+  buyerThreads                Thread[]             @relation("BuyerThreads")
+  sellerThreads               Thread[]             @relation("SellerThreads")
+  auditLogs                   AuditLog[]
+  favorites                   Favorite[]
+  reports                     Report[]
+  refreshTokens               RefreshToken[]
+  wallet                      Wallet?              
+  buyerBoosts                 Boost[]              @relation("BuyerBoosts")
+  walletTransactionsAsActor   WalletTransaction[]  @relation("WalletTransactionActor")
+
+  @@map("users")
+}
+
+// Token de rafraîchissement
+model RefreshToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  userId    String   @map("user_id")
+  expiresAt DateTime @map("expires_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("refresh_tokens")
+}
+
+// Marques de véhicules
+model Brand {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  slug      String    @unique
+  createdAt DateTime  @default(now()) @map("created_at")
+
+  models   Model[]
+  listings Listing[]
+
+  @@map("brands")
+}
+
+// Modèles de véhicules
+model Model {
+  id        Int      @id @default(autoincrement())
+  brandId   Int      @map("brand_id")
+  name      String
+  slug      String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  brand    Brand     @relation(fields: [brandId], references: [id], onDelete: Cascade)
+  listings Listing[]
+
+  @@unique([brandId, name])
+  @@map("models")
+}
+
+// Catégories
+model Category {
+  id        Int      @id @default(autoincrement())
+  name      String
+  slug      String   @unique
+  parentId  Int?     @map("parent_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  parent   Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id], onDelete: Cascade)
+  children Category[] @relation("CategoryHierarchy")
+  listings Listing[]
+
+  @@map("categories")
+}
+
+// Annonces
+model Listing {
+  id                String        @id @default(uuid())
+  userId            String        @map("user_id")
+  title             String
+  description       String        @db.Text
+  priceFcfa         BigInt        @map("price_fcfa")
+  state             ListingState
+  fuel              FuelType
+  gearbox           GearboxType
+  year              Int
+  mileageKm         Int           @map("mileage_km")
+  color             String
+  doors             Int?
+  powerCv           Int?          @map("power_cv")
+  chassisNumber     String?       @map("chassis_number")
+  brandId           Int           @map("brand_id")
+  modelId           Int?          @map("model_id")
+  categoryId        Int           @map("category_id")
+  locationCountry   String        @default("Côte d'Ivoire") @map("location_country")
+  locationCity      String        @map("location_city")
+  status            ListingStatus @default(EN_ATTENTE)
+  rejectionReason   String?       @db.Text @map("rejection_reason")
+  isSponsored       Boolean       @default(false) @map("is_sponsored")
+  sponsoredUntil    DateTime?     @map("sponsored_until")
+  sponsoredPriority Int           @default(0) @map("sponsored_priority")
+  viewCount         Int           @default(0) @map("view_count")
+  createdAt         DateTime      @default(now()) @map("created_at")
+  updatedAt         DateTime      @updatedAt @map("updated_at")
+
+  // Relations
+  user      User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  brand     Brand           @relation(fields: [brandId], references: [id])
+  model     Model?          @relation(fields: [modelId], references: [id])
+  category  Category        @relation(fields: [categoryId], references: [id])
+  images    ListingImage[]
+  threads   Thread[]
+  boosts    Boost[]
+  favorites Favorite[]
+  reports   Report[]
+
+  @@index([status])
+  @@index([isSponsored])
+  @@index([createdAt])
+  @@index([priceFcfa])
+  @@index([brandId])
+  @@index([categoryId])
+  @@index([locationCity])
+  @@map("listings")
+}
+
+// Images d'annonces
+model ListingImage {
+  id        Int      @id @default(autoincrement())
+  listingId String   @map("listing_id")
+  url       String
+  sort      Int      @default(0)
+  createdAt DateTime @default(now()) @map("created_at")
+
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@map("listing_images")
+}
+
+// Fils de discussion (messagerie)
+model Thread {
+  id        String   @id @default(uuid())
+  listingId String   @map("listing_id")
+  buyerId   String   @map("buyer_id")
+  sellerId  String   @map("seller_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  listing  Listing   @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  buyer    User      @relation("BuyerThreads", fields: [buyerId], references: [id], onDelete: Cascade)
+  seller   User      @relation("SellerThreads", fields: [sellerId], references: [id], onDelete: Cascade)
+  messages Message[]
+
+  @@unique([listingId, buyerId])
+  @@map("threads")
+}
+
+// Messages
+model Message {
+  id        String   @id @default(uuid())
+  threadId  String   @map("thread_id")
+  senderId  String   @map("sender_id")
+  body      String   @db.Text
+  isRead    Boolean  @default(false) @map("is_read")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  thread Thread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  sender User   @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+
+  @@index([threadId])
+  @@index([createdAt])
+  @@map("messages")
+}
+
+// Produits de boost (packs de monétisation)
+model BoostProduct {
+  id           Int         @id @default(autoincrement())
+  name         String
+  description  String?     @db.Text
+  durationDays Int         @map("duration_days")
+  priority     Int         @default(0)
+  priceFcfa    BigInt      @map("price_fcfa") // Prix en FCFA (ancien système)
+  creditsCost  BigInt      @default(0) @map("credits_cost") // Prix en crédits (nouveau système)
+  effect       BoostEffect @default(TOP)
+  isActive     Boolean     @default(true) @map("is_active")
+  features     Json?
+
+  boosts Boost[]
+
+  @@map("boost_products")
+}
+
+enum BoostEffect {
+  TOP              // Top de liste
+  SEARCH_PRIORITY  // Priorité recherche
+  HOME_PREMIUM     // Mise en avant page d'accueil
+}
+
+// Boosts appliqués
+model Boost {
+  id              String   @id @default(uuid())
+  listingId       String   @map("listing_id")
+  boostProductId  Int      @map("boost_product_id")
+  buyerId         String?  @map("buyer_id") // Vendeur qui a acheté le boost
+  startsAt        DateTime @map("starts_at")
+  endsAt          DateTime @map("ends_at")
+  paymentStatus   String   @default("COMPLETED") @map("payment_status")
+  paymentAmount   BigInt   @default(0) @map("payment_amount") // Pour ancien système FCFA
+  paymentProvider String?  @map("payment_provider")
+  createdAt       DateTime @default(now()) @map("created_at")
+
+  listing       Listing       @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  boostProduct  BoostProduct  @relation(fields: [boostProductId], references: [id])
+  buyer         User?         @relation("BuyerBoosts", fields: [buyerId], references: [id], onDelete: SetNull)
+
+  @@index([listingId])
+  @@index([endsAt])
+  @@index([buyerId])
+  @@map("boosts")
+}
+
+// Wallet (portefeuille de crédits)
+model Wallet {
+  id             String              @id @default(uuid())
+  userId         String              @unique @map("user_id")
+  balanceCredits BigInt              @default(0) @map("balance_credits")
+  createdAt      DateTime            @default(now()) @map("created_at")
+  updatedAt      DateTime            @updatedAt @map("updated_at")
+
+  user         User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions WalletTransaction[]
+
+  @@map("wallets")
+}
+
+// Transactions du wallet (journal des mouvements)
+model WalletTransaction {
+  id                 String                 @id @default(uuid())
+  walletId           String                 @map("wallet_id")
+  type               WalletTransactionType
+  amount             BigInt // Toujours positif
+  reason             String?                @db.Text
+  relatedEntityType  String?                @map("related_entity_type") // 'PACK' | 'BOOST' | 'ADMIN_OP'
+  relatedEntityId    String?                @map("related_entity_id")
+  actorId            String?                @map("actor_id") // Qui a effectué l'action
+  createdAt          DateTime               @default(now()) @map("created_at")
+
+  wallet Wallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  actor  User?  @relation("WalletTransactionActor", fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([walletId])
+  @@index([createdAt])
+  @@index([actorId])
+  @@map("wallet_transactions")
+}
+
+enum WalletTransactionType {
+  CREDIT // Ajout de crédits
+  DEBIT  // Déduction de crédits
+}
+
+// Favoris
+model Favorite {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  listingId String   @map("listing_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, listingId])
+  @@map("favorites")
+}
+
+// Signalements
+model Report {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  listingId String   @map("listing_id")
+  reason    String   @db.Text
+  status    String   @default("PENDING")
+  adminNote String?  @db.Text @map("admin_note")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@map("reports")
+}
+
+// Logs d'audit (traçabilité)
+model AuditLog {
+  id         BigInt   @id @default(autoincrement())
+  actorId    String?  @map("actor_id")
+  action     String
+  targetType String   @map("target_type")
+  targetId   String   @map("target_id")
+  meta       Json?
+  ip         String?
+  createdAt  DateTime @default(now()) @map("created_at")
+
+  actor User? @relation(fields: [actorId], references: [id], onDelete: SetNull)
+
+  @@index([actorId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+

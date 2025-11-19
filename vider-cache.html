@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vider le Cache - Annonces Auto CI</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 500px;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .status {
+            font-size: 18px;
+            margin: 20px 0;
+            padding: 20px;
+            border-radius: 10px;
+            font-weight: bold;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+        .info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 2px solid #bee5eb;
+        }
+        .button {
+            display: inline-block;
+            padding: 15px 30px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: bold;
+            margin: 10px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .steps {
+            text-align: left;
+            margin: 20px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        .steps li {
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+        .icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">🔧</div>
+        <h1>Vider le Cache</h1>
+        
+        <div id="status" class="status info">
+            Cliquez sur le bouton pour vider le cache automatiquement
+        </div>
+
+        <button class="button" onclick="clearCache()">
+            🗑️ Vider le Cache
+        </button>
+
+        <div class="steps">
+            <h3>Après avoir vidé le cache :</h3>
+            <ol>
+                <li>✅ Le cache sera vidé automatiquement</li>
+                <li>✅ La page va se recharger</li>
+                <li>✅ Reconnectez-vous avec :
+                    <br><strong>Email:</strong> vendeur1@gmail.com
+                    <br><strong>Mot de passe:</strong> seller123
+                </li>
+                <li>✅ Vous resterez connecté pendant 24 heures !</li>
+            </ol>
+        </div>
+
+        <a href="http://localhost:3000" class="button" style="background: #28a745;">
+            ➡️ Aller sur le Site
+        </a>
+    </div>
+
+    <script>
+        function clearCache() {
+            try {
+                // Vider localStorage
+                localStorage.clear();
+                
+                // Vider sessionStorage
+                sessionStorage.clear();
+                
+                // Mettre à jour le statut
+                const statusDiv = document.getElementById('status');
+                statusDiv.className = 'status success';
+                statusDiv.innerHTML = '✅ Cache vidé avec succès !<br>Rechargement dans 3 secondes...';
+                
+                // Recharger après 3 secondes
+                setTimeout(() => {
+                    window.location.href = 'http://localhost:3000/auth/login';
+                }, 3000);
+            } catch (error) {
+                alert('Erreur lors du vidage du cache : ' + error.message);
+            }
+        }
+
+        // Vérifier si on arrive avec un paramètre auto
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('auto') === 'true') {
+            setTimeout(() => {
+                clearCache();
+            }, 1000);
+        }
+    </script>
+</body>
+</html>
+
+
+
+

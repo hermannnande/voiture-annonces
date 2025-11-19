@@ -1,0 +1,17 @@
+DATABASE_URL="mysql://c0ann5434:$J-ZFr!Huo))_@localhost:3306/c0ann5434"
+JWT_SECRET="votre_jwt_secret_super_securise_changez_moi_123456789"
+JWT_REFRESH_SECRET="votre_jwt_refresh_secret_super_securise_changez_moi_987654321"
+JWT_EXPIRATION="15m"
+JWT_REFRESH_EXPIRATION="7d"
+FRONTEND_URL="https://annonceauto.ci"
+BACKEND_PORT=3001
+NODE_ENV=production
+UPLOAD_PATH="/home/annonceauto/backend/uploads"
+EMAIL_HOST="vps116108.serveur-vps.net"
+EMAIL_PORT=587
+EMAIL_USER="admin@annonceauto.ci"
+EMAIL_PASSWORD="Y_LrJsjuYMOlN"
+EMAIL_FROM="admin@annonceauto.ci"
+
+
+
