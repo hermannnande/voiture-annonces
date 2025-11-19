@@ -29,6 +29,6 @@ RUN npm run build
 # Exposer le port
 EXPOSE 3001
 
-# Démarrer en production
-CMD ["npm", "run", "start:prod"]
+# Démarrer en production (avec setup de la DB)
+CMD ["npm", "run", "deploy:prod"]
 
