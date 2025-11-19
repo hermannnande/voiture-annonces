@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import Header from '@/components/layout/Header';
@@ -9,7 +9,7 @@ import api from '@/lib/api';
 import { formatRelativeTime, formatPrice } from '@/lib/utils';
 import { Send, MessageSquare } from 'lucide-react';
 
-export default function MessagesPage() {
+function MessagesContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const threadIdParam = searchParams.get('thread');
@@ -243,6 +243,14 @@ export default function MessagesPage() {
 
       <Footer />
     </div>
+  );
+}
+
+export default function MessagesPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div></div>}>
+      <MessagesContent />
+    </Suspense>
   );
 }
 
