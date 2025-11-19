@@ -7,7 +7,8 @@ README.md
 npm-debug.log
 coverage
 .vscode
-uploads
+# Exclure seulement le dossier uploads à la racine (images), pas src/uploads (code source)
+/uploads
 
 
 
