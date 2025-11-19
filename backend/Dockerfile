@@ -23,12 +23,9 @@ COPY . .
 # Générer le client Prisma
 RUN npx prisma generate
 
-# Compiler le code TypeScript en JavaScript
-RUN npm run build
-
 # Exposer le port
 EXPOSE 3001
 
-# Commande de production
-CMD ["npm", "run", "start:prod"]
+# Compiler et démarrer en production
+CMD sh -c "npm run build && npm run start:prod"
 
