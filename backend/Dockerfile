@@ -23,9 +23,12 @@ COPY . .
 # Générer le client Prisma
 RUN npx prisma generate
 
+# Compiler le code TypeScript en JavaScript
+RUN npm run build
+
 # Exposer le port
 EXPOSE 3001
 
-# Commande par défaut (surchargée par docker-compose)
-CMD ["npm", "run", "start:dev"]
+# Commande de production
+CMD ["npm", "run", "start:prod"]
 
