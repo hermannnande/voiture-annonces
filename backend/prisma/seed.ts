@@ -270,8 +270,175 @@ async function main() {
   await createModel('Volkswagen', 'Tiguan');
   await createModel('Volkswagen', 'Passat');
   await createModel('Volkswagen', 'Amarok');
+  await createModel('Volkswagen', 'Jetta');
+  await createModel('Volkswagen', 'T-Roc');
 
-  console.log('✅ Marques et modèles créés');
+  // Citroën
+  await createModel('Citroën', 'C3');
+  await createModel('Citroën', 'C4');
+  await createModel('Citroën', 'C5');
+  await createModel('Citroën', 'Berlingo');
+  await createModel('Citroën', 'Jumpy');
+  await createModel('Citroën', 'C3 Aircross');
+
+  // Dacia
+  await createModel('Dacia', 'Duster');
+  await createModel('Dacia', 'Sandero');
+  await createModel('Dacia', 'Logan');
+  await createModel('Dacia', 'Dokker');
+  await createModel('Dacia', 'Lodgy');
+
+  // Opel
+  await createModel('Opel', 'Corsa');
+  await createModel('Opel', 'Astra');
+  await createModel('Opel', 'Insignia');
+  await createModel('Opel', 'Crossland');
+  await createModel('Opel', 'Grandland');
+  await createModel('Opel', 'Vivaro');
+
+  // Chevrolet
+  await createModel('Chevrolet', 'Spark');
+  await createModel('Chevrolet', 'Aveo');
+  await createModel('Chevrolet', 'Cruze');
+  await createModel('Chevrolet', 'Trax');
+  await createModel('Chevrolet', 'Tahoe');
+  await createModel('Chevrolet', 'Silverado');
+
+  // Audi
+  await createModel('Audi', 'A1');
+  await createModel('Audi', 'A3');
+  await createModel('Audi', 'A4');
+  await createModel('Audi', 'A6');
+  await createModel('Audi', 'Q3');
+  await createModel('Audi', 'Q5');
+  await createModel('Audi', 'Q7');
+
+  // Skoda
+  await createModel('Skoda', 'Fabia');
+  await createModel('Skoda', 'Octavia');
+  await createModel('Skoda', 'Superb');
+  await createModel('Skoda', 'Kodiaq');
+  await createModel('Skoda', 'Karoq');
+
+  // Mazda
+  await createModel('Mazda', 'Mazda2');
+  await createModel('Mazda', 'Mazda3');
+  await createModel('Mazda', 'Mazda6');
+  await createModel('Mazda', 'CX-3');
+  await createModel('Mazda', 'CX-5');
+  await createModel('Mazda', 'CX-9');
+
+  // Mitsubishi
+  await createModel('Mitsubishi', 'Pajero');
+  await createModel('Mitsubishi', 'L200');
+  await createModel('Mitsubishi', 'ASX');
+  await createModel('Mitsubishi', 'Outlander');
+  await createModel('Mitsubishi', 'Eclipse Cross');
+
+  // Land Rover
+  await createModel('Land Rover', 'Defender');
+  await createModel('Land Rover', 'Discovery');
+  await createModel('Land Rover', 'Discovery Sport');
+  await createModel('Land Rover', 'Freelander');
+
+  // Range Rover
+  await createModel('Range Rover', 'Evoque');
+  await createModel('Range Rover', 'Velar');
+  await createModel('Range Rover', 'Sport');
+  await createModel('Range Rover', 'Vogue');
+
+  // Porsche
+  await createModel('Porsche', '911');
+  await createModel('Porsche', 'Cayenne');
+  await createModel('Porsche', 'Macan');
+  await createModel('Porsche', 'Panamera');
+  await createModel('Porsche', 'Taycan');
+
+  // Fiat
+  await createModel('Fiat', '500');
+  await createModel('Fiat', 'Panda');
+  await createModel('Fiat', 'Tipo');
+  await createModel('Fiat', '500X');
+  await createModel('Fiat', 'Ducato');
+
+  // Alfa Romeo
+  await createModel('Alfa Romeo', 'Giulia');
+  await createModel('Alfa Romeo', 'Stelvio');
+  await createModel('Alfa Romeo', 'Giulietta');
+
+  // Volvo
+  await createModel('Volvo', 'XC40');
+  await createModel('Volvo', 'XC60');
+  await createModel('Volvo', 'XC90');
+  await createModel('Volvo', 'S60');
+  await createModel('Volvo', 'V60');
+
+  // Suzuki
+  await createModel('Suzuki', 'Swift');
+  await createModel('Suzuki', 'Vitara');
+  await createModel('Suzuki', 'Jimny');
+  await createModel('Suzuki', 'S-Cross');
+  await createModel('Suzuki', 'Baleno');
+
+  // Seat
+  await createModel('Seat', 'Ibiza');
+  await createModel('Seat', 'Leon');
+  await createModel('Seat', 'Arona');
+  await createModel('Seat', 'Ateca');
+  await createModel('Seat', 'Tarraco');
+
+  // Tesla
+  await createModel('Tesla', 'Model 3');
+  await createModel('Tesla', 'Model Y');
+  await createModel('Tesla', 'Model S');
+  await createModel('Tesla', 'Model X');
+
+  // Mini
+  await createModel('Mini', 'Cooper');
+  await createModel('Mini', 'Countryman');
+  await createModel('Mini', 'Clubman');
+  await createModel('Mini', 'Paceman');
+
+  // Jaguar
+  await createModel('Jaguar', 'XE');
+  await createModel('Jaguar', 'XF');
+  await createModel('Jaguar', 'F-Pace');
+  await createModel('Jaguar', 'E-Pace');
+  await createModel('Jaguar', 'I-Pace');
+
+  // Great Wall
+  await createModel('Great Wall', 'Wingle');
+  await createModel('Great Wall', 'Steed');
+  await createModel('Great Wall', 'Hover');
+
+  // Chery
+  await createModel('Chery', 'Tiggo 4');
+  await createModel('Chery', 'Tiggo 7');
+  await createModel('Chery', 'Tiggo 8');
+  await createModel('Chery', 'Arrizo 5');
+  await createModel('Chery', 'QQ');
+
+  // Geely
+  await createModel('Geely', 'Coolray');
+  await createModel('Geely', 'Emgrand');
+  await createModel('Geely', 'Atlas');
+  await createModel('Geely', 'Okavango');
+
+  // BYD
+  await createModel('BYD', 'Han');
+  await createModel('BYD', 'Tang');
+  await createModel('BYD', 'Song');
+  await createModel('BYD', 'Atto 3');
+  await createModel('BYD', 'Seal');
+  await createModel('BYD', 'Dolphin');
+
+  // Haval
+  await createModel('Haval', 'H6');
+  await createModel('Haval', 'Jolion');
+  await createModel('Haval', 'H9');
+  await createModel('Haval', 'F7');
+
+  console.log('✅ Marques et modèles créés (200+ modèles)');
 
   // ============ PRODUITS DE BOOST ============
   console.log('\n⚡ Création des produits de boost...');
