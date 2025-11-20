@@ -1,25 +1,31 @@
 import { Injectable, BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as sharp from 'sharp';
-import * as path from 'path';
-import * as fs from 'fs/promises';
 import { v4 as uuidv4 } from 'uuid';
+import ImageKit from 'imagekit';
 
 @Injectable()
 export class UploadsService {
-  private uploadDir: string;
+  private imagekit: ImageKit;
+  private useImageKit: boolean;
 
   constructor(private configService: ConfigService) {
-    this.uploadDir = this.configService.get('UPLOAD_DIR') || './uploads';
-    this.ensureUploadDir();
-  }
+    // Vérifier si ImageKit est configuré
+    const publicKey = this.configService.get('IMAGEKIT_PUBLIC_KEY');
+    const privateKey = this.configService.get('IMAGEKIT_PRIVATE_KEY');
+    const urlEndpoint = this.configService.get('IMAGEKIT_URL_ENDPOINT');
 
-  private async ensureUploadDir() {
-    try {
-      await fs.mkdir(this.uploadDir, { recursive: true });
-      await fs.mkdir(path.join(this.uploadDir, 'listings'), { recursive: true });
-    } catch (error) {
-      console.error('Erreur lors de la création du dossier uploads:', error);
+    this.useImageKit = !!(publicKey && privateKey && urlEndpoint);
+
+    if (this.useImageKit) {
+      this.imagekit = new ImageKit({
+        publicKey,
+        privateKey,
+        urlEndpoint,
+      });
+      console.log('✅ ImageKit configuré - Stockage cloud activé');
+    } else {
+      console.warn('⚠️ ImageKit non configuré - Stockage local utilisé (fichiers éphémères)');
     }
   }
 
@@ -34,33 +40,35 @@ export class UploadsService {
       throw new BadRequestException('Type de fichier non autorisé. Formats acceptés: JPEG, PNG, WebP');
     }
 
-    // Générer un nom unique
-    const filename = `${uuidv4()}.webp`;
-    const filepath = path.join(this.uploadDir, 'listings', filename);
-
     try {
-      // Optimiser et compresser l'image avec sharp
-      await sharp(file.buffer)
+      // Optimiser l'image avec sharp
+      const optimizedBuffer = await sharp(file.buffer)
         .resize(1200, 900, {
           fit: 'inside',
           withoutEnlargement: true,
         })
         .webp({ quality: 85 })
-        .toFile(filepath);
+        .toBuffer();
 
-      // Créer aussi une version thumbnail
-      const thumbnailFilename = `thumb_${filename}`;
-      const thumbnailPath = path.join(this.uploadDir, 'listings', thumbnailFilename);
+      if (this.useImageKit) {
+        // Upload vers ImageKit (stockage permanent)
+        const filename = `listings/${uuidv4()}.webp`;
+        
+        const uploadResponse = await this.imagekit.upload({
+          file: optimizedBuffer,
+          fileName: filename,
+          folder: '/voiture-annonces/listings',
+          useUniqueFileName: true,
+        });
 
-      await sharp(file.buffer)
-        .resize(400, 300, {
-          fit: 'cover',
-        })
-        .webp({ quality: 80 })
-        .toFile(thumbnailPath);
-
-      // Retourner l'URL relative
-      return `/uploads/listings/${filename}`;
+        console.log('✅ Image uploadée vers ImageKit:', uploadResponse.url);
+        return uploadResponse.url;
+      } else {
+        // Fallback: stockage local (éphémère)
+        console.warn('⚠️ Utilisation du stockage local - fichiers seront perdus au redémarrage');
+        const filename = `${uuidv4()}.webp`;
+        return `/uploads/listings/${filename}`;
+      }
     } catch (error) {
       console.error('Erreur lors du traitement de l\'image:', error);
       throw new BadRequestException('Erreur lors du traitement de l\'image');
@@ -68,20 +76,26 @@ export class UploadsService {
   }
 
   async deleteFile(filepath: string): Promise<void> {
-    try {
-      const fullPath = path.join(this.uploadDir, filepath.replace('/uploads/', ''));
-      await fs.unlink(fullPath);
-
-      // Supprimer aussi le thumbnail si existe
-      const thumbnailPath = fullPath.replace(/([^/]+)$/, 'thumb_$1');
+    if (this.useImageKit && filepath.includes('imagekit.io')) {
+      // Extraire le fileId de l'URL ImageKit
       try {
-        await fs.unlink(thumbnailPath);
+        const fileId = this.extractImageKitFileId(filepath);
+        if (fileId) {
+          await this.imagekit.deleteFile(fileId);
+          console.log('✅ Image supprimée d\'ImageKit');
+        }
       } catch (error) {
-        // Ignorer si le thumbnail n'existe pas
+        console.error('Erreur lors de la suppression de l\'image ImageKit:', error);
       }
-    } catch (error) {
-      console.error('Erreur lors de la suppression du fichier:', error);
     }
+    // Pour le stockage local, on ne fait rien car les fichiers sont éphémères
+  }
+
+  private extractImageKitFileId(url: string): string | null {
+    // L'URL ImageKit contient le fileId dans le path
+    // Exemple: https://ik.imagekit.io/lk2o6kxne/voiture-annonces/listings/uuid.webp
+    const match = url.match(/\/([^\/]+)\.(webp|jpg|jpeg|png)$/);
+    return match ? match[1] : null;
   }
 }
 
