@@ -43,10 +43,9 @@ export default function ListingCard({ listing }: ListingCardProps) {
 
   return (
     <Link href={`/listings/${listing.id}`} className="group">
-      <div className={`card-hover overflow-hidden ${isBoosted ? 'ring-2 ring-gradient-to-r from-yellow-400 via-orange-500 to-red-500 shadow-xl border-4 border-transparent bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 p-[3px]' : ''}`}>
-        <div className={`${isBoosted ? 'bg-white' : ''}`}>
-          {/* Image */}
-          <div className="relative h-44 sm:h-48 md:h-52 bg-gray-100 overflow-hidden">
+      <div className="card-hover overflow-hidden">
+        {/* Image */}
+        <div className="relative h-44 sm:h-48 md:h-52 bg-gray-100 overflow-hidden">
           <Image
             src={imageUrl}
             alt={listing.title}
@@ -104,7 +103,6 @@ export default function ListingCard({ listing }: ListingCardProps) {
               <span className="truncate">{listing.fuel}</span>
             </div>
           </div>
-        </div>
         </div>
       </div>
     </Link>
