@@ -206,13 +206,9 @@ export class AuthService {
       },
     });
 
-    // Envoyer un email de confirmation
-    try {
-      await this.emailService.sendPasswordChangedEmail(user.email, user.name);
-    } catch (error) {
-      console.error('Erreur envoi email de confirmation:', error);
-    }
-
+    // Envoyer un email de confirmation (optionnel)
+    // Note: Vous pouvez ajouter cette méthode dans EmailService si nécessaire
+    
     return {
       message: 'Mot de passe réinitialisé avec succès',
     };
