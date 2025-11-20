@@ -15,17 +15,32 @@ export class UploadsService {
     const privateKey = this.configService.get('IMAGEKIT_PRIVATE_KEY');
     const urlEndpoint = this.configService.get('IMAGEKIT_URL_ENDPOINT');
 
+    // Debug: Afficher l'état des variables (sans montrer les valeurs complètes)
+    console.log('🔍 Configuration ImageKit:');
+    console.log(`  - Public Key: ${publicKey ? `✅ (${publicKey.substring(0, 15)}...)` : '❌ NON DÉFINIE'}`);
+    console.log(`  - Private Key: ${privateKey ? `✅ (${privateKey.substring(0, 15)}...)` : '❌ NON DÉFINIE'}`);
+    console.log(`  - URL Endpoint: ${urlEndpoint ? `✅ ${urlEndpoint}` : '❌ NON DÉFINIE'}`);
+
     this.useImageKit = !!(publicKey && privateKey && urlEndpoint);
 
     if (this.useImageKit) {
-      this.imagekit = new ImageKit({
-        publicKey,
-        privateKey,
-        urlEndpoint,
-      });
-      console.log('✅ ImageKit configuré - Stockage cloud activé');
+      try {
+        this.imagekit = new ImageKit({
+          publicKey,
+          privateKey,
+          urlEndpoint,
+        });
+        console.log('✅ ImageKit configuré - Stockage cloud activé');
+      } catch (error) {
+        console.error('❌ Erreur lors de l\'initialisation d\'ImageKit:', error.message);
+        this.useImageKit = false;
+      }
     } else {
-      console.warn('⚠️ ImageKit non configuré - Stockage local utilisé (fichiers éphémères)');
+      console.warn('⚠️ ImageKit non configuré - Les variables d\'environnement sont manquantes');
+      console.warn('   Ajoute ces variables dans Railway:');
+      console.warn('   - IMAGEKIT_PUBLIC_KEY');
+      console.warn('   - IMAGEKIT_PRIVATE_KEY');
+      console.warn('   - IMAGEKIT_URL_ENDPOINT');
     }
   }
 

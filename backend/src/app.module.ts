@@ -2,8 +2,6 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { ScheduleModule } from '@nestjs/schedule';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
 
 import { PrismaModule } from './prisma/prisma.module';
 import { AuthModule } from './auth/auth.module';
@@ -25,11 +23,7 @@ import { WalletModule } from './wallet/wallet.module';
       isGlobal: true,
     }),
 
-    // Servir les fichiers statiques (uploads)
-    ServeStaticModule.forRoot({
-      rootPath: join(process.cwd(), 'uploads'),
-      serveRoot: '/uploads',
-    }),
+    // Note: ServeStaticModule retiré car on utilise ImageKit pour le stockage cloud
 
     // Rate limiting (protection contre le spam)
     ThrottlerModule.forRoot([
