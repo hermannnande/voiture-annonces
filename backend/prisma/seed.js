@@ -154,37 +154,40 @@ async function main() {
         name: 'Boost 7 jours',
         description: 'Mettez votre annonce en avant pendant 7 jours',
         durationDays: 7,
-        price: 2000,
-        credits: 10,
+        priceFcfa: BigInt(2000),
+        creditsCost: BigInt(10),
         isActive: true,
       },
       {
         name: 'Boost 15 jours',
         description: 'Mettez votre annonce en avant pendant 15 jours',
         durationDays: 15,
-        price: 3500,
-        credits: 18,
+        priceFcfa: BigInt(3500),
+        creditsCost: BigInt(18),
         isActive: true,
       },
       {
         name: 'Boost 30 jours',
         description: 'Mettez votre annonce en avant pendant 30 jours',
         durationDays: 30,
-        price: 6000,
-        credits: 30,
+        priceFcfa: BigInt(6000),
+        creditsCost: BigInt(30),
         isActive: true,
       },
     ];
 
-    for (const product of boostProducts) {
-      await prisma.boostProduct.upsert({
-        where: { name: product.name },
-        update: {},
-        create: product,
+    // Vérifier si des produits existent déjà
+    const existingProducts = await prisma.boostProduct.findMany();
+    
+    if (existingProducts.length === 0) {
+      // Créer les produits uniquement s'il n'y en a pas
+      await prisma.boostProduct.createMany({
+        data: boostProducts,
       });
+      console.log('✅ 3 produits de boost créés');
+    } else {
+      console.log('✅ Produits de boost déjà présents, ignoré');
     }
-
-    console.log('✅ 3 produits de boost créés');
 
     console.log('\n🎉 Seed terminé avec succès!');
   } catch (error) {
