@@ -37,7 +37,7 @@ export default function ListingsGrid() {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {[1, 2, 3, 4, 5, 6].map((i) => (
           <div key={i} className="card p-4 skeleton h-80"></div>
         ))}
@@ -47,11 +47,11 @@ export default function ListingsGrid() {
 
   if (listings.length === 0) {
     return (
-      <div className="card p-12 text-center">
-        <p className="text-gray-600 mb-4">
+      <div className="card p-6 sm:p-12 text-center">
+        <p className="text-gray-600 mb-4 text-sm sm:text-base">
           Aucune annonce ne correspond à vos critères
         </p>
-        <a href="/listings" className="btn-primary">
+        <a href="/listings" className="btn-primary text-sm sm:text-base">
           Voir toutes les annonces
         </a>
       </div>
@@ -61,7 +61,7 @@ export default function ListingsGrid() {
   return (
     <>
       {/* Résultats */}
-      <div className="mb-4 text-sm text-gray-600">
+      <div className="mb-3 sm:mb-4 text-xs sm:text-sm text-gray-600 px-1">
         {pagination && (
           <p>
             {pagination.total} annonce{pagination.total > 1 ? 's' : ''} trouvée{pagination.total > 1 ? 's' : ''}
@@ -70,7 +70,7 @@ export default function ListingsGrid() {
       </div>
 
       {/* Grille */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {listings.map((listing: any) => (
           <ListingCard key={listing.id} listing={listing} />
         ))}
@@ -78,12 +78,12 @@ export default function ListingsGrid() {
 
       {/* Pagination */}
       {pagination && pagination.totalPages > 1 && (
-        <div className="mt-8 flex justify-center space-x-2">
+        <div className="mt-6 sm:mt-8 flex justify-center flex-wrap gap-2">
           {Array.from({ length: pagination.totalPages }, (_, i) => i + 1).map((page) => (
             <a
               key={page}
               href={`?${new URLSearchParams({ ...Object.fromEntries(searchParams), page: page.toString() })}`}
-              className={`px-4 py-2 rounded-lg ${
+              className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-sm ${
                 page === pagination.page
                   ? 'bg-primary-600 text-white'
                   : 'bg-white text-gray-700 hover:bg-gray-100'

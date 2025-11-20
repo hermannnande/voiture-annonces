@@ -45,7 +45,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
     <Link href={`/listings/${listing.id}`} className="group">
       <div className="card-hover overflow-hidden">
         {/* Image */}
-        <div className="relative h-48 bg-gray-200">
+        <div className="relative h-44 sm:h-48 md:h-52 bg-gray-200">
           <Image
             src={imageUrl}
             alt={listing.title}
@@ -55,52 +55,52 @@ export default function ListingCard({ listing }: ListingCardProps) {
           />
           
           {/* Badges */}
-          <div className="absolute top-2 left-2 flex flex-col gap-2">
+          <div className="absolute top-2 left-2 flex flex-col gap-1.5 sm:gap-2">
             {isBoosted && (
-              <span className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-xs px-3 py-1.5 rounded-full shadow-lg font-bold flex items-center space-x-1 animate-pulse">
-                <Pin className="w-3 h-3" />
+              <span className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-[10px] sm:text-xs px-2 sm:px-3 py-1 sm:py-1.5 rounded-full shadow-lg font-bold flex items-center space-x-1 animate-pulse">
+                <Pin className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
                 <span>📌 Épinglé</span>
               </span>
             )}
             {listing.isSponsored && !isBoosted && (
-              <span className="badge-primary text-xs px-2 py-1">
+              <span className="badge-primary text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 sm:py-1">
                 ⭐ Premium
               </span>
             )}
-            <span className={`badge ${listing.state === 'NEUF' ? 'badge-success' : 'badge-info'} text-xs px-2 py-1`}>
+            <span className={`badge ${listing.state === 'NEUF' ? 'badge-success' : 'badge-info'} text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 sm:py-1`}>
               {listing.state === 'NEUF' ? 'Neuf' : 'Occasion'}
             </span>
           </div>
 
           {/* Prix */}
-          <div className="absolute bottom-2 left-2 bg-white px-3 py-1 rounded-lg shadow-md">
-            <span className="font-bold text-primary-600">{formatPrice(listing.priceFcfa)} FCFA</span>
+          <div className="absolute bottom-2 left-2 bg-white px-2 sm:px-3 py-1 rounded-lg shadow-md">
+            <span className="font-bold text-primary-600 text-sm sm:text-base">{formatPrice(listing.priceFcfa)} FCFA</span>
           </div>
         </div>
 
         {/* Contenu */}
-        <div className="p-4">
-          <h3 className="font-bold text-lg text-gray-900 mb-2 line-clamp-2 group-hover:text-primary-600 transition-colors">
+        <div className="p-3 sm:p-4">
+          <h3 className="font-bold text-base sm:text-lg text-gray-900 mb-2 line-clamp-2 group-hover:text-primary-600 transition-colors">
             {listing.title}
           </h3>
 
-          <div className="flex items-center text-sm text-gray-600 mb-3">
-            <MapPin className="w-4 h-4 mr-1" />
-            <span>{listing.locationCity}</span>
+          <div className="flex items-center text-xs sm:text-sm text-gray-600 mb-2 sm:mb-3">
+            <MapPin className="w-3 h-3 sm:w-4 sm:h-4 mr-1 flex-shrink-0" />
+            <span className="truncate">{listing.locationCity}</span>
           </div>
 
-          <div className="grid grid-cols-3 gap-2 text-xs text-gray-600">
-            <div className="flex items-center space-x-1">
-              <Calendar className="w-3 h-3" />
+          <div className="grid grid-cols-3 gap-1.5 sm:gap-2 text-[10px] sm:text-xs text-gray-600">
+            <div className="flex items-center space-x-0.5 sm:space-x-1">
+              <Calendar className="w-3 h-3 flex-shrink-0" />
               <span>{listing.year}</span>
             </div>
-            <div className="flex items-center space-x-1">
-              <Gauge className="w-3 h-3" />
-              <span>{formatPrice(listing.mileageKm)} km</span>
+            <div className="flex items-center space-x-0.5 sm:space-x-1">
+              <Gauge className="w-3 h-3 flex-shrink-0" />
+              <span className="truncate">{formatPrice(listing.mileageKm)} km</span>
             </div>
-            <div className="flex items-center space-x-1">
-              <Fuel className="w-3 h-3" />
-              <span>{listing.fuel}</span>
+            <div className="flex items-center space-x-0.5 sm:space-x-1">
+              <Fuel className="w-3 h-3 flex-shrink-0" />
+              <span className="truncate">{listing.fuel}</span>
             </div>
           </div>
         </div>

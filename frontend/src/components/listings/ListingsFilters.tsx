@@ -4,7 +4,11 @@ import { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import api from '@/lib/api';
 
-export default function ListingsFilters() {
+interface ListingsFiltersProps {
+  onClose?: () => void;
+}
+
+export default function ListingsFilters({ onClose }: ListingsFiltersProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -45,6 +49,7 @@ export default function ListingsFilters() {
       if (value) query.set(key, value);
     });
     router.push(`/listings?${query.toString()}`);
+    if (onClose) onClose();
   };
 
   const resetFilters = () => {
@@ -61,6 +66,7 @@ export default function ListingsFilters() {
       mileageMax: '',
     });
     router.push('/listings');
+    if (onClose) onClose();
   };
 
   return (
