@@ -2,7 +2,7 @@ import { Injectable, BadRequestException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as sharp from 'sharp';
 import { v4 as uuidv4 } from 'uuid';
-import ImageKit from 'imagekit';
+import ImageKit = require('imagekit');
 
 @Injectable()
 export class UploadsService {
