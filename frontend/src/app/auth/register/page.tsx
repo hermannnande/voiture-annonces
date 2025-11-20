@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/stores/authStore';
 import { UserPlus } from 'lucide-react';
+import GoogleButton from '@/components/auth/GoogleButton';
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -44,7 +45,8 @@ export default function RegisterPage() {
         phone: formData.phone,
         password: formData.password,
       });
-      router.push('/dashboard');
+      // Rediriger vers une page de succès avec message de vérification email
+      router.push(`/auth/registration-success?email=${encodeURIComponent(formData.email)}`);
     } catch (error: any) {
       setError(error.response?.data?.message || 'Erreur lors de l\'inscription');
     } finally {
@@ -167,6 +169,16 @@ export default function RegisterPage() {
               )}
             </button>
           </form>
+
+          {/* Divider */}
+          <div className="my-6 flex items-center">
+            <div className="flex-1 border-t border-gray-300"></div>
+            <span className="px-4 text-sm text-gray-500">OU</span>
+            <div className="flex-1 border-t border-gray-300"></div>
+          </div>
+
+          {/* Bouton Google */}
+          <GoogleButton text="S'inscrire avec Google" />
 
           <div className="mt-6 text-center text-sm text-gray-600">
             Déjà un compte ?{' '}

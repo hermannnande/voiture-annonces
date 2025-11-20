@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/stores/authStore';
 import { LogIn } from 'lucide-react';
+import GoogleButton from '@/components/auth/GoogleButton';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -75,9 +76,17 @@ export default function LoginPage() {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Mot de passe
-              </label>
+              <div className="flex items-center justify-between mb-2">
+                <label className="block text-sm font-medium text-gray-700">
+                  Mot de passe
+                </label>
+                <Link 
+                  href="/auth/forgot-password" 
+                  className="text-xs text-primary-600 hover:text-primary-700 font-medium"
+                >
+                  Mot de passe oublié ?
+                </Link>
+              </div>
               <input
                 type="password"
                 required
@@ -103,6 +112,16 @@ export default function LoginPage() {
               )}
             </button>
           </form>
+
+          {/* Divider */}
+          <div className="my-6 flex items-center">
+            <div className="flex-1 border-t border-gray-300"></div>
+            <span className="px-4 text-sm text-gray-500">OU</span>
+            <div className="flex-1 border-t border-gray-300"></div>
+          </div>
+
+          {/* Bouton Google */}
+          <GoogleButton text="Se connecter avec Google" />
 
           <div className="mt-6 text-center text-sm text-gray-600">
             Pas encore de compte ?{' '}
