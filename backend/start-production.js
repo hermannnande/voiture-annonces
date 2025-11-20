@@ -1,21 +1,28 @@
 const { execSync } = require('child_process');
 
-console.log('🚀 Démarrage de la production...\n');
+console.log('🚀🚀🚀 DÉMARRAGE DE LA PRODUCTION 🚀🚀🚀\n');
+
+function runCommand(command, description) {
+  try {
+    console.log(`\n>>> ${description}`);
+    console.log(`>>> Commande: ${command}`);
+    execSync(command, { stdio: 'inherit' });
+    console.log(`>>> ✅ ${description} - Succès!\n`);
+  } catch (error) {
+    console.error(`>>> ❌ ${description} - ÉCHEC!`);
+    console.error(`>>> Erreur: ${error.message}`);
+    throw error;
+  }
+}
 
 try {
-  console.log('📦 Génération du client Prisma...');
-  execSync('npx prisma generate', { stdio: 'inherit' });
-  
-  console.log('\n🔄 Synchronisation de la base de données...');
-  execSync('npx prisma db push --accept-data-loss', { stdio: 'inherit' });
-  
-  console.log('\n🌱 Exécution du seed...');
-  execSync('npx prisma db seed', { stdio: 'inherit' });
-  
-  console.log('\n✅ Configuration terminée, démarrage du serveur...');
-  execSync('npm run start:prod', { stdio: 'inherit' });
+  runCommand('npx prisma generate', 'ÉTAPE 1: Génération du client Prisma');
+  runCommand('npx prisma db push --accept-data-loss', 'ÉTAPE 2: Synchronisation de la base de données');
+  runCommand('npx prisma db seed', 'ÉTAPE 3: Exécution du seed');
+  runCommand('npm run start:prod', 'ÉTAPE 4: Démarrage du serveur');
 } catch (error) {
-  console.error('❌ Erreur lors du démarrage:', error.message);
+  console.error('\n❌❌❌ ERREUR FATALE LORS DU DÉMARRAGE ❌❌❌');
+  console.error(error);
   process.exit(1);
 }
 
