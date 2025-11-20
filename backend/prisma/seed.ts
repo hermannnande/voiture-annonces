@@ -162,58 +162,114 @@ async function main() {
     createdBrands[brandName] = brand;
   }
 
-  // Modèles Toyota
-  await prisma.model.upsert({
-    where: { brandId_name: { brandId: createdBrands['Toyota'].id, name: 'Corolla' } },
-    update: {},
-    create: {
-      brandId: createdBrands['Toyota'].id,
-      name: 'Corolla',
-      slug: 'corolla',
-    },
-  });
+  // ============ MODÈLES ============
+  console.log('\n🚙 Création des modèles populaires...');
 
-  await prisma.model.upsert({
-    where: { brandId_name: { brandId: createdBrands['Toyota'].id, name: 'Hiace' } },
-    update: {},
-    create: {
-      brandId: createdBrands['Toyota'].id,
-      name: 'Hiace',
-      slug: 'hiace',
-    },
-  });
+  // Fonction helper pour créer un modèle
+  const createModel = async (brandName: string, modelName: string) => {
+    const slug = modelName.toLowerCase().replace(/\s+/g, '-');
+    await prisma.model.upsert({
+      where: { brandId_name: { brandId: createdBrands[brandName].id, name: modelName } },
+      update: {},
+      create: {
+        brandId: createdBrands[brandName].id,
+        name: modelName,
+        slug,
+      },
+    });
+  };
 
-  await prisma.model.upsert({
-    where: { brandId_name: { brandId: createdBrands['Toyota'].id, name: 'Land Cruiser' } },
-    update: {},
-    create: {
-      brandId: createdBrands['Toyota'].id,
-      name: 'Land Cruiser',
-      slug: 'land-cruiser',
-    },
-  });
+  // Toyota
+  await createModel('Toyota', 'Corolla');
+  await createModel('Toyota', 'Camry');
+  await createModel('Toyota', 'RAV4');
+  await createModel('Toyota', 'Hilux');
+  await createModel('Toyota', 'Land Cruiser');
+  await createModel('Toyota', 'Prado');
+  await createModel('Toyota', 'Yaris');
+  await createModel('Toyota', 'Hiace');
+  await createModel('Toyota', 'Fortuner');
 
-  // Modèles Hyundai
-  await prisma.model.upsert({
-    where: { brandId_name: { brandId: createdBrands['Hyundai'].id, name: 'Tucson' } },
-    update: {},
-    create: {
-      brandId: createdBrands['Hyundai'].id,
-      name: 'Tucson',
-      slug: 'tucson',
-    },
-  });
+  // Honda
+  await createModel('Honda', 'Civic');
+  await createModel('Honda', 'Accord');
+  await createModel('Honda', 'CR-V');
+  await createModel('Honda', 'HR-V');
+  await createModel('Honda', 'City');
+  await createModel('Honda', 'Jazz');
+  await createModel('Honda', 'Pilot');
 
-  // Modèles Renault
-  await prisma.model.upsert({
-    where: { brandId_name: { brandId: createdBrands['Renault'].id, name: 'Duster' } },
-    update: {},
-    create: {
-      brandId: createdBrands['Renault'].id,
-      name: 'Duster',
-      slug: 'duster',
-    },
-  });
+  // Nissan
+  await createModel('Nissan', 'Patrol');
+  await createModel('Nissan', 'Pathfinder');
+  await createModel('Nissan', 'Qashqai');
+  await createModel('Nissan', 'X-Trail');
+  await createModel('Nissan', 'Navara');
+  await createModel('Nissan', 'Micra');
+  await createModel('Nissan', 'Juke');
+
+  // Hyundai
+  await createModel('Hyundai', 'Tucson');
+  await createModel('Hyundai', 'Santa Fe');
+  await createModel('Hyundai', 'Elantra');
+  await createModel('Hyundai', 'i10');
+  await createModel('Hyundai', 'i20');
+  await createModel('Hyundai', 'Kona');
+  await createModel('Hyundai', 'Accent');
+
+  // Kia
+  await createModel('Kia', 'Sportage');
+  await createModel('Kia', 'Sorento');
+  await createModel('Kia', 'Picanto');
+  await createModel('Kia', 'Rio');
+  await createModel('Kia', 'Cerato');
+  await createModel('Kia', 'Seltos');
+
+  // Peugeot
+  await createModel('Peugeot', '208');
+  await createModel('Peugeot', '308');
+  await createModel('Peugeot', '3008');
+  await createModel('Peugeot', '5008');
+  await createModel('Peugeot', '2008');
+  await createModel('Peugeot', 'Partner');
+
+  // Renault
+  await createModel('Renault', 'Duster');
+  await createModel('Renault', 'Clio');
+  await createModel('Renault', 'Captur');
+  await createModel('Renault', 'Megane');
+  await createModel('Renault', 'Kadjar');
+  await createModel('Renault', 'Kangoo');
+
+  // Mercedes-Benz
+  await createModel('Mercedes-Benz', 'Classe A');
+  await createModel('Mercedes-Benz', 'Classe C');
+  await createModel('Mercedes-Benz', 'Classe E');
+  await createModel('Mercedes-Benz', 'GLA');
+  await createModel('Mercedes-Benz', 'GLC');
+  await createModel('Mercedes-Benz', 'GLE');
+
+  // BMW
+  await createModel('BMW', 'Série 1');
+  await createModel('BMW', 'Série 3');
+  await createModel('BMW', 'Série 5');
+  await createModel('BMW', 'X1');
+  await createModel('BMW', 'X3');
+  await createModel('BMW', 'X5');
+
+  // Ford
+  await createModel('Ford', 'Fiesta');
+  await createModel('Ford', 'Focus');
+  await createModel('Ford', 'Ranger');
+  await createModel('Ford', 'Explorer');
+  await createModel('Ford', 'Escape');
+
+  // Volkswagen
+  await createModel('Volkswagen', 'Golf');
+  await createModel('Volkswagen', 'Polo');
+  await createModel('Volkswagen', 'Tiguan');
+  await createModel('Volkswagen', 'Passat');
+  await createModel('Volkswagen', 'Amarok');
 
   console.log('✅ Marques et modèles créés');
 
