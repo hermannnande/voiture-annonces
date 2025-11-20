@@ -45,12 +45,12 @@ export default function ListingCard({ listing }: ListingCardProps) {
     <Link href={`/listings/${listing.id}`} className="group">
       <div className="card-hover overflow-hidden">
         {/* Image */}
-        <div className="relative h-44 sm:h-48 md:h-52 bg-gray-200">
+        <div className="relative h-44 sm:h-48 md:h-52 bg-gray-100 overflow-hidden">
           <Image
             src={imageUrl}
             alt={listing.title}
             fill
-            className="object-cover group-hover:scale-105 transition-transform duration-300"
+            className="object-contain group-hover:scale-105 transition-transform duration-300"
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
           />
           

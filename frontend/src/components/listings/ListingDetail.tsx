@@ -78,13 +78,13 @@ export default function ListingDetail({ listing }: ListingDetailProps) {
           {/* Galerie d'images */}
           <div className="card overflow-hidden">
             {/* Image principale */}
-            <div className="relative h-96 bg-gray-200">
+            <div className="relative h-96 bg-gray-100">
               {listing.images && listing.images.length > 0 ? (
                 <Image
                   src={getImageUrl(listing.images[selectedImage]?.url)}
                   alt={listing.title}
                   fill
-                  className="object-cover"
+                  className="object-contain"
                   priority
                 />
               ) : (
