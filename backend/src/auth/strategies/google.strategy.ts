@@ -1,15 +1,11 @@
 import { Injectable } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { Strategy, Profile, VerifyCallback } from 'passport-google-oauth20';
+import { Strategy, VerifyCallback } from 'passport-google-oauth20';
 import { ConfigService } from '@nestjs/config';
-import { AuthService } from '../auth.service';
 
 @Injectable()
 export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
-  constructor(
-    private configService: ConfigService,
-    private authService: AuthService,
-  ) {
+  constructor(private configService: ConfigService) {
     super({
       clientID: configService.get('GOOGLE_CLIENT_ID'),
       clientSecret: configService.get('GOOGLE_CLIENT_SECRET'),
@@ -21,30 +17,18 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
   async validate(
     accessToken: string,
     refreshToken: string,
-    profile: Profile,
+    profile: any,
     done: VerifyCallback,
   ): Promise<any> {
-    const { id, emails, displayName, photos } = profile;
+    const { id, name, emails, photos } = profile;
     
-    const email = emails?.[0]?.value;
-    const photo = photos?.[0]?.value;
-
-    if (!email) {
-      return done(new Error('Email non disponible depuis Google'), null);
-    }
-
-    try {
-      const user = await this.authService.validateGoogleUser({
-        googleId: id,
-        email,
-        name: displayName,
-        photo,
-      });
-
-      done(null, user);
-    } catch (error) {
-      done(error, null);
-    }
+    const user = {
+      googleId: id,
+      email: emails[0].value,
+      name: `${name.givenName} ${name.familyName}`,
+      photo: photos[0].value,
+    };
+    
+    done(null, user);
   }
 }
-
