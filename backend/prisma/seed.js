@@ -45,10 +45,10 @@ async function main() {
     console.log('\n📁 Création des catégories...');
     
     const categories = [
-      { name: 'Voitures', slug: 'voitures', description: 'Véhicules de tourisme' },
-      { name: '4x4 et SUV', slug: '4x4-suv', description: 'Véhicules tout-terrain' },
-      { name: 'Motos', slug: 'motos', description: 'Deux-roues motorisés' },
-      { name: 'Utilitaires', slug: 'utilitaires', description: 'Véhicules professionnels' },
+      { name: 'Voitures', slug: 'voitures' },
+      { name: '4x4 et SUV', slug: '4x4-suv' },
+      { name: 'Motos', slug: 'motos' },
+      { name: 'Utilitaires', slug: 'utilitaires' },
     ];
 
     for (const cat of categories) {
@@ -125,16 +125,17 @@ async function main() {
       const brand = await prisma.brand.findUnique({ where: { name: brandName } });
       if (brand) {
         for (const modelName of models) {
-          await prisma.vehicleModel.upsert({
+          await prisma.model.upsert({
             where: { 
-              name_brandId: { 
-                name: modelName, 
-                brandId: brand.id 
+              brandId_name: { 
+                brandId: brand.id,
+                name: modelName
               } 
             },
             update: {},
             create: {
               name: modelName,
+              slug: modelName.toLowerCase().replace(/\s+/g, '-'),
               brandId: brand.id,
             },
           });
