@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import Image from 'next/image';
-import { MapPin, Fuel, Calendar, Gauge, Pin } from 'lucide-react';
+import { MapPin, Fuel, Calendar, Gauge, Rocket } from 'lucide-react';
 import { formatPrice } from '@/lib/utils';
 import { getImageUrl } from '@/lib/imageUtils';
 
@@ -43,9 +43,10 @@ export default function ListingCard({ listing }: ListingCardProps) {
 
   return (
     <Link href={`/listings/${listing.id}`} className="group">
-      <div className="card-hover overflow-hidden">
-        {/* Image */}
-        <div className="relative h-44 sm:h-48 md:h-52 bg-gray-100 overflow-hidden">
+      <div className={`card-hover overflow-hidden ${isBoosted ? 'ring-2 ring-gradient-to-r from-yellow-400 via-orange-500 to-red-500 shadow-xl border-4 border-transparent bg-gradient-to-r from-yellow-400 via-orange-500 to-red-500 p-[3px]' : ''}`}>
+        <div className={`${isBoosted ? 'bg-white' : ''}`}>
+          {/* Image */}
+          <div className="relative h-44 sm:h-48 md:h-52 bg-gray-100 overflow-hidden">
           <Image
             src={imageUrl}
             alt={listing.title}
@@ -57,9 +58,9 @@ export default function ListingCard({ listing }: ListingCardProps) {
           {/* Badges */}
           <div className="absolute top-2 left-2 flex flex-col gap-1.5 sm:gap-2">
             {isBoosted && (
-              <span className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-[10px] sm:text-xs px-2 sm:px-3 py-1 sm:py-1.5 rounded-full shadow-lg font-bold flex items-center space-x-1 animate-pulse">
-                <Pin className="w-2.5 h-2.5 sm:w-3 sm:h-3" />
-                <span>📌 Épinglé</span>
+              <span className="bg-gradient-to-r from-yellow-500 via-orange-500 to-red-500 text-white text-[10px] sm:text-xs px-2 sm:px-3 py-1 sm:py-1.5 rounded-full shadow-lg font-bold flex items-center space-x-1 animate-pulse">
+                <Rocket className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                <span>🚀 Boost</span>
               </span>
             )}
             {listing.isSponsored && !isBoosted && (
@@ -103,6 +104,7 @@ export default function ListingCard({ listing }: ListingCardProps) {
               <span className="truncate">{listing.fuel}</span>
             </div>
           </div>
+        </div>
         </div>
       </div>
     </Link>
