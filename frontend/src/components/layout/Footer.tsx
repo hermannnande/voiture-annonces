@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Facebook, Twitter, Instagram, Mail, Phone } from 'lucide-react';
+import { Facebook, Mail, Phone } from 'lucide-react';
 
 export default function Footer() {
   return (
@@ -16,12 +16,6 @@ export default function Footer() {
             <div className="flex space-x-4">
               <a href="#" className="hover:text-primary-400 transition-colors">
                 <Facebook className="w-5 h-5" />
-              </a>
-              <a href="#" className="hover:text-primary-400 transition-colors">
-                <Twitter className="w-5 h-5" />
-              </a>
-              <a href="#" className="hover:text-primary-400 transition-colors">
-                <Instagram className="w-5 h-5" />
               </a>
             </div>
           </div>
@@ -86,19 +80,19 @@ export default function Footer() {
             <ul className="space-y-3 text-sm">
               <li className="flex items-center space-x-2">
                 <Mail className="w-4 h-4" />
-                <a href="mailto:contact@annoncesautoci.com" className="hover:text-primary-400 transition-colors">
-                  contact@annoncesautoci.com
+                <a href="mailto:annonceautoci@gmail.com" className="hover:text-primary-400 transition-colors">
+                  annonceautoci@gmail.com
                 </a>
               </li>
               <li className="flex items-center space-x-2">
                 <Phone className="w-4 h-4" />
-                <a href="tel:+2250700000000" className="hover:text-primary-400 transition-colors">
-                  +225 07 00 00 00 00
+                <a href="tel:+2250778030075" className="hover:text-primary-400 transition-colors">
+                  +225 07 78 03 00 75
                 </a>
               </li>
               <li>
                 <a
-                  href="https://wa.me/2250700000000"
+                  href="https://wa.me/2250778030075"
                   target="_blank"
                   rel="noopener noreferrer"
                   className="inline-flex items-center space-x-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors"
@@ -122,9 +116,6 @@ export default function Footer() {
               </Link>
               <Link href="/legal/privacy" className="hover:text-primary-400 transition-colors">
                 Politique de confidentialité
-              </Link>
-              <Link href="/legal/cookies" className="hover:text-primary-400 transition-colors">
-                Cookies
               </Link>
             </div>
           </div>
