@@ -7,6 +7,7 @@ import { Request, Response } from 'express';
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
+  // Routes d'authentification avancée : email, reset password, Google OAuth
 
   @Post('register')
   async register(@Body() dto: RegisterDto, @Ip() ip: string) {
