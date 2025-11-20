@@ -60,8 +60,13 @@ export default function CreateListingPage() {
   useEffect(() => {
     if (formData.brandId) {
       api.get(`/brands/${formData.brandId}/models`)
-        .then(res => setModels(res.data))
+        .then(res => {
+          console.log('Modèles chargés:', res.data);
+          setModels(res.data);
+        })
         .catch(err => console.error('Erreur lors du chargement des modèles:', err));
+    } else {
+      setModels([]);
     }
   }, [formData.brandId]);
 
@@ -178,30 +183,42 @@ export default function CreateListingPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Titre de l'annonce *
+                      Titre de l'annonce * <span className="text-xs text-gray-500">(minimum 5 caractères)</span>
                     </label>
                     <input
                       type="text"
                       required
+                      minLength={5}
                       value={formData.title}
                       onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                       className="input"
                       placeholder="Ex: Toyota Corolla 2018 - Très propre"
                     />
+                    {formData.title.length > 0 && formData.title.length < 5 && (
+                      <p className="text-xs text-red-600 mt-1">
+                        {5 - formData.title.length} caractère{5 - formData.title.length > 1 ? 's' : ''} restant{5 - formData.title.length > 1 ? 's' : ''}
+                      </p>
+                    )}
                   </div>
 
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Description *
+                      Description * <span className="text-xs text-gray-500">(minimum 10 caractères)</span>
                     </label>
                     <textarea
                       required
+                      minLength={10}
                       rows={5}
                       value={formData.description}
                       onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                       className="input"
                       placeholder="Décrivez votre véhicule en détail..."
                     />
+                    {formData.description.length > 0 && formData.description.length < 10 && (
+                      <p className="text-xs text-red-600 mt-1">
+                        {10 - formData.description.length} caractère{10 - formData.description.length > 1 ? 's' : ''} restant{10 - formData.description.length > 1 ? 's' : ''}
+                      </p>
+                    )}
                   </div>
 
                   <div>
@@ -267,11 +284,22 @@ export default function CreateListingPage() {
                       className="input"
                       disabled={!formData.brandId}
                     >
-                      <option value="">Sélectionnez un modèle</option>
+                      <option value="">
+                        {!formData.brandId 
+                          ? 'Sélectionnez d\'abord une marque' 
+                          : models.length === 0 
+                            ? 'Aucun modèle disponible'
+                            : 'Sélectionnez un modèle'}
+                      </option>
                       {models.map((model: any) => (
                         <option key={model.id} value={model.id}>{model.name}</option>
                       ))}
                     </select>
+                    {formData.brandId && models.length === 0 && (
+                      <p className="text-xs text-gray-500 mt-1">
+                        Aucun modèle trouvé pour cette marque
+                      </p>
+                    )}
                   </div>
 
                   <div>
