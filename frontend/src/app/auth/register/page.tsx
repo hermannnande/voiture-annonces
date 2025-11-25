@@ -45,11 +45,12 @@ export default function RegisterPage() {
         phone: formData.phone,
         password: formData.password,
       });
-      // Rediriger vers une page de succès avec message de vérification email
+      
+      // Toujours rediriger vers la page de succès, même si user n'est pas retourné
       router.push(`/auth/registration-success?email=${encodeURIComponent(formData.email)}`);
     } catch (error: any) {
+      console.error('Erreur inscription:', error);
       setError(error.response?.data?.message || 'Erreur lors de l\'inscription');
-    } finally {
       setLoading(false);
     }
   };
@@ -204,8 +205,4 @@ export default function RegisterPage() {
     </div>
   );
 }
-
-
-
-
 
