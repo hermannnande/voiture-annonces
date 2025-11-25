@@ -7,14 +7,11 @@ export class EmailService {
   private transporter: nodemailer.Transporter;
 
   constructor(private configService: ConfigService) {
-    // Configuration du transporteur email avec timeout court
+    // Configuration du transporteur email
     this.transporter = nodemailer.createTransport({
       host: this.configService.get('SMTP_HOST', 'smtp.gmail.com'),
       port: this.configService.get('SMTP_PORT', 587),
       secure: false,
-      connectionTimeout: 5000, // 5 secondes max
-      greetingTimeout: 5000,
-      socketTimeout: 5000,
       auth: {
         user: this.configService.get('SMTP_USER'),
         pass: this.configService.get('SMTP_PASS'),

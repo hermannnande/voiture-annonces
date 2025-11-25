@@ -65,15 +65,6 @@ Site d'annonces de vente de véhicules 100% en français pour la Côte d'Ivoire.
 - **Docker Compose** >= 2.x
 - **npm** >= 10.x
 
-### 🔐 Configuration Google OAuth (Optionnel)
-
-Pour activer la connexion avec Google :
-1. Consultez le guide : **`GUIDE_CONFIGURATION_GOOGLE_OAUTH.md`**
-2. Créez un projet OAuth sur Google Cloud Console
-3. Ajoutez les variables d'environnement dans votre hébergeur (Railway/Vercel)
-
-> ⚠️ **Important** : Sans configuration OAuth, la connexion Google ne fonctionnera pas. Les utilisateurs pourront toujours s'inscrire avec email/mot de passe.
-
 ## 🚀 Installation et Démarrage
 
 ### 1. Cloner le Projet
