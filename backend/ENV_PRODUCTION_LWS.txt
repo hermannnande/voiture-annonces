@@ -1,0 +1,18 @@
+# Configuration pour VPS LWS - annonceauto.ci
+# Copiez ce fichier vers backend/.env sur le serveur
+
+# Base de données MySQL LWS
+DATABASE_URL="mysql://c0ann5434:$J-ZFr!Huo))_@localhost:3306/c0ann5434"
+
+# JWT Secrets (GARDEZ-LES SECRETS !)
+JWT_SECRET=annonceauto_lws_production_jwt_secret_2024_ultra_secure
+JWT_REFRESH_SECRET=annonceauto_lws_production_refresh_jwt_secret_2024_ultra_secure
+JWT_EXPIRATION=24h
+JWT_REFRESH_EXPIRATION=7d
+
+# Application
+NODE_ENV=production
+PORT=3001
+
+
+

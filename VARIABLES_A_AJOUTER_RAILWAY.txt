@@ -1,0 +1,43 @@
+# ============================================
+# VARIABLES À AJOUTER DANS RAILWAY
+# ============================================
+
+# Copiez-collez ces 3 variables dans Railway :
+
+GOOGLE_CLIENT_ID=203996676228-f2ev5hdqv9c8mcqihvmqtfk6oa6vmpqm.apps.googleusercontent.com
+
+GOOGLE_CLIENT_SECRET=VOTRE_SECRET_COPIE_DE_GOOGLE_CLOUD
+
+GOOGLE_CALLBACK_URL=https://voiture-annonces-production.up.railway.app/api/auth/google/callback
+
+# ============================================
+# VARIABLE FRONTEND (à vérifier)
+# ============================================
+
+FRONTEND_URL=https://voiture-annonces.vercel.app
+
+# ============================================
+# SENDGRID (pour les emails) - OPTIONNEL
+# ============================================
+
+SENDGRID_API_KEY=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
+
+# Variables SMTP alternatives (si vous n'utilisez pas Sendgrid)
+# SMTP_HOST=smtp.sendgrid.net
+# SMTP_PORT=587
+# SMTP_USER=apikey
+# SMTP_PASS=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
+# SMTP_FROM=noreply@voiture-annonces.com
+
+# ============================================
+# INSTRUCTIONS
+# ============================================
+
+# 1. Allez sur Railway : https://railway.app/
+# 2. Sélectionnez votre projet "voiture-annonces"
+# 3. Cliquez sur "Variables"
+# 4. Ajoutez chaque variable ci-dessus
+# 5. Remplacez VOTRE_SECRET_COPIE_DE_GOOGLE_CLOUD par le secret que vous avez copié
+# 6. Railway redéploiera automatiquement
+
+
