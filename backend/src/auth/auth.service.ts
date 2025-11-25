@@ -52,17 +52,15 @@ export class AuthService {
       },
     });
 
-    // Envoyer l'email de vérification
-    try {
-      await this.emailService.sendVerificationEmail(
-        user.email,
-        user.name,
-        emailVerificationToken,
-      );
-    } catch (error) {
+    // Envoyer l'email de vérification en arrière-plan (sans attendre)
+    this.emailService.sendVerificationEmail(
+      user.email,
+      user.name,
+      emailVerificationToken,
+    ).catch(error => {
       console.error('Erreur envoi email de vérification:', error);
       // On ne bloque pas l'inscription si l'email échoue
-    }
+    });
 
     // Générer les tokens JWT
     return {
