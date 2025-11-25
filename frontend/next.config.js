@@ -5,7 +5,13 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'voiture-annonces-production.up.railway.app',
+        hostname: 'api.annonceauto.ci',
+        port: '',
+        pathname: '/uploads/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'www.annonceauto.ci',
         port: '',
         pathname: '/uploads/**',
       },

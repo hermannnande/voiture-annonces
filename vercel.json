@@ -10,6 +10,10 @@
     "enabled": true,
     "autoAlias": true,
     "silent": false
+  },
+  "env": {
+    "NEXT_PUBLIC_API_URL": "https://api.annonceauto.ci/api",
+    "NEXT_PUBLIC_SITE_URL": "https://www.annonceauto.ci"
   }
 }
 
