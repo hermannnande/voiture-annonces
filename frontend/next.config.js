@@ -5,13 +5,7 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: 'https',
-        hostname: 'api.annonceauto.ci',
-        port: '',
-        pathname: '/uploads/**',
-      },
-      {
-        protocol: 'https',
-        hostname: 'www.annonceauto.ci',
+        hostname: 'voiture-annonces-production.up.railway.app',
         port: '',
         pathname: '/uploads/**',
       },
@@ -28,21 +22,6 @@ const nextConfig = {
   },
   typescript: {
     ignoreBuildErrors: true,
-  },
-  async redirects() {
-    return [
-      {
-        source: '/:path*',
-        has: [
-          {
-            type: 'host',
-            value: 'annonceauto.ci',
-          },
-        ],
-        destination: 'https://www.annonceauto.ci/:path*',
-        permanent: true,
-      },
-    ];
   },
 };
 

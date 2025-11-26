@@ -31,4 +31,3 @@ EXPOSE 3001
 
 # Script de démarrage qui exécute les migrations puis démarre l'app
 CMD sh -c "npx prisma migrate deploy && npm run start:prod"
-

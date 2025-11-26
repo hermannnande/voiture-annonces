@@ -51,17 +51,30 @@ export const useAuthStore = create<AuthState>()(
         const response = await api.post('/auth/register', data);
         const { user, accessToken, refreshToken } = response.data;
 
-        // Stocker dans localStorage
-        localStorage.setItem('accessToken', accessToken);
-        localStorage.setItem('refreshToken', refreshToken);
-        localStorage.setItem('user', JSON.stringify(user));
-
-        set({
-          user,
-          accessToken,
-          refreshToken,
-          isAuthenticated: true,
-        });
+        // Stocker dans localStorage seulement si les données existent
+        if (accessToken) {
+          localStorage.setItem('accessToken', accessToken);
+        }
+        if (refreshToken) {
+          localStorage.setItem('refreshToken', refreshToken);
+        }
+        if (user) {
+          localStorage.setItem('user', JSON.stringify(user));
+          set({
+            user,
+            accessToken,
+            refreshToken,
+            isAuthenticated: true,
+          });
+        } else {
+          // Si pas d'user retourné, juste stocker les tokens
+          set({
+            user: null,
+            accessToken,
+            refreshToken,
+            isAuthenticated: false,
+          });
+        }
       },
 
       logout: () => {
@@ -83,7 +96,6 @@ export const useAuthStore = create<AuthState>()(
     }),
     {
       name: 'auth-storage',
-      partialUpdate: true,
     },
   ),
 );
@@ -111,8 +123,3 @@ if (typeof window !== 'undefined') {
     }
   }
 }
-
-
-
-
-
