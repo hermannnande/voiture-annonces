@@ -29,6 +29,6 @@ RUN npm run build
 # Exposer le port
 EXPOSE 3001
 
-# Démarrer en production (avec setup de la DB)
-CMD ["npm", "run", "deploy:prod"]
+# Script de démarrage qui exécute les migrations puis démarre l'app
+CMD sh -c "npx prisma migrate deploy && npm run start:prod"
 
