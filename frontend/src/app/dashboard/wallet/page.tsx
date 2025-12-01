@@ -27,9 +27,9 @@ export default function WalletPage() {
     {
       id: 'starter',
       name: 'Pack Starter',
-      credits: 50,
-      price: 5000,
-      description: '1 boost "Top de liste 7j"',
+      credits: 5,
+      price: 500,
+      description: 'Pack Test',
       color: 'from-blue-500 to-blue-600',
     },
     {
