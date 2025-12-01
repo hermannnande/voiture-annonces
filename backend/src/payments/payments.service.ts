@@ -7,20 +7,22 @@ import axios from 'axios';
 
 @Injectable()
 export class PaymentsService {
-  private readonly monerooApiUrl = 'https://api.moneroo.io/v1';
-  private readonly monerooSecretKey: string;
-  private readonly monerooPublicKey: string;
+  private readonly fedapayApiUrl = 'https://api.fedapay.com/v1';
+  private readonly fedapaySecretKey: string;
+  private readonly fedapayPublicKey: string;
 
   constructor(
     private prisma: PrismaService,
     private walletService: WalletService,
     private auditService: AuditService,
   ) {
-    this.monerooSecretKey = process.env.MONEROO_SECRET_KEY || '';
-    this.monerooPublicKey = process.env.MONEROO_PUBLIC_KEY || '';
+    this.fedapaySecretKey = process.env.FEDAPAY_SECRET_KEY || process.env.MONEROO_SECRET_KEY || '';
+    this.fedapayPublicKey = process.env.FEDAPAY_PUBLIC_KEY || process.env.MONEROO_PUBLIC_KEY || '';
 
-    if (!this.monerooSecretKey || !this.monerooPublicKey) {
-      console.warn('⚠️  Clés Moneroo non configurées. Le système de paiement automatique sera désactivé.');
+    if (!this.fedapaySecretKey || !this.fedapayPublicKey) {
+      console.warn('⚠️  Clés FedaPay non configurées. Le système de paiement automatique sera désactivé.');
+    } else {
+      console.log('✅ Clés FedaPay configurées - Paiement automatique activé');
     }
   }
 
@@ -39,10 +41,10 @@ export class PaymentsService {
   }
 
   /**
-   * Initialiser un paiement Moneroo pour acheter des crédits
+   * Initialiser un paiement FedaPay pour acheter des crédits
    */
   async initializePayment(userId: string, dto: InitializePaymentDto) {
-    if (!this.monerooSecretKey || !this.monerooPublicKey) {
+    if (!this.fedapaySecretKey || !this.fedapayPublicKey) {
       throw new BadRequestException('Le système de paiement automatique n\'est pas configuré');
     }
 
@@ -61,19 +63,31 @@ export class PaymentsService {
     // URL de retour par défaut
     const returnUrl = dto.returnUrl || `${process.env.FRONTEND_URL}/dashboard/wallet/payment-result`;
 
-    // Préparer les données pour Moneroo
-    const paymentData = {
-      amount: amountFcfa,
-      currency: 'XOF', // Franc CFA
+    // Extraire le prénom et nom
+    const nameParts = user.name.split(' ');
+    const firstname = nameParts[0] || user.name;
+    const lastname = nameParts.slice(1).join(' ') || 'Client';
+
+    // Préparer les données pour FedaPay
+    const transactionData = {
       description: `Achat de ${dto.creditsAmount} crédits - ${dto.packName || 'Pack personnalisé'}`,
-      return_url: returnUrl,
-      customer: {
-        email: user.email,
-        first_name: user.name.split(' ')[0] || user.name,
-        last_name: user.name.split(' ').slice(1).join(' ') || 'Client',
-        phone: user.phone || undefined,
+      amount: amountFcfa,
+      currency: {
+        iso: 'XOF', // Franc CFA
       },
-      metadata: {
+      callback_url: returnUrl,
+      customer: {
+        firstname,
+        lastname,
+        email: user.email,
+        ...(user.phone && {
+          phone_number: {
+            number: user.phone,
+            country: 'ci', // Côte d'Ivoire
+          },
+        }),
+      },
+      custom_metadata: {
         user_id: userId,
         credits_amount: dto.creditsAmount.toString(),
         pack_name: dto.packName || 'custom',
@@ -81,24 +95,45 @@ export class PaymentsService {
     };
 
     try {
-      // Appeler l'API Moneroo pour initialiser le paiement
-      const response = await axios.post(
-        `${this.monerooApiUrl}/payments/initialize`,
-        paymentData,
+      console.log('🔄 Initialisation paiement FedaPay...', { amount: amountFcfa, credits: dto.creditsAmount });
+
+      // Étape 1 : Créer la transaction FedaPay
+      const transactionResponse = await axios.post(
+        `${this.fedapayApiUrl}/transactions`,
+        transactionData,
         {
           headers: {
-            'Authorization': `Bearer ${this.monerooSecretKey}`,
+            'Authorization': `Bearer ${this.fedapaySecretKey}`,
             'Content-Type': 'application/json',
-            'Accept': 'application/json',
           },
         },
       );
 
-      const monerooResponse = response.data;
+      const transaction = transactionResponse.data.v1?.transaction || transactionResponse.data;
+      const transactionId = transaction.id;
 
-      if (!monerooResponse.success) {
-        throw new BadRequestException('Erreur lors de l\'initialisation du paiement');
+      if (!transactionId) {
+        throw new BadRequestException('ID de transaction FedaPay manquant');
       }
+
+      console.log('✅ Transaction FedaPay créée:', transactionId);
+
+      // Étape 2 : Générer le token pour obtenir l'URL de paiement
+      const tokenResponse = await axios.put(
+        `${this.fedapayApiUrl}/transactions/${transactionId}/token`,
+        {},
+        {
+          headers: {
+            'Authorization': `Bearer ${this.fedapaySecretKey}`,
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+
+      const tokenData = tokenResponse.data.v1?.transaction || tokenResponse.data;
+      const checkoutUrl = tokenData.url || `https://checkout.fedapay.com/${tokenData.token}`;
+
+      console.log('✅ URL de paiement générée:', checkoutUrl);
 
       // Créer l'enregistrement dans la base de données
       const purchase = await this.prisma.creditPurchase.create({
@@ -107,25 +142,25 @@ export class PaymentsService {
           amount: BigInt(amountFcfa),
           creditsAmount: BigInt(dto.creditsAmount),
           currency: 'XOF',
-          monerooPaymentId: monerooResponse.data.id,
+          monerooPaymentId: transactionId.toString(), // On garde ce champ pour l'ID FedaPay
           status: 'PENDING',
           customerEmail: user.email,
           customerPhone: user.phone,
           returnUrl,
-          checkoutUrl: monerooResponse.data.checkout_url,
-          metadata: paymentData.metadata,
+          checkoutUrl,
+          metadata: transactionData.custom_metadata,
         },
       });
 
       return {
         purchaseId: purchase.id,
-        checkoutUrl: monerooResponse.data.checkout_url,
-        monerooPaymentId: monerooResponse.data.id,
+        checkoutUrl,
+        fedapayTransactionId: transactionId,
         amount: amountFcfa,
         creditsAmount: dto.creditsAmount,
       };
     } catch (error) {
-      console.error('Erreur Moneroo:', error.response?.data || error.message);
+      console.error('❌ Erreur FedaPay:', error.response?.data || error.message);
       throw new BadRequestException(
         error.response?.data?.message || 'Erreur lors de la création du paiement',
       );
@@ -133,46 +168,54 @@ export class PaymentsService {
   }
 
   /**
-   * Vérifier un paiement Moneroo
+   * Vérifier un paiement FedaPay
    */
-  async verifyPayment(monerooPaymentId: string) {
-    if (!this.monerooSecretKey) {
-      throw new BadRequestException('Clés Moneroo non configurées');
+  async verifyPayment(fedapayTransactionId: string) {
+    if (!this.fedapaySecretKey) {
+      throw new BadRequestException('Clés FedaPay non configurées');
     }
 
     try {
       const response = await axios.get(
-        `${this.monerooApiUrl}/payments/${monerooPaymentId}`,
+        `${this.fedapayApiUrl}/transactions/${fedapayTransactionId}`,
         {
           headers: {
-            'Authorization': `Bearer ${this.monerooSecretKey}`,
-            'Accept': 'application/json',
+            'Authorization': `Bearer ${this.fedapaySecretKey}`,
+            'Content-Type': 'application/json',
           },
         },
       );
 
       return response.data;
     } catch (error) {
-      console.error('Erreur vérification Moneroo:', error.response?.data || error.message);
+      console.error('Erreur vérification FedaPay:', error.response?.data || error.message);
       throw new BadRequestException('Erreur lors de la vérification du paiement');
     }
   }
 
   /**
-   * Traiter le webhook de Moneroo après paiement
+   * Traiter le webhook de FedaPay après paiement
    */
   async handleWebhook(webhookData: any) {
     try {
-      const { id: monerooPaymentId, status, metadata } = webhookData;
+      // FedaPay envoie les données dans différents formats possibles
+      const transaction = webhookData.entity || webhookData.transaction || webhookData;
+      const fedapayTransactionId = transaction.id?.toString();
+      const status = transaction.status;
+
+      if (!fedapayTransactionId) {
+        console.error('ID de transaction FedaPay manquant dans le webhook');
+        return { success: false, message: 'ID de transaction manquant' };
+      }
 
       // Trouver l'achat de crédits correspondant
       const purchase = await this.prisma.creditPurchase.findUnique({
-        where: { monerooPaymentId },
+        where: { monerooPaymentId: fedapayTransactionId }, // On utilise ce champ pour FedaPay aussi
         include: { user: true },
       });
 
       if (!purchase) {
-        console.error('Achat introuvable pour le paiement Moneroo:', monerooPaymentId);
+        console.error('Achat introuvable pour la transaction FedaPay:', fedapayTransactionId);
         return { success: false, message: 'Achat introuvable' };
       }
 
@@ -181,8 +224,8 @@ export class PaymentsService {
         return { success: true, message: 'Déjà traité' };
       }
 
-      // Vérifier le statut du paiement
-      if (status === 'success' || status === 'successful' || status === 'completed') {
+      // Vérifier le statut du paiement FedaPay
+      if (status === 'approved' || status === 'transferred') {
         // Paiement réussi, créditer le wallet
         await this.prisma.$transaction(async (tx) => {
           // Mettre à jour le statut de l'achat
@@ -214,39 +257,30 @@ export class PaymentsService {
               walletId: wallet.id,
               type: 'CREDIT',
               amount: purchase.creditsAmount,
-              reason: `Achat de ${purchase.creditsAmount} crédits via Moneroo (${purchase.amount.toString()} FCFA)`,
+              reason: `Achat de ${purchase.creditsAmount} crédits via FedaPay (${purchase.amount.toString()} FCFA)`,
               relatedEntityType: 'CREDIT_PURCHASE',
               relatedEntityId: purchase.id,
             },
           });
         });
 
-        console.log(`✅ Paiement Moneroo réussi - ${purchase.creditsAmount} crédits ajoutés à ${purchase.user.email}`);
+        console.log(`✅ Paiement FedaPay réussi - ${purchase.creditsAmount} crédits ajoutés à ${purchase.user.email}`);
 
         return { success: true, message: 'Crédits ajoutés avec succès' };
-      } else if (status === 'failed' || status === 'error') {
-        // Paiement échoué
+      } else if (status === 'declined' || status === 'canceled') {
+        // Paiement échoué ou annulé
         await this.prisma.creditPurchase.update({
           where: { id: purchase.id },
-          data: { status: 'FAILED' },
+          data: { status: status === 'declined' ? 'FAILED' : 'CANCELLED' },
         });
 
-        console.log(`❌ Paiement Moneroo échoué pour ${purchase.user.email}`);
-        return { success: false, message: 'Paiement échoué' };
-      } else if (status === 'cancelled' || status === 'canceled') {
-        // Paiement annulé
-        await this.prisma.creditPurchase.update({
-          where: { id: purchase.id },
-          data: { status: 'CANCELLED' },
-        });
-
-        console.log(`⚠️  Paiement Moneroo annulé pour ${purchase.user.email}`);
-        return { success: false, message: 'Paiement annulé' };
+        console.log(`❌ Paiement FedaPay ${status} pour ${purchase.user.email}`);
+        return { success: false, message: `Paiement ${status}` };
       }
 
-      return { success: false, message: 'Statut inconnu' };
+      return { success: false, message: 'Statut inconnu: ' + status };
     } catch (error) {
-      console.error('Erreur traitement webhook Moneroo:', error);
+      console.error('Erreur traitement webhook FedaPay:', error);
       throw error;
     }
   }

@@ -32,12 +32,12 @@ export class PaymentsController {
   }
 
   /**
-   * Vérifier un paiement Moneroo
-   * GET /api/payments/verify/:monerooPaymentId
+   * Vérifier un paiement FedaPay
+   * GET /api/payments/verify/:transactionId
    */
-  @Get('verify/:monerooPaymentId')
-  async verifyPayment(@Param('monerooPaymentId') monerooPaymentId: string) {
-    return this.paymentsService.verifyPayment(monerooPaymentId);
+  @Get('verify/:transactionId')
+  async verifyPayment(@Param('transactionId') transactionId: string) {
+    return this.paymentsService.verifyPayment(transactionId);
   }
 
   /**
@@ -67,16 +67,27 @@ export class PaymentsController {
   }
 
   /**
-   * Webhook de Moneroo (appelé automatiquement après paiement)
+   * Webhook de FedaPay (appelé automatiquement après paiement)
+   * POST /api/payments/webhook/fedapay
+   */
+  @Post('webhook/fedapay')
+  @Public() // Public car appelé par FedaPay
+  async handleFedaPayWebhook(@Req() req: any, @Body() webhookData: any) {
+    console.log('📥 Webhook FedaPay reçu:', JSON.stringify(webhookData, null, 2));
+
+    // TODO: Ajouter vérification de signature FedaPay pour sécurité
+    
+    return this.paymentsService.handleWebhook(webhookData);
+  }
+
+  /**
+   * Webhook Moneroo (rétrocompatibilité)
    * POST /api/payments/webhook/moneroo
    */
   @Post('webhook/moneroo')
-  @Public() // Public car appelé par Moneroo
+  @Public()
   async handleMonerooWebhook(@Req() req: any, @Body() webhookData: any) {
-    console.log('📥 Webhook Moneroo reçu:', JSON.stringify(webhookData, null, 2));
-
-    // TODO: Ajouter vérification de signature Moneroo pour sécurité
-    
+    console.log('📥 Webhook Moneroo/FedaPay reçu:', JSON.stringify(webhookData, null, 2));
     return this.paymentsService.handleWebhook(webhookData);
   }
 }
