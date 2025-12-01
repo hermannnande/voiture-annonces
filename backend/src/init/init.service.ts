@@ -22,20 +22,22 @@ export class InitService implements OnModuleInit {
       });
 
       if (existingAdmin) {
-        // Mettre à jour l'admin existant pour s'assurer qu'il est SUPER_ADMIN
-        if (existingAdmin.role !== UserRole.SUPER_ADMIN) {
-          await this.prisma.user.update({
-            where: { email: adminEmail },
-            data: {
-              role: UserRole.SUPER_ADMIN,
-              isActive: true,
-              isEmailVerified: true,
-            },
-          });
-          console.log('✅ Admin existant promu en SUPER_ADMIN');
-        } else {
-          console.log('✅ Admin principal déjà existant');
-        }
+        // Mettre à jour l'admin existant avec le nouveau mot de passe
+        const password = process.env.ADMIN_DEFAULT_PASSWORD || 'admin123';
+        const passwordHash = await bcrypt.hash(password, 10);
+        
+        await this.prisma.user.update({
+          where: { email: adminEmail },
+          data: {
+            passwordHash,
+            role: UserRole.SUPER_ADMIN,
+            isActive: true,
+            isEmailVerified: true,
+          },
+        });
+        console.log('✅ Admin existant mis à jour');
+        console.log(`   Email: ${adminEmail}`);
+        console.log(`   Nouveau mot de passe: ${password}`);
 
         // Vérifier et créer le wallet si nécessaire
         const wallet = await this.prisma.wallet.findUnique({
