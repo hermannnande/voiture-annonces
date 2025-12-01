@@ -17,6 +17,37 @@ export default function WalletPage() {
   const [loading, setLoading] = useState(true);
   const [showBuyModal, setShowBuyModal] = useState(false);
   const [amount, setAmount] = useState('');
+  const [selectedPack, setSelectedPack] = useState<any>(null);
+  const [paymentProcessing, setPaymentProcessing] = useState(false);
+
+  // Packs de crédits disponibles
+  const creditPacks = [
+    {
+      id: 'starter',
+      name: 'Pack Starter',
+      credits: 50,
+      price: 5000,
+      description: '1 boost "Top de liste 7j"',
+      color: 'from-blue-500 to-blue-600',
+    },
+    {
+      id: 'standard',
+      name: 'Pack Standard',
+      credits: 100,
+      price: 9500,
+      description: '2 boosts (-5%)',
+      popular: true,
+      color: 'from-primary-500 to-primary-600',
+    },
+    {
+      id: 'premium',
+      name: 'Pack Premium',
+      credits: 500,
+      price: 45000,
+      description: '10 boosts (-10%)',
+      color: 'from-yellow-500 to-yellow-600',
+    },
+  ];
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -43,16 +74,44 @@ export default function WalletPage() {
     }
   };
 
+  const handlePayNow = async (pack: any) => {
+    setPaymentProcessing(true);
+    try {
+      // Initialiser le paiement Moneroo
+      const response = await api.post('/payments/initialize-credits', {
+        creditsAmount: pack.credits,
+        packName: pack.name,
+        returnUrl: `${window.location.origin}/dashboard/wallet/payment-result`,
+      });
+
+      // Rediriger vers la page de paiement Moneroo
+      if (response.data.checkoutUrl) {
+        window.location.href = response.data.checkoutUrl;
+      } else {
+        alert('Erreur lors de la création du paiement');
+      }
+    } catch (error: any) {
+      console.error('Erreur paiement:', error);
+      alert(error.response?.data?.message || 'Erreur lors de l\'initialisation du paiement');
+    } finally {
+      setPaymentProcessing(false);
+    }
+  };
+
   const handleWhatsAppContact = () => {
+    const creditsText = selectedPack ? `${selectedPack.credits}` : (amount || '...');
+    const priceText = selectedPack ? ` (${selectedPack.price.toLocaleString()} FCFA)` : '';
+    
     const message = `🪙 DEMANDE D'ACHAT DE CRÉDITS
 
-Je souhaite acheter ${amount || '...'} crédits pour booster mes annonces.
+Je souhaite acheter ${creditsText} crédits${priceText} pour booster mes annonces.
 
 Merci de me recontacter pour organiser le paiement.`;
 
     const whatsappUrl = `https://wa.me/2250778030075?text=${encodeURIComponent(message)}`;
     window.open(whatsappUrl, '_blank');
     setShowBuyModal(false);
+    setSelectedPack(null);
   };
 
   if (loading) {
@@ -182,32 +241,67 @@ Merci de me recontacter pour organiser le paiement.`;
 
       {/* Modal d'achat de crédits */}
       {showBuyModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg max-w-md w-full p-6">
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 overflow-y-auto">
+          <div className="bg-white rounded-lg max-w-2xl w-full p-6 my-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              Acheter des crédits
+              💰 Acheter des crédits
             </h2>
 
-            <div className="mb-6">
-              <p className="text-gray-600 mb-4">
-                Le paiement se fait manuellement via WhatsApp. 
-                L'administrateur créditera votre wallet après réception du paiement.
-              </p>
+            <p className="text-gray-600 mb-6">
+              Choisissez un pack et payez directement en ligne ou contactez l'admin via WhatsApp.
+            </p>
 
-              <label className="block mb-2 text-sm font-medium text-gray-700">
-                Combien de crédits souhaitez-vous ? (informatif)
-              </label>
-              <input
-                type="number"
-                value={amount}
-                onChange={(e) => setAmount(e.target.value)}
-                placeholder="Ex: 100"
-                className="input"
-              />
+            {/* Packs de crédits */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+              {creditPacks.map((pack) => (
+                <div
+                  key={pack.id}
+                  onClick={() => setSelectedPack(pack)}
+                  className={`relative cursor-pointer rounded-lg border-2 p-4 transition-all hover:shadow-lg ${
+                    selectedPack?.id === pack.id
+                      ? 'border-primary-500 bg-primary-50'
+                      : 'border-gray-200 hover:border-primary-300'
+                  }`}
+                >
+                  {pack.popular && (
+                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+                      <span className="bg-primary-600 text-white text-xs font-bold px-3 py-1 rounded-full">
+                        ⭐ Populaire
+                      </span>
+                    </div>
+                  )}
+                  <div className={`bg-gradient-to-br ${pack.color} text-white rounded-lg p-3 mb-3`}>
+                    <div className="text-3xl font-bold">{pack.credits}</div>
+                    <div className="text-sm opacity-90">crédits</div>
+                  </div>
+                  <div className="font-semibold text-gray-900 mb-1">{pack.name}</div>
+                  <div className="text-2xl font-bold text-primary-600 mb-2">
+                    {pack.price.toLocaleString()} <span className="text-sm">FCFA</span>
+                  </div>
+                  <div className="text-xs text-gray-600">{pack.description}</div>
+                </div>
+              ))}
             </div>
 
+            {selectedPack && (
+              <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <div className="font-semibold text-blue-900">{selectedPack.name}</div>
+                    <div className="text-sm text-blue-700">
+                      {selectedPack.credits} crédits = {selectedPack.price.toLocaleString()} FCFA
+                    </div>
+                  </div>
+                  <div className="text-sm text-blue-600">
+                    {(selectedPack.price / selectedPack.credits).toFixed(0)} FCFA/crédit
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Moyens de paiement disponibles */}
             <div className="mb-6 p-4 bg-green-50 rounded-lg border border-green-200">
-              <h3 className="font-semibold text-green-900 mb-2">💳 Moyens de paiement</h3>
+              <h3 className="font-semibold text-green-900 mb-2">💳 Paiements acceptés</h3>
               <div className="grid grid-cols-2 gap-2 text-sm">
                 <div className="flex items-center text-green-800">
                   <span className="mr-2">🧡</span> Orange Money
@@ -224,24 +318,51 @@ Merci de me recontacter pour organiser le paiement.`;
               </div>
             </div>
 
-            <div className="flex space-x-3">
+            {/* Boutons d'action */}
+            <div className="space-y-3">
+              {/* Bouton Payer maintenant (Moneroo) */}
+              {selectedPack && (
+                <button
+                  onClick={() => handlePayNow(selectedPack)}
+                  disabled={paymentProcessing}
+                  className="w-full btn-primary bg-primary-600 hover:bg-primary-700 flex items-center justify-center space-x-2 text-lg py-4"
+                >
+                  {paymentProcessing ? (
+                    <span>Chargement...</span>
+                  ) : (
+                    <>
+                      <span className="text-2xl">💳</span>
+                      <span>Payer {selectedPack.price.toLocaleString()} FCFA maintenant</span>
+                    </>
+                  )}
+                </button>
+              )}
+
+              {/* Bouton WhatsApp (option alternative) */}
               <button
-                onClick={() => setShowBuyModal(false)}
-                className="flex-1 btn-outline"
+                onClick={handleWhatsAppContact}
+                disabled={!selectedPack && !amount}
+                className="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg flex items-center justify-center space-x-2 font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <MessageCircle className="w-5 h-5" />
+                <span>Ou contacter l'admin via WhatsApp</span>
+              </button>
+
+              {/* Bouton Annuler */}
+              <button
+                onClick={() => {
+                  setShowBuyModal(false);
+                  setSelectedPack(null);
+                  setAmount('');
+                }}
+                className="w-full btn-outline"
               >
                 Annuler
               </button>
-              <button
-                onClick={handleWhatsAppContact}
-                className="flex-1 btn-primary bg-green-600 hover:bg-green-700 flex items-center justify-center space-x-2"
-              >
-                <MessageCircle className="w-5 h-5" />
-                <span>Contacter via WhatsApp</span>
-              </button>
             </div>
 
-            <p className="text-center text-sm text-gray-600 mt-4">
-              📞 WhatsApp : <span className="font-semibold">+225 07 78 03 00 75</span>
+            <p className="text-center text-xs text-gray-500 mt-4">
+              🔒 Paiement sécurisé par Moneroo • WhatsApp : +225 07 78 03 00 75
             </p>
           </div>
         </div>

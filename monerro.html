@@ -1,0 +1,2384 @@
+# Authentication
+
+Les endpoints de l'API de Moneroo sont sécurisés par des clés d'API, que vous pouvez créer à partir du tableau de bord. Vous devez inclure votre **clé d'API** dans toutes les requêtes d'API adressées au serveur en tant que champ d'en-tête.
+
+Pour interagir avec l'API de Moneroo, vous devez ajouter un en-tête d'autorisation (`Authorization header`) incluant votre **clé secrète**. Vous pouvez gérer vos clés d'API depuis le tableau de bord.
+
+En général, nous fournissons des **clés publiques** et **clés secrètes**. Les clés publiques sont destinées à être utilisées à partir de votre interface lors de l'intégration à l'aide des SDK JavaScript et dans nos SDK mobiles uniquement. De par leur conception, les clés publiques ne peuvent modifier aucune partie de votre compte, sauf pour initier des transactions vers vous. Les clés secrètes, en revanche, doivent rester **secrètes**. Si, pour une raison quelconque, vous pensez que votre clé secrète a été compromise ou si vous souhaitez la réinitialiser, vous pouvez le faire à partir du tableau de bord.
+
+Pour créer des clés d'API, rendez-vous dans la section développeur de votre application Moneroo.
+
+<figure><img src="https://953366264-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FwlygsCi74JW2nJTRD6cj%2Fuploads%2FkYdCVDZ7Up7eTOoKVfPj%2FCleanShot%202023-09-29%20at%2014.49.41%402x.png?alt=media&#x26;token=bc54ad34-22e4-4d08-9c30-e60ed818a9c7" alt=""><figcaption></figcaption></figure>
+
+{% hint style="danger" %}
+Ne "commitez" pas vos clés secrètes sur git, et ne les utilisez pas dans du code côté client.
+{% endhint %}
+
+Lorsque vous construisez et testez votre intégration, vous devez utiliser les **clés API Sandbox**. Pour en savoir plus sur le mode Sandbox, consultez notre guide sur les tests de l'API Moneroo. Une fois que vous êtes prêt à traiter des paiements réels, remplacez votre **clé de test** par des **clés d'API en direct**.
+
+Il est très important de **sécuriser toutes les clés d'API**. Ne les partagez jamais. Toutefois, si une clé fuite, vous pouvez toujours la supprimer. N'oubliez pas d'appliquer les nouvelles clés à votre code. Tant que vous ne l'aurez pas fait, votre intégration ne fonctionnera pas.
+
+### Authentication d'une requête API
+
+La **clé ou le jeton d'API** doit être envoyé avec chaque demande d'API, en le fournissant dans l'en-tête `Authorization` de l'appel HTTP à l'aide de la méthode Bearer.
+
+Par exemple, un en-tête Authorization valide est :&#x20;
+
+```
+Authorization: Bearer test_dHar4XY7LxsDOtmarVtjNVWXLSlXsM
+```
+
+En général, nos SDK fournissent des raccourcis permettant de définir facilement la clé API ou le jeton d'accès.
+
+Dans l'exemple ci-dessous, nous utilisons une **clé API de test** pour la méthode GET de la ressource de paiement. Cette méthode permet de récupérer un paiement, dans ce cas, le paiement avec l'ID `test_yyfbwekjnsd`.
+
+```http
+GET /payments/test_yyfbwekjnsd HTTP/1.1
+Host: api.moneroo.com
+Authorization: Bearer test_dHar4XY7LxsDOtmarVtjNVWXLSlXsM
+```
+
+```bash
+curl https://api.moneroo.io/v1/payments/test_yyfbwekjnsd
+-H "Authorization: Bearer YOUR_SECRET_KEY"
+-X GET
+```
+
+{% hint style="warning" %}
+Ne mettez pas `VERIFY_PEER` à `FALSE`. Assurez-vous que votre serveur vérifie la connexion SSL à Moneroo.
+{% endhint %}
+
+### Limites de nombre de requêtes
+
+L'API Moneroo a une limite de **120 requêtes par minute**. Si vous dépassez cette limite, vous obtiendrez une réponse **429 Too Many Requests**. Si vous obtenez cette réponse, attendez une minute avant de réessayer votre requête.
+
+
+
+# Authentication
+
+Les endpoints de l'API de Moneroo sont sécurisés par des clés d'API, que vous pouvez créer à partir du tableau de bord. Vous devez inclure votre **clé d'API** dans toutes les requêtes d'API adressées au serveur en tant que champ d'en-tête.
+
+Pour interagir avec l'API de Moneroo, vous devez ajouter un en-tête d'autorisation (`Authorization header`) incluant votre **clé secrète**. Vous pouvez gérer vos clés d'API depuis le tableau de bord.
+
+En général, nous fournissons des **clés publiques** et **clés secrètes**. Les clés publiques sont destinées à être utilisées à partir de votre interface lors de l'intégration à l'aide des SDK JavaScript et dans nos SDK mobiles uniquement. De par leur conception, les clés publiques ne peuvent modifier aucune partie de votre compte, sauf pour initier des transactions vers vous. Les clés secrètes, en revanche, doivent rester **secrètes**. Si, pour une raison quelconque, vous pensez que votre clé secrète a été compromise ou si vous souhaitez la réinitialiser, vous pouvez le faire à partir du tableau de bord.
+
+Pour créer des clés d'API, rendez-vous dans la section développeur de votre application Moneroo.
+
+<figure><img src="https://953366264-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FwlygsCi74JW2nJTRD6cj%2Fuploads%2FkYdCVDZ7Up7eTOoKVfPj%2FCleanShot%202023-09-29%20at%2014.49.41%402x.png?alt=media&#x26;token=bc54ad34-22e4-4d08-9c30-e60ed818a9c7" alt=""><figcaption></figcaption></figure>
+
+{% hint style="danger" %}
+Ne "commitez" pas vos clés secrètes sur git, et ne les utilisez pas dans du code côté client.
+{% endhint %}
+
+Lorsque vous construisez et testez votre intégration, vous devez utiliser les **clés API Sandbox**. Pour en savoir plus sur le mode Sandbox, consultez notre guide sur les tests de l'API Moneroo. Une fois que vous êtes prêt à traiter des paiements réels, remplacez votre **clé de test** par des **clés d'API en direct**.
+
+Il est très important de **sécuriser toutes les clés d'API**. Ne les partagez jamais. Toutefois, si une clé fuite, vous pouvez toujours la supprimer. N'oubliez pas d'appliquer les nouvelles clés à votre code. Tant que vous ne l'aurez pas fait, votre intégration ne fonctionnera pas.
+
+### Authentication d'une requête API
+
+La **clé ou le jeton d'API** doit être envoyé avec chaque demande d'API, en le fournissant dans l'en-tête `Authorization` de l'appel HTTP à l'aide de la méthode Bearer.
+
+Par exemple, un en-tête Authorization valide est :&#x20;
+
+```
+Authorization: Bearer test_dHar4XY7LxsDOtmarVtjNVWXLSlXsM
+```
+
+En général, nos SDK fournissent des raccourcis permettant de définir facilement la clé API ou le jeton d'accès.
+
+Dans l'exemple ci-dessous, nous utilisons une **clé API de test** pour la méthode GET de la ressource de paiement. Cette méthode permet de récupérer un paiement, dans ce cas, le paiement avec l'ID `test_yyfbwekjnsd`.
+
+```http
+GET /payments/test_yyfbwekjnsd HTTP/1.1
+Host: api.moneroo.com
+Authorization: Bearer test_dHar4XY7LxsDOtmarVtjNVWXLSlXsM
+```
+
+```bash
+curl https://api.moneroo.io/v1/payments/test_yyfbwekjnsd
+-H "Authorization: Bearer YOUR_SECRET_KEY"
+-X GET
+```
+
+{% hint style="warning" %}
+Ne mettez pas `VERIFY_PEER` à `FALSE`. Assurez-vous que votre serveur vérifie la connexion SSL à Moneroo.
+{% endhint %}
+
+### Limites de nombre de requêtes
+
+L'API Moneroo a une limite de **120 requêtes par minute**. Si vous dépassez cette limite, vous obtiendrez une réponse **429 Too Many Requests**. Si vous obtenez cette réponse, attendez une minute avant de réessayer votre requête.
+
+
+# Authentication
+
+Les endpoints de l'API de Moneroo sont sécurisés par des clés d'API, que vous pouvez créer à partir du tableau de bord. Vous devez inclure votre **clé d'API** dans toutes les requêtes d'API adressées au serveur en tant que champ d'en-tête.
+
+Pour interagir avec l'API de Moneroo, vous devez ajouter un en-tête d'autorisation (`Authorization header`) incluant votre **clé secrète**. Vous pouvez gérer vos clés d'API depuis le tableau de bord.
+
+En général, nous fournissons des **clés publiques** et **clés secrètes**. Les clés publiques sont destinées à être utilisées à partir de votre interface lors de l'intégration à l'aide des SDK JavaScript et dans nos SDK mobiles uniquement. De par leur conception, les clés publiques ne peuvent modifier aucune partie de votre compte, sauf pour initier des transactions vers vous. Les clés secrètes, en revanche, doivent rester **secrètes**. Si, pour une raison quelconque, vous pensez que votre clé secrète a été compromise ou si vous souhaitez la réinitialiser, vous pouvez le faire à partir du tableau de bord.
+
+Pour créer des clés d'API, rendez-vous dans la section développeur de votre application Moneroo.
+
+<figure><img src="https://953366264-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FwlygsCi74JW2nJTRD6cj%2Fuploads%2FkYdCVDZ7Up7eTOoKVfPj%2FCleanShot%202023-09-29%20at%2014.49.41%402x.png?alt=media&#x26;token=bc54ad34-22e4-4d08-9c30-e60ed818a9c7" alt=""><figcaption></figcaption></figure>
+
+{% hint style="danger" %}
+Ne "commitez" pas vos clés secrètes sur git, et ne les utilisez pas dans du code côté client.
+{% endhint %}
+
+Lorsque vous construisez et testez votre intégration, vous devez utiliser les **clés API Sandbox**. Pour en savoir plus sur le mode Sandbox, consultez notre guide sur les tests de l'API Moneroo. Une fois que vous êtes prêt à traiter des paiements réels, remplacez votre **clé de test** par des **clés d'API en direct**.
+
+Il est très important de **sécuriser toutes les clés d'API**. Ne les partagez jamais. Toutefois, si une clé fuite, vous pouvez toujours la supprimer. N'oubliez pas d'appliquer les nouvelles clés à votre code. Tant que vous ne l'aurez pas fait, votre intégration ne fonctionnera pas.
+
+### Authentication d'une requête API
+
+La **clé ou le jeton d'API** doit être envoyé avec chaque demande d'API, en le fournissant dans l'en-tête `Authorization` de l'appel HTTP à l'aide de la méthode Bearer.
+
+Par exemple, un en-tête Authorization valide est :&#x20;
+
+```
+Authorization: Bearer test_dHar4XY7LxsDOtmarVtjNVWXLSlXsM
+```
+
+En général, nos SDK fournissent des raccourcis permettant de définir facilement la clé API ou le jeton d'accès.
+
+Dans l'exemple ci-dessous, nous utilisons une **clé API de test** pour la méthode GET de la ressource de paiement. Cette méthode permet de récupérer un paiement, dans ce cas, le paiement avec l'ID `test_yyfbwekjnsd`.
+
+```http
+GET /payments/test_yyfbwekjnsd HTTP/1.1
+Host: api.moneroo.com
+Authorization: Bearer test_dHar4XY7LxsDOtmarVtjNVWXLSlXsM
+```
+
+```bash
+curl https://api.moneroo.io/v1/payments/test_yyfbwekjnsd
+-H "Authorization: Bearer YOUR_SECRET_KEY"
+-X GET
+```
+
+{% hint style="warning" %}
+Ne mettez pas `VERIFY_PEER` à `FALSE`. Assurez-vous que votre serveur vérifie la connexion SSL à Moneroo.
+{% endhint %}
+
+### Limites de nombre de requêtes
+
+L'API Moneroo a une limite de **120 requêtes par minute**. Si vous dépassez cette limite, vous obtiendrez une réponse **429 Too Many Requests**. Si vous obtenez cette réponse, attendez une minute avant de réessayer votre requête.
+
+
+# Authentication
+
+Les endpoints de l'API de Moneroo sont sécurisés par des clés d'API, que vous pouvez créer à partir du tableau de bord. Vous devez inclure votre **clé d'API** dans toutes les requêtes d'API adressées au serveur en tant que champ d'en-tête.
+
+Pour interagir avec l'API de Moneroo, vous devez ajouter un en-tête d'autorisation (`Authorization header`) incluant votre **clé secrète**. Vous pouvez gérer vos clés d'API depuis le tableau de bord.
+
+En général, nous fournissons des **clés publiques** et **clés secrètes**. Les clés publiques sont destinées à être utilisées à partir de votre interface lors de l'intégration à l'aide des SDK JavaScript et dans nos SDK mobiles uniquement. De par leur conception, les clés publiques ne peuvent modifier aucune partie de votre compte, sauf pour initier des transactions vers vous. Les clés secrètes, en revanche, doivent rester **secrètes**. Si, pour une raison quelconque, vous pensez que votre clé secrète a été compromise ou si vous souhaitez la réinitialiser, vous pouvez le faire à partir du tableau de bord.
+
+Pour créer des clés d'API, rendez-vous dans la section développeur de votre application Moneroo.
+
+<figure><img src="https://953366264-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FwlygsCi74JW2nJTRD6cj%2Fuploads%2FkYdCVDZ7Up7eTOoKVfPj%2FCleanShot%202023-09-29%20at%2014.49.41%402x.png?alt=media&#x26;token=bc54ad34-22e4-4d08-9c30-e60ed818a9c7" alt=""><figcaption></figcaption></figure>
+
+{% hint style="danger" %}
+Ne "commitez" pas vos clés secrètes sur git, et ne les utilisez pas dans du code côté client.
+{% endhint %}
+
+Lorsque vous construisez et testez votre intégration, vous devez utiliser les **clés API Sandbox**. Pour en savoir plus sur le mode Sandbox, consultez notre guide sur les tests de l'API Moneroo. Une fois que vous êtes prêt à traiter des paiements réels, remplacez votre **clé de test** par des **clés d'API en direct**.
+
+Il est très important de **sécuriser toutes les clés d'API**. Ne les partagez jamais. Toutefois, si une clé fuite, vous pouvez toujours la supprimer. N'oubliez pas d'appliquer les nouvelles clés à votre code. Tant que vous ne l'aurez pas fait, votre intégration ne fonctionnera pas.
+
+### Authentication d'une requête API
+
+La **clé ou le jeton d'API** doit être envoyé avec chaque demande d'API, en le fournissant dans l'en-tête `Authorization` de l'appel HTTP à l'aide de la méthode Bearer.
+
+Par exemple, un en-tête Authorization valide est :&#x20;
+
+```
+Authorization: Bearer test_dHar4XY7LxsDOtmarVtjNVWXLSlXsM
+```
+
+En général, nos SDK fournissent des raccourcis permettant de définir facilement la clé API ou le jeton d'accès.
+
+Dans l'exemple ci-dessous, nous utilisons une **clé API de test** pour la méthode GET de la ressource de paiement. Cette méthode permet de récupérer un paiement, dans ce cas, le paiement avec l'ID `test_yyfbwekjnsd`.
+
+```http
+GET /payments/test_yyfbwekjnsd HTTP/1.1
+Host: api.moneroo.com
+Authorization: Bearer test_dHar4XY7LxsDOtmarVtjNVWXLSlXsM
+```
+
+```bash
+curl https://api.moneroo.io/v1/payments/test_yyfbwekjnsd
+-H "Authorization: Bearer YOUR_SECRET_KEY"
+-X GET
+```
+
+{% hint style="warning" %}
+Ne mettez pas `VERIFY_PEER` à `FALSE`. Assurez-vous que votre serveur vérifie la connexion SSL à Moneroo.
+{% endhint %}
+
+### Limites de nombre de requêtes
+
+L'API Moneroo a une limite de **120 requêtes par minute**. Si vous dépassez cette limite, vous obtiendrez une réponse **429 Too Many Requests**. Si vous obtenez cette réponse, attendez une minute avant de réessayer votre requête.
+
+
+# Authentication
+
+Les endpoints de l'API de Moneroo sont sécurisés par des clés d'API, que vous pouvez créer à partir du tableau de bord. Vous devez inclure votre **clé d'API** dans toutes les requêtes d'API adressées au serveur en tant que champ d'en-tête.
+
+Pour interagir avec l'API de Moneroo, vous devez ajouter un en-tête d'autorisation (`Authorization header`) incluant votre **clé secrète**. Vous pouvez gérer vos clés d'API depuis le tableau de bord.
+
+En général, nous fournissons des **clés publiques** et **clés secrètes**. Les clés publiques sont destinées à être utilisées à partir de votre interface lors de l'intégration à l'aide des SDK JavaScript et dans nos SDK mobiles uniquement. De par leur conception, les clés publiques ne peuvent modifier aucune partie de votre compte, sauf pour initier des transactions vers vous. Les clés secrètes, en revanche, doivent rester **secrètes**. Si, pour une raison quelconque, vous pensez que votre clé secrète a été compromise ou si vous souhaitez la réinitialiser, vous pouvez le faire à partir du tableau de bord.
+
+Pour créer des clés d'API, rendez-vous dans la section développeur de votre application Moneroo.
+
+<figure><img src="https://953366264-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FwlygsCi74JW2nJTRD6cj%2Fuploads%2FkYdCVDZ7Up7eTOoKVfPj%2FCleanShot%202023-09-29%20at%2014.49.41%402x.png?alt=media&#x26;token=bc54ad34-22e4-4d08-9c30-e60ed818a9c7" alt=""><figcaption></figcaption></figure>
+
+{% hint style="danger" %}
+Ne "commitez" pas vos clés secrètes sur git, et ne les utilisez pas dans du code côté client.
+{% endhint %}
+
+Lorsque vous construisez et testez votre intégration, vous devez utiliser les **clés API Sandbox**. Pour en savoir plus sur le mode Sandbox, consultez notre guide sur les tests de l'API Moneroo. Une fois que vous êtes prêt à traiter des paiements réels, remplacez votre **clé de test** par des **clés d'API en direct**.
+
+Il est très important de **sécuriser toutes les clés d'API**. Ne les partagez jamais. Toutefois, si une clé fuite, vous pouvez toujours la supprimer. N'oubliez pas d'appliquer les nouvelles clés à votre code. Tant que vous ne l'aurez pas fait, votre intégration ne fonctionnera pas.
+
+### Authentication d'une requête API
+
+La **clé ou le jeton d'API** doit être envoyé avec chaque demande d'API, en le fournissant dans l'en-tête `Authorization` de l'appel HTTP à l'aide de la méthode Bearer.
+
+Par exemple, un en-tête Authorization valide est :&#x20;
+
+```
+Authorization: Bearer test_dHar4XY7LxsDOtmarVtjNVWXLSlXsM
+```
+
+En général, nos SDK fournissent des raccourcis permettant de définir facilement la clé API ou le jeton d'accès.
+
+Dans l'exemple ci-dessous, nous utilisons une **clé API de test** pour la méthode GET de la ressource de paiement. Cette méthode permet de récupérer un paiement, dans ce cas, le paiement avec l'ID `test_yyfbwekjnsd`.
+
+```http
+GET /payments/test_yyfbwekjnsd HTTP/1.1
+Host: api.moneroo.com
+Authorization: Bearer test_dHar4XY7LxsDOtmarVtjNVWXLSlXsM
+```
+
+```bash
+curl https://api.moneroo.io/v1/payments/test_yyfbwekjnsd
+-H "Authorization: Bearer YOUR_SECRET_KEY"
+-X GET
+```
+
+{% hint style="warning" %}
+Ne mettez pas `VERIFY_PEER` à `FALSE`. Assurez-vous que votre serveur vérifie la connexion SSL à Moneroo.
+{% endhint %}
+
+### Limites de nombre de requêtes
+
+L'API Moneroo a une limite de **120 requêtes par minute**. Si vous dépassez cette limite, vous obtiendrez une réponse **429 Too Many Requests**. Si vous obtenez cette réponse, attendez une minute avant de réessayer votre requête.
+
+
+# Initialiser un paiement
+
+Lorsque vous encaissez des paiements avec Moneroo, de nombreuses options s'offrent à vous. En voici un bref aperçu :
+
+* [**Moneroo Standard** ](https://docs.moneroo.io/fr/payments/integration-standard)**:** Il s'agit de l'approche d'intégration de base, "standard". Pour l'utiliser, vous devez appeler notre API depuis votre serveur pour générer un lien de paiement. Vous redirigez ensuite votre client vers ce lien pour qu'il effectue le paiement. Une fois le paiement traité, nous le redirigeons vers vous.
+
+D'autres options et intégrations seront bientôt disponibles.
+
+
+# Intégration Standard
+
+### Vue d'ensemble
+
+Moneroo Standard est notre flux de paiement qui redirige votre client vers une page de paiement hébergée par Moneroo.
+
+Voici comment cela fonctionne :
+
+* Depuis votre serveur, appelez le endpoint "initialiser le paiement" de notre API avec les détails du paiement.
+* Nous vous renvoyons un lien vers une page de paiement. Redirigez votre client vers ce lien pour effectuer le paiement.
+* Lorsque la transaction est terminée, nous redirigeons le client vers vous (vers `return_url` que vous avez fournie) avec les détails du paiement.
+
+### Étape 1 : Collecte des données de paiement
+
+Tout d'abord, vous devez rassembler les données de paiement qui seront envoyées à votre API sous la forme d'un objet JSON.
+
+Voici les champs à collecter :
+
+<table><thead><tr><th width="305">Nom du champ</th><th width="145">Type</th><th width="125">Exigée</th><th>Description</th></tr></thead><tbody><tr><td><code>amount</code></td><td>integer</td><td>Oui</td><td>Le montant du paiement.</td></tr><tr><td><code>currency</code></td><td>string</td><td>Oui</td><td>La devise du paiement.</td></tr><tr><td><code>description</code></td><td>string</td><td>Oui</td><td>Description du paiement.</td></tr><tr><td><code>return_url</code></td><td>string</td><td>Oui</td><td>URL de retour où votre client sera redirigé après le paiement.</td></tr><tr><td><code>customer.email</code></td><td>string</td><td>Oui</td><td>Adresse e-mail du client.</td></tr><tr><td><code>customer.first_name</code></td><td>string</td><td>Oui</td><td>Prénom du client.</td></tr><tr><td><code>customer.last_name</code></td><td>string</td><td>Oui</td><td>Nom de famille du client.</td></tr><tr><td><code>customer.phone</code></td><td>string</td><td>Non<strong>¹</strong></td><td>Numéro de téléphone du client.</td></tr><tr><td><code>customer.address</code></td><td>string</td><td>Non<strong>¹</strong></td><td>Adresse du client.</td></tr><tr><td><code>customer.city</code></td><td>string</td><td>Non<strong>¹</strong></td><td>Ville du client.</td></tr><tr><td><code>customer.state</code></td><td>string</td><td>Non<strong>¹</strong></td><td>État du client.</td></tr><tr><td><code>customer.country</code></td><td>string</td><td>Non<strong>¹</strong></td><td>Pays du client.</td></tr><tr><td><code>customer.zip</code></td><td>string</td><td>Non<strong>¹</strong></td><td>Code postal du client.</td></tr><tr><td><code>metadata</code></td><td>array</td><td>Non<strong>²</strong></td><td>Données complémentaires pour le paiement.</td></tr><tr><td><code>methods</code></td><td>array</td><td>Non<strong>³</strong></td><td>Méthodes de paiement autorisées.</td></tr><tr><td><code>restrict_country_code</code></td><td>string</td><td>Non⁴</td><td>Restreindre le paiement à un pays spécifique.</td></tr><tr><td><code>restricted_phone</code></td><td>object</td><td>Non⁴</td><td>Restreindre le paiement à un numéro de téléphone spécifique.</td></tr><tr><td><code>restricted_phone.number</code></td><td>string</td><td>Oui⁵</td><td>Le numéro de téléphone auquel restreindre le paiement.</td></tr><tr><td><code>restricted_phone.country_code</code></td><td>string</td><td>Oui⁵</td><td>Le code pays du numéro de téléphone restreint.</td></tr></tbody></table>
+
+1. Si ces informations ne sont pas fournies, le client peut être invité à les saisir au cours de la procédure de paiement, en fonction de la méthode de paiement sélectionnée.
+2. Il doit s'agir d'un tableau de paires clé-valeur. Seules les chaînes de caractères sont autorisées.
+3. S'il n'est pas fourni, tous les modes de paiement disponibles seront autorisés. Le tableau ne doit contenir que les modes de paiement pris en charge.
+4. Vous pouvez utiliser soit `restrict_country_code`, soit `restricted_phone`, mais pas les deux. Ils sont mutuellement exclusifs.
+5. Obligatoire si `restricted_phone` est fourni.
+
+### Étape 2 : Obtention d'un lien de paiement
+
+Ensuite, initiez le paiement en appelant notre API avec les détails de paiement collectés (n'oubliez pas d'autoriser avec votre clé secrète).
+
+#### Exemple de demande :
+
+```bash
+POST /v1/payments/initialize
+Host: https://api.moneroo.io
+Authorization: Bearer YOUR_SECRET_KEY
+Content-Type: application/json
+Accept: application/json
+{
+    "amount": 100,
+    "currency": "USD",
+    "description": "Payment for order #123",
+    "customer": {
+        "email": "john@example.com",
+        "first_name": "John",
+        "last_name": "Doe"
+    },
+    "return_url": "https://example.com/payments/thank-you"
+    "metadata": {
+        "order_id": "123",
+        "customer_id": "123" 
+    },
+    "methods": ["qr_ngn", "bank_transfer_ngn"]
+}
+```
+
+#### Exemple de réponse :
+
+```json
+{
+  "success": true,
+  "message": "Transaction initialized successfully",
+  "data": {
+    "id": "5f7b1b2c-1b2c-5f7b-0000-000000000000",
+    "checkout_url": "https://checkout.moneroo.io/5f7b1b2c-1b2c-5f7b-0000-000000000000"
+  }
+}
+```
+
+### Étape 3 : Redirection de l'utilisateur vers le lien de paiement
+
+Il vous suffit de rediriger votre client vers le lien renvoyé dans data.link. Nous afficherons notre interface de paiement pour que le client puisse effectuer le paiement.
+
+### Étape 4 : Après le paiement
+
+Une fois le paiement effectué (avec ou sans succès), cinq choses se produisent :
+
+* Nous redirigeons vers votre URL de retour avec le statut, `monerooPaymentId`, et `monerooPaymentStatus` dans les paramètres de la requête une fois que le paiement est terminé.
+* Nous vous enverrons un Webhook si vous l'avez activé. Pour plus d'informations sur les Webhooks et pour voir des exemples, consultez notre guide sur les Webhooks.
+* Nous enverrons un accusé de réception à votre client si le paiement a été effectué avec succès (sauf si vous l'avez désactivé).
+* Nous vous enverrons un email (sauf si vous l'avez désactivé).
+* Côté serveur, vous devez gérer la redirection et toujours vérifier l'état final de la transaction. Un exemple de vérification d'une transaction dans une application PHP avec notre backend SDK sera fourni plus loin.
+
+Si vous avez activé les Webhooks, nous vous enverrons une notification pour chaque tentative de paiement échouée. C'est utile si vous souhaitez contacter ultérieurement les clients qui ont eu des difficultés à payer. Consultez notre guide des Webhooks pour un exemple.
+
+### Exemple
+
+{% hint style="warning" %}
+
+* N'oubliez pas de remplacer `YOUR_SECRET_KEY` par votre véritable clé secrète.
+* Tous les exemples suivants doivent être réalisés dans le backend, ne jamais exposer votre clé secrète au public.
+  {% endhint %}
+
+{% tabs %}
+{% tab title="cURL" %}
+
+```
+curl -X POST https://api.moneroo.io/v1/payments/initialize \
+     -H "Content-Type: application/json" \
+     -H "Authorization: Bearer YOUR_SECRET_KEY" \
+     -H "Accept: application/json" \
+     -d '{
+         "amount": 100,
+         "currency": "USD",
+         "description": "Payment for order #123",
+         "customer": {
+             "email": "john@example.com",
+             "first_name": "John",
+             "last_name": "Doe"
+         },
+         "return_url": "https://example.com/payments/thank-you",
+         "metadata": {
+             "order_id": "123",
+             "customer_id": "123"
+         },
+         "methods": ["qr_ngn", "bank_transfer_ngn"]
+     }'
+```
+
+{% endtab %}
+
+{% tab title="PHP" %}
+
+<pre class="language-php"><code class="lang-php"><strong>&#x3C;?php
+</strong>
+$url = 'https://api.moneroo.io/v1/payments/initialize';
+
+$headers = [
+    'Content-Type: application/json',
+    'Authorization: Bearer YOUR_SECRET_KEY'
+    'Accept: application/json'
+];
+
+$data = [
+    "amount" => 100,
+    "currency" => "USD",
+    "description" => "Payment for order #123",
+    "customer" => [
+        "email" => "john@example.com",
+        "first_name" => "John",
+        "last_name" => "Doe"
+    ],
+    "return_url" => "https://example.com/payments/thank-you",
+    "metadata" => [
+        "order_id" => "123",
+        "customer_id" => "123",
+    ],
+    "methods" => ["qr_ngn", "bank_transfer_ngn"]
+];
+
+$ch = curl_init($url);
+
+curl_setopt($ch, CURLOPT_POST, 1);
+curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+$response = curl_exec($ch);
+$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+curl_close($ch);
+
+if ($httpcode != 201) {
+    die('Error: "' . curl_error($ch) . '" - Code: ' . curl_errno($ch));
+}
+
+$response_data = json_decode($response, true);
+
+// Redirect to checkout page
+header("Location: " . $response_data['checkout_url']);
+
+?>
+
+</code></pre>
+
+{% endtab %}
+
+{% tab title="Python" %}
+
+```python
+import requests
+import json
+
+url = 'https://api.moneroo.io/v1/payments/initialize'
+
+headers = {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer YOUR_SECRET_KEY'
+    'Accept': 'application/json'
+}
+
+data = {
+    "amount": 100,
+    "currency": "USD",
+    "description": "Payment for order #123",
+    "customer": {
+        "email": "john@example.com",
+        "first_name": "John",
+        "last_name": "Doe"
+    },
+    "return_url": "https://example.com/payments/thank-you",
+    "metadata": {
+        "order_id": "123",
+        "customer_id": "123",
+    },
+    "methods": ["qr_ngn", "bank_transfer_ngn"]
+}
+
+response = requests.post(url, headers=headers, data=json.dumps(data))
+
+if response.status_code != 201:
+    raise Exception(f"Request failed with status {response.status_code}")
+
+checkout_url = response.json()['checkout_url']
+print(f"Redirect to: {checkout_url}")
+```
+
+{% endtab %}
+
+{% tab title="Go" %}
+
+```go
+package main
+
+import (
+	"bytes"
+	"encoding/json"
+	"net/http"
+	"fmt"
+)
+
+func main() {
+	data := map[string]interface{}{
+		"amount": 100,
+		"currency": "USD",
+		"description": "Payment for order #123",
+		"customer": map[string]string{
+			"email": "john@example.com",
+			"first_name": "John",
+			"last_name": "Doe",
+		},
+		"return_url": "https://example.com/payments/thank-you",
+		"metadata": map[string]string{
+			"order_id": "123",
+			"customer_id": "123",
+		},
+		"methods": []string{"qr_ngn", "bank_transfer_ngn"},
+	}
+
+	bytesRepresentation, _ := json.Marshal(data)
+
+	req, _ := http.NewRequest("POST", "https://api.moneroo.io/v1/payments/initialize", bytes.NewBuffer(bytesRepresentation))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer YOUR_SECRET_KEY")
+	req.Header.Set("Accept", "application/json")
+
+	client := &http.Client{}
+	response, _ := client.Do(req)
+	defer response.Body.Close()
+
+	var result map[string]interface{}
+	json.NewDecoder(response.Body).Decode(&result)
+
+	if response.StatusCode != 201 {
+		panic(fmt.Sprintf("Request failed with status %d", response.StatusCode))
+	}
+
+	fmt.Printf("Redirect to: %s", result["checkout_url"])
+}
+```
+
+{% endtab %}
+
+{% tab title="JavaScript (Node.js)" %}
+
+```javascript
+const axios = require('axios');
+
+const data = {
+    "amount": 100,
+    "currency": "USD",
+    "description": "Payment for order #123",
+    "customer": {
+        "email": "john@example.com",
+        "first_name": "John",
+        "last_name": "Doe"
+    },
+    "return_url": "https://example.com/payments/thank-you",
+    "metadata": {
+        "order_id": "123",
+        "customer_id": "123",
+    },
+    "methods": ["qr_ngn", "bank_transfer_ngn"]
+};
+
+const options = {
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer YOUR_SECRET_KEY'
+    'Accept': 'application/json'
+  }
+};
+
+axios.post('https://api.moneroo.io/v1/payments/initialize', data, options)
+    .then((response) => {
+        if (response.status !== 201) {
+            throw new Error(`Request failed with status ${response.status}`);
+
+
+ }
+        console.log(`Redirect to: ${response.data.checkout_url}`);
+    })
+    .catch((error) => {
+        console.error(error);
+    });
+```
+
+{% endtab %}
+{% endtabs %}
+
+
+# Intégration Standard
+
+### Vue d'ensemble
+
+Moneroo Standard est notre flux de paiement qui redirige votre client vers une page de paiement hébergée par Moneroo.
+
+Voici comment cela fonctionne :
+
+* Depuis votre serveur, appelez le endpoint "initialiser le paiement" de notre API avec les détails du paiement.
+* Nous vous renvoyons un lien vers une page de paiement. Redirigez votre client vers ce lien pour effectuer le paiement.
+* Lorsque la transaction est terminée, nous redirigeons le client vers vous (vers `return_url` que vous avez fournie) avec les détails du paiement.
+
+### Étape 1 : Collecte des données de paiement
+
+Tout d'abord, vous devez rassembler les données de paiement qui seront envoyées à votre API sous la forme d'un objet JSON.
+
+Voici les champs à collecter :
+
+<table><thead><tr><th width="305">Nom du champ</th><th width="145">Type</th><th width="125">Exigée</th><th>Description</th></tr></thead><tbody><tr><td><code>amount</code></td><td>integer</td><td>Oui</td><td>Le montant du paiement.</td></tr><tr><td><code>currency</code></td><td>string</td><td>Oui</td><td>La devise du paiement.</td></tr><tr><td><code>description</code></td><td>string</td><td>Oui</td><td>Description du paiement.</td></tr><tr><td><code>return_url</code></td><td>string</td><td>Oui</td><td>URL de retour où votre client sera redirigé après le paiement.</td></tr><tr><td><code>customer.email</code></td><td>string</td><td>Oui</td><td>Adresse e-mail du client.</td></tr><tr><td><code>customer.first_name</code></td><td>string</td><td>Oui</td><td>Prénom du client.</td></tr><tr><td><code>customer.last_name</code></td><td>string</td><td>Oui</td><td>Nom de famille du client.</td></tr><tr><td><code>customer.phone</code></td><td>string</td><td>Non<strong>¹</strong></td><td>Numéro de téléphone du client.</td></tr><tr><td><code>customer.address</code></td><td>string</td><td>Non<strong>¹</strong></td><td>Adresse du client.</td></tr><tr><td><code>customer.city</code></td><td>string</td><td>Non<strong>¹</strong></td><td>Ville du client.</td></tr><tr><td><code>customer.state</code></td><td>string</td><td>Non<strong>¹</strong></td><td>État du client.</td></tr><tr><td><code>customer.country</code></td><td>string</td><td>Non<strong>¹</strong></td><td>Pays du client.</td></tr><tr><td><code>customer.zip</code></td><td>string</td><td>Non<strong>¹</strong></td><td>Code postal du client.</td></tr><tr><td><code>metadata</code></td><td>array</td><td>Non<strong>²</strong></td><td>Données complémentaires pour le paiement.</td></tr><tr><td><code>methods</code></td><td>array</td><td>Non<strong>³</strong></td><td>Méthodes de paiement autorisées.</td></tr><tr><td><code>restrict_country_code</code></td><td>string</td><td>Non⁴</td><td>Restreindre le paiement à un pays spécifique.</td></tr><tr><td><code>restricted_phone</code></td><td>object</td><td>Non⁴</td><td>Restreindre le paiement à un numéro de téléphone spécifique.</td></tr><tr><td><code>restricted_phone.number</code></td><td>string</td><td>Oui⁵</td><td>Le numéro de téléphone auquel restreindre le paiement.</td></tr><tr><td><code>restricted_phone.country_code</code></td><td>string</td><td>Oui⁵</td><td>Le code pays du numéro de téléphone restreint.</td></tr></tbody></table>
+
+1. Si ces informations ne sont pas fournies, le client peut être invité à les saisir au cours de la procédure de paiement, en fonction de la méthode de paiement sélectionnée.
+2. Il doit s'agir d'un tableau de paires clé-valeur. Seules les chaînes de caractères sont autorisées.
+3. S'il n'est pas fourni, tous les modes de paiement disponibles seront autorisés. Le tableau ne doit contenir que les modes de paiement pris en charge.
+4. Vous pouvez utiliser soit `restrict_country_code`, soit `restricted_phone`, mais pas les deux. Ils sont mutuellement exclusifs.
+5. Obligatoire si `restricted_phone` est fourni.
+
+### Étape 2 : Obtention d'un lien de paiement
+
+Ensuite, initiez le paiement en appelant notre API avec les détails de paiement collectés (n'oubliez pas d'autoriser avec votre clé secrète).
+
+#### Exemple de demande :
+
+```bash
+POST /v1/payments/initialize
+Host: https://api.moneroo.io
+Authorization: Bearer YOUR_SECRET_KEY
+Content-Type: application/json
+Accept: application/json
+{
+    "amount": 100,
+    "currency": "USD",
+    "description": "Payment for order #123",
+    "customer": {
+        "email": "john@example.com",
+        "first_name": "John",
+        "last_name": "Doe"
+    },
+    "return_url": "https://example.com/payments/thank-you"
+    "metadata": {
+        "order_id": "123",
+        "customer_id": "123" 
+    },
+    "methods": ["qr_ngn", "bank_transfer_ngn"]
+}
+```
+
+#### Exemple de réponse :
+
+```json
+{
+  "success": true,
+  "message": "Transaction initialized successfully",
+  "data": {
+    "id": "5f7b1b2c-1b2c-5f7b-0000-000000000000",
+    "checkout_url": "https://checkout.moneroo.io/5f7b1b2c-1b2c-5f7b-0000-000000000000"
+  }
+}
+```
+
+### Étape 3 : Redirection de l'utilisateur vers le lien de paiement
+
+Il vous suffit de rediriger votre client vers le lien renvoyé dans data.link. Nous afficherons notre interface de paiement pour que le client puisse effectuer le paiement.
+
+### Étape 4 : Après le paiement
+
+Une fois le paiement effectué (avec ou sans succès), cinq choses se produisent :
+
+* Nous redirigeons vers votre URL de retour avec le statut, `monerooPaymentId`, et `monerooPaymentStatus` dans les paramètres de la requête une fois que le paiement est terminé.
+* Nous vous enverrons un Webhook si vous l'avez activé. Pour plus d'informations sur les Webhooks et pour voir des exemples, consultez notre guide sur les Webhooks.
+* Nous enverrons un accusé de réception à votre client si le paiement a été effectué avec succès (sauf si vous l'avez désactivé).
+* Nous vous enverrons un email (sauf si vous l'avez désactivé).
+* Côté serveur, vous devez gérer la redirection et toujours vérifier l'état final de la transaction. Un exemple de vérification d'une transaction dans une application PHP avec notre backend SDK sera fourni plus loin.
+
+Si vous avez activé les Webhooks, nous vous enverrons une notification pour chaque tentative de paiement échouée. C'est utile si vous souhaitez contacter ultérieurement les clients qui ont eu des difficultés à payer. Consultez notre guide des Webhooks pour un exemple.
+
+### Exemple
+
+{% hint style="warning" %}
+
+* N'oubliez pas de remplacer `YOUR_SECRET_KEY` par votre véritable clé secrète.
+* Tous les exemples suivants doivent être réalisés dans le backend, ne jamais exposer votre clé secrète au public.
+  {% endhint %}
+
+{% tabs %}
+{% tab title="cURL" %}
+
+```
+curl -X POST https://api.moneroo.io/v1/payments/initialize \
+     -H "Content-Type: application/json" \
+     -H "Authorization: Bearer YOUR_SECRET_KEY" \
+     -H "Accept: application/json" \
+     -d '{
+         "amount": 100,
+         "currency": "USD",
+         "description": "Payment for order #123",
+         "customer": {
+             "email": "john@example.com",
+             "first_name": "John",
+             "last_name": "Doe"
+         },
+         "return_url": "https://example.com/payments/thank-you",
+         "metadata": {
+             "order_id": "123",
+             "customer_id": "123"
+         },
+         "methods": ["qr_ngn", "bank_transfer_ngn"]
+     }'
+```
+
+{% endtab %}
+
+{% tab title="PHP" %}
+
+<pre class="language-php"><code class="lang-php"><strong>&#x3C;?php
+</strong>
+$url = 'https://api.moneroo.io/v1/payments/initialize';
+
+$headers = [
+    'Content-Type: application/json',
+    'Authorization: Bearer YOUR_SECRET_KEY'
+    'Accept: application/json'
+];
+
+$data = [
+    "amount" => 100,
+    "currency" => "USD",
+    "description" => "Payment for order #123",
+    "customer" => [
+        "email" => "john@example.com",
+        "first_name" => "John",
+        "last_name" => "Doe"
+    ],
+    "return_url" => "https://example.com/payments/thank-you",
+    "metadata" => [
+        "order_id" => "123",
+        "customer_id" => "123",
+    ],
+    "methods" => ["qr_ngn", "bank_transfer_ngn"]
+];
+
+$ch = curl_init($url);
+
+curl_setopt($ch, CURLOPT_POST, 1);
+curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_HTTPHEADER, $headers);
+
+$response = curl_exec($ch);
+$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+curl_close($ch);
+
+if ($httpcode != 201) {
+    die('Error: "' . curl_error($ch) . '" - Code: ' . curl_errno($ch));
+}
+
+$response_data = json_decode($response, true);
+
+// Redirect to checkout page
+header("Location: " . $response_data['checkout_url']);
+
+?>
+
+</code></pre>
+
+{% endtab %}
+
+{% tab title="Python" %}
+
+```python
+import requests
+import json
+
+url = 'https://api.moneroo.io/v1/payments/initialize'
+
+headers = {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer YOUR_SECRET_KEY'
+    'Accept': 'application/json'
+}
+
+data = {
+    "amount": 100,
+    "currency": "USD",
+    "description": "Payment for order #123",
+    "customer": {
+        "email": "john@example.com",
+        "first_name": "John",
+        "last_name": "Doe"
+    },
+    "return_url": "https://example.com/payments/thank-you",
+    "metadata": {
+        "order_id": "123",
+        "customer_id": "123",
+    },
+    "methods": ["qr_ngn", "bank_transfer_ngn"]
+}
+
+response = requests.post(url, headers=headers, data=json.dumps(data))
+
+if response.status_code != 201:
+    raise Exception(f"Request failed with status {response.status_code}")
+
+checkout_url = response.json()['checkout_url']
+print(f"Redirect to: {checkout_url}")
+```
+
+{% endtab %}
+
+{% tab title="Go" %}
+
+```go
+package main
+
+import (
+	"bytes"
+	"encoding/json"
+	"net/http"
+	"fmt"
+)
+
+func main() {
+	data := map[string]interface{}{
+		"amount": 100,
+		"currency": "USD",
+		"description": "Payment for order #123",
+		"customer": map[string]string{
+			"email": "john@example.com",
+			"first_name": "John",
+			"last_name": "Doe",
+		},
+		"return_url": "https://example.com/payments/thank-you",
+		"metadata": map[string]string{
+			"order_id": "123",
+			"customer_id": "123",
+		},
+		"methods": []string{"qr_ngn", "bank_transfer_ngn"},
+	}
+
+	bytesRepresentation, _ := json.Marshal(data)
+
+	req, _ := http.NewRequest("POST", "https://api.moneroo.io/v1/payments/initialize", bytes.NewBuffer(bytesRepresentation))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer YOUR_SECRET_KEY")
+	req.Header.Set("Accept", "application/json")
+
+	client := &http.Client{}
+	response, _ := client.Do(req)
+	defer response.Body.Close()
+
+	var result map[string]interface{}
+	json.NewDecoder(response.Body).Decode(&result)
+
+	if response.StatusCode != 201 {
+		panic(fmt.Sprintf("Request failed with status %d", response.StatusCode))
+	}
+
+	fmt.Printf("Redirect to: %s", result["checkout_url"])
+}
+```
+
+{% endtab %}
+
+{% tab title="JavaScript (Node.js)" %}
+
+```javascript
+const axios = require('axios');
+
+const data = {
+    "amount": 100,
+    "currency": "USD",
+    "description": "Payment for order #123",
+    "customer": {
+        "email": "john@example.com",
+        "first_name": "John",
+        "last_name": "Doe"
+    },
+    "return_url": "https://example.com/payments/thank-you",
+    "metadata": {
+        "order_id": "123",
+        "customer_id": "123",
+    },
+    "methods": ["qr_ngn", "bank_transfer_ngn"]
+};
+
+const options = {
+  headers: {
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer YOUR_SECRET_KEY'
+    'Accept': 'application/json'
+  }
+};
+
+axios.post('https://api.moneroo.io/v1/payments/initialize', data, options)
+    .then((response) => {
+        if (response.status !== 201) {
+            throw new Error(`Request failed with status ${response.status}`);
+
+
+ }
+        console.log(`Redirect to: ${response.data.checkout_url}`);
+    })
+    .catch((error) => {
+        console.error(error);
+    });
+```
+
+{% endtab %}
+{% endtabs %}
+
+
+# Retrouver un paiement
+
+L'API de la plateforme Moneroo offre un endpoint qui vous permet de récupérer les informations détaillées d'une transaction de paiement spécifique sur la base de son `transaction ID`.
+
+Ce guide vous guidera à travers le processus de récupération d'une transaction de paiement en utilisant l'API de Moneroo.
+
+### Demande
+
+```bash
+GET /v1/payments/{paymentId} HTTP/1.1
+Host: https://api.moneroo.io
+Authorization: Bearer YOUR_SECRET_KEY
+Content-Type: application/json
+Accept: application/json
+```
+
+#### Paramètres
+
+* Endpoint: `/v1/payments/{paymentId}`
+* Method: `GET`
+
+<table><thead><tr><th width="211">Nom</th><th width="107">Type</th><th width="89">Exigée</th><th>Description</th></tr></thead><tbody><tr><td><code>paymentId</code></td><td>String</td><td>Oui</td><td>L'id de l'opération de paiement à récupérer.</td></tr></tbody></table>
+
+### Structure de la Réponse
+
+La réponse de cet endpoint de l'API sera dans le format standard de réponse de l'API Moneroo.
+
+Vous obtiendrez une réponse qui ressemble à celle-ci :
+
+```json
+{
+  "success": true,
+  "message": "Payment transaction fetched successfully",
+  "data": {
+    // Details of the payment transaction
+  }
+}
+```
+
+**Réponse Positive:**
+
+En cas de récupération réussie, l'endpoint renvoie un code d'état HTTP de 200 et les détails de l'opération de paiement dans le corps de la réponse.
+
+**Réponses d'erreurs :**
+
+Si votre demande pose un problème, l'API renvoie une réponse d'erreur. Le type de réponse dépend de la nature du problème. Consultez notre page sur les formats de réponse pour plus d'informations.
+
+### Considérations de sécurité
+
+Cet endpoint nécessite un jeton de support pour l'authentification. Ce jeton doit être inclus dans l'en-tête Authorization de la demande. Assurez-vous que le jeton est conservé en toute sécurité et qu'il n'est pas partagé ou exposé de manière inappropriée.
+
+### Exemples de demandes
+
+{% hint style="info" %}
+Veuillez remplacer `'`**`paymentId`**`'` par l'identifiant de la transaction de paiement et`'`**`your_token`**`'` par votre jeton d'autorisation valide dans les extraits de code ci-dessus.
+{% endhint %}
+
+{% tabs %}
+{% tab title="Curl" %}
+
+```bash
+curl --location --request GET 'https://api.moneroo.io/v1/payments/{paymentId}' \
+--header 'Authorization: Bearer YOUR_TOKEN'
+```
+
+{% endtab %}
+
+{% tab title="PHP" %}
+
+```php
+<?php
+
+$paymentId = 'your_payment_public_id';
+$token = 'your_token';
+
+$curl = curl_init();
+
+curl_setopt_array($curl, [
+  CURLOPT_URL => "https://api.moneroo.io/v1/payments/{$paymentId}",
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_HTTPHEADER => [
+    "Authorization: Bearer {$token}"
+  ]
+]);
+
+$response = curl_exec($curl);
+$httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+
+if ($httpCode === 200) {
+  $responseData = json_decode($response, true);
+  // Handle successful response and retrieve the payment transaction details
+} else {
+  // Handle error response
+}
+
+curl_close($curl);
+```
+
+{% endtab %}
+
+{% tab title="Python" %}
+
+```python
+import requests
+
+payment_public_id = 'your_payment_public_id'
+token = 'your_token'
+
+headers = {
+  'Authorization': f'Bearer {token}'
+}
+
+response = requests.get(f'https://api.moneroo.io/v1/payments/{payment_public_id}', headers=headers)
+
+if response.status_code == 200:
+  data = response.json()
+  # Handle successful response and retrieve the payment transaction details
+else:
+  # Handle error response
+```
+
+{% endtab %}
+
+{% tab title="Go" %}
+
+<pre class="language-go"><code class="lang-go"><strong>package main
+</strong>
+import (
+	"fmt"
+	"net/http"
+	"io/ioutil"
+)
+
+func main() {
+	paymentPublicID := "your_payment_public_id"
+	token := "your_token"
+
+	url := fmt.Sprintf("https://api.moneroo.io/v1/payments/%s", paymentPublicID)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		// Handle error
+	}
+
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
+
+	client := &#x26;http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		// Handle error
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		// Handle error
+	}
+
+	if resp.StatusCode == 200 {
+		// Handle successful response and retrieve the payment transaction details
+	} else {
+		// Handle error response
+	}
+}
+</code></pre>
+
+{% endtab %}
+
+{% tab title="JavaScript (Node.js)" %}
+
+```javascript
+const axios = require("axios");
+
+const paymentId = "your_payment_public_id";
+const token = "your_token";
+
+axios
+  .get(`https://api.moneroo.io/v1/payments/${paymentId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+  .then((response) => {
+    if (response.status === 200) {
+      const data = response.data;
+      // Handle successful response and retrieve the payment transaction details
+    } else {
+      // Handle error response
+    }
+  })
+  .catch((error) => {
+    // Handle error
+  });
+```
+
+{% endtab %}
+{% endtabs %}
+
+### Exemple de réponse
+
+Vous obtiendrez une réponse qui ressemble à celle-ci :
+
+```json
+{
+  "success": true,
+  "message": "Payment transaction fetched successfully",
+  "data": {
+    "id": "abc123",
+    "status": "success",
+    "is_processed": true,
+    "processed_at": "2023-05-21T12:00:00Z",
+    "amount": 100.0,
+    "currency": "USD",
+    "amount_formatted": "$100.00",
+    "description": "Purchase of goods",
+    "return_url": "https://example.com/return",
+    "environment": "production",
+    "initiated_at": "2023-05-21T11:00:00Z",
+    "checkout_url": "https://example.com/checkout",
+    "payment_phone_number": "+1234567890",
+    "app": {
+      "id": "app1",
+      "name": "Example App",
+      "icon_url": "https://example.com/icon.png"
+    },
+    "customer": {
+      "id": "cust1",
+      "first_name": "John",
+      "last_name": "Doe",
+      "email": "john.doe@example.com",
+      "phone": "+1234567890",
+      "address": "123 Main St",
+      "city": "Springfield",
+      "state": "IL",
+      "country_code": "US",
+      "country": "United States",
+      "zip_code": "62701",
+      "environment": "production",
+      "created_at": "2023-01-01T00:00:00Z",
+      "updated_at": "2023-05-21T00:00:00Z"
+    },
+    "method": {
+      "name": "Credit Card",
+      "code": "cc",
+      "icon_url": "https://example.com/cc.png",
+      "environment": "production"
+    },
+    "gateway": {
+      "name": "Stripe",
+      "account_name": "Acme Corp",
+      "code": "stripe",
+      "icon_url": "https://example.com/stripe.png",
+      "environment": "production"
+    },
+    "metadata": {
+      "custom_field1": "custom_value1",
+      "custom_field2": "custom_value2"
+    },
+    "context": {
+      "ip": "192.0.2.0",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (HTML, like Gecko) Chrome/58.0.3029.110 Safari/537",
+      "country": "US",
+      "local": "en-US"
+    }
+  }
+}
+```
+
+Le champ de `data` contient les détails de la transaction. La structure et le contenu de ce champ dépendent des détails de chaque transaction.
+
+
+# Statut
+
+Lorsque vous acceptez des paiements, vous pouvez suivre leur évolution en prêtant attention aux statuts spécifiques des transactions. Cette section a pour but de vous aider à comprendre la signification de chaque statut de transaction sur Moneroo.
+
+Ainsi, chaque étape de paiement passant par notre plateforme est accompagnée d'un certain statut de transaction. Tous ces statuts sont divisés en deux groupes : **transitoire** ou **final**.
+
+Vue simple des statuts des transactions de paiement :
+
+<figure><img src="https://953366264-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FwlygsCi74JW2nJTRD6cj%2Fuploads%2FCS4bkXjEzZeamL2EA0kB%2Fpayment-transaction-status.png?alt=media&#x26;token=8fb0c4fc-3ec5-44c6-ae71-83e1e00e90a0" alt=""><figcaption><p>Etat de la transaction de paiement Moneroo</p></figcaption></figure>
+
+Le tableau ci-dessous donne une vue d'ensemble des statuts des opérations de paiement :
+
+| Statuts     |      Etat      | Description                                                                                        |
+| ----------- | :------------: | -------------------------------------------------------------------------------------------------- |
+| `initiated` | Transactionnel | La transaction a été initiée et attend que le client complète le paiement sur la page de paiement. |
+| `pending`   | Transactionnel | Le client a commencé le processus de paiement, mais il n'est pas encore terminé.                   |
+| `cancelled` |      Final     | La transaction a été annulée. Il s'agit d'un statut final.                                         |
+| `failed`    |      Final     | La transaction a échoué. Il s'agit d'un état final.                                                |
+| `success`   |      Final     | La transaction a été effectuée avec succès. Il s'agit d'un statut final.                           |
+
+
+# Méthodes Disponibles
+
+Vous trouverez ci-dessous une liste des méthodes de paiement que nous acceptons. Cette liste s'enrichit constamment, alors n'hésitez pas à la consulter régulièrement pour des mises à jour.
+
+Pour en savoir plus sur une méthode de paiement spécifique et sur la passerelle de paiement qui la prend en charge, veuillez consulter la section de votre [liste de connexions](http://moneroo.io/connection)
+
+{% hint style="info" %}
+Vous pouvez obtenir une liste actualisée de toutes les méthodes de paiement disponibles en appelant l'endpoint [GET /utils/payment/methods](https://api.moneroo.io/utils/payment/methods).
+
+```
+GET /utils/payout/methods HTTP/1.1
+Host: https://api.moneroo.io
+Accept: application/json
+```
+
+{% endhint %}
+
+***
+
+| Noms                           | Codes              | Devises |          Pays          |
+| ------------------------------ | ------------------ | :-----: | :--------------------: |
+| Orange Money Côte d'Ivoire     | `orange_ci`        |   XOF   |           CI           |
+| Orange Money Sénégal           | `orange_sn`        |   XOF   |           SN           |
+| Orange Money Burkina Faso      | `orange_bf`        |   XOF   |           BF           |
+| Orange Money Mali              | `orange_ml`        |   XOF   |           ML           |
+| E-Money Sénégal                | `e_money_sn`       |   XOF   |           SN           |
+| Orange Money Cameroon          | `orange_cm`        |   XAF   |           CM           |
+| EU Mobile Money Cameroon       | `eu_mobile_cm`     |   XAF   |           CM           |
+| MTN Mobile Money Cameroon      | `mtn_cm`           |   XAF   |           CM           |
+| MTN Mobile Money Bénin         | `mtn_bj`           |   XOF   |           BJ           |
+| MTN Mobile Money Côte d'Ivoire | `mtn_ci`           |   XOF   |           CI           |
+| Airtel Money Nigéria           | `airtel_ng`        |   NGN   |           NG           |
+| Moov Money Bénin               | `moov_bj`          |   XOF   |           BJ           |
+| Moov Money Burkina Faso        | `moov_bf`          |   XOF   |           BF           |
+| Moov Money Togo                | `moov_tg`          |   XOF   |           TG           |
+| Moov Money Côte d'Ivoire       | `moov_ci`          |   XOF   |           CI           |
+| Moov Money Mali                | `moov_ml`          |   XOF   |           ML           |
+| Togocel Money (TMoney)         | `togocel`          |   XOF   |           TG           |
+| Credit Card NGN                | `card_ngn`         |   NGN   |           NG           |
+| Credit Card USD                | `card_usd`         |   USD   |           US           |
+| Credit Card GHS                | `card_ghs`         |   GHS   |           GH           |
+| Credit Card XOF                | `card_xof`         |   XOF   |   CI, BF, TG, BJ, ML   |
+| Credit Card XAF                | `card_xaf`         |   XAF   | CM, CF, CG, GA, GQ, TD |
+| Credit Card ZAR                | `card_zar`         |   ZAR   |           ZA           |
+| Wave Côte d'Ivoire             | `wave_ci`          |   XOF   |           CI           |
+| Wave Sénégal                   | `wave_sn`          |   XOF   |           SN           |
+| Free Money Sénégal             | `freemoney_sn`     |   XOF   |           SN           |
+| MTN Nigéria                    | `mtn_ng`           |   NGN   |           NG           |
+| MTN Ghana                      | `mtn_gh`           |   GHS   |           GH           |
+| Mobi Cash Burkina Faso         | `mobi_cash_bf`     |   XOF   |           BF           |
+| Mobi Cash Mali                 | `mobi_cash_ml`     |   XOF   |           ML           |
+| Airtel Niger                   | `airtel_ne`        |   XOF   |           NE           |
+| MTN MoMo Guinée                | `mtn_gf`           |   GNF   |           GN           |
+| Airtel/Tigo Ghana              | `airtel_gh`        |   GHS   |           GH           |
+| Vodafone Ghana                 | `vodafone_gh`      |   GHS   |           GH           |
+| Barter                         | `barter`           |   NGN   |           NG           |
+| USSD NGN                       | `ussd_ngn`         |   NGN   |           NG           |
+| QR Code Nigéria                | `qr_ngn`           |   NGN   |           NG           |
+| Bank Transfer Nigéria          | `bank_transfer_ng` |   NGN   |           NG           |
+
+Nous ajoutons constamment de nouvelles méthodes de paiement. Si vous ne trouvez pas votre mode de paiement préféré, veuillez [nous contacter](https://moneroo.io/contact).
+
+# Méthodes Disponibles
+
+Vous trouverez ci-dessous une liste des méthodes de paiement que nous acceptons. Cette liste s'enrichit constamment, alors n'hésitez pas à la consulter régulièrement pour des mises à jour.
+
+Pour en savoir plus sur une méthode de paiement spécifique et sur la passerelle de paiement qui la prend en charge, veuillez consulter la section de votre [liste de connexions](http://moneroo.io/connection)
+
+{% hint style="info" %}
+Vous pouvez obtenir une liste actualisée de toutes les méthodes de paiement disponibles en appelant l'endpoint [GET /utils/payment/methods](https://api.moneroo.io/utils/payment/methods).
+
+```
+GET /utils/payout/methods HTTP/1.1
+Host: https://api.moneroo.io
+Accept: application/json
+```
+
+{% endhint %}
+
+***
+
+| Noms                           | Codes              | Devises |          Pays          |
+| ------------------------------ | ------------------ | :-----: | :--------------------: |
+| Orange Money Côte d'Ivoire     | `orange_ci`        |   XOF   |           CI           |
+| Orange Money Sénégal           | `orange_sn`        |   XOF   |           SN           |
+| Orange Money Burkina Faso      | `orange_bf`        |   XOF   |           BF           |
+| Orange Money Mali              | `orange_ml`        |   XOF   |           ML           |
+| E-Money Sénégal                | `e_money_sn`       |   XOF   |           SN           |
+| Orange Money Cameroon          | `orange_cm`        |   XAF   |           CM           |
+| EU Mobile Money Cameroon       | `eu_mobile_cm`     |   XAF   |           CM           |
+| MTN Mobile Money Cameroon      | `mtn_cm`           |   XAF   |           CM           |
+| MTN Mobile Money Bénin         | `mtn_bj`           |   XOF   |           BJ           |
+| MTN Mobile Money Côte d'Ivoire | `mtn_ci`           |   XOF   |           CI           |
+| Airtel Money Nigéria           | `airtel_ng`        |   NGN   |           NG           |
+| Moov Money Bénin               | `moov_bj`          |   XOF   |           BJ           |
+| Moov Money Burkina Faso        | `moov_bf`          |   XOF   |           BF           |
+| Moov Money Togo                | `moov_tg`          |   XOF   |           TG           |
+| Moov Money Côte d'Ivoire       | `moov_ci`          |   XOF   |           CI           |
+| Moov Money Mali                | `moov_ml`          |   XOF   |           ML           |
+| Togocel Money (TMoney)         | `togocel`          |   XOF   |           TG           |
+| Credit Card NGN                | `card_ngn`         |   NGN   |           NG           |
+| Credit Card USD                | `card_usd`         |   USD   |           US           |
+| Credit Card GHS                | `card_ghs`         |   GHS   |           GH           |
+| Credit Card XOF                | `card_xof`         |   XOF   |   CI, BF, TG, BJ, ML   |
+| Credit Card XAF                | `card_xaf`         |   XAF   | CM, CF, CG, GA, GQ, TD |
+| Credit Card ZAR                | `card_zar`         |   ZAR   |           ZA           |
+| Wave Côte d'Ivoire             | `wave_ci`          |   XOF   |           CI           |
+| Wave Sénégal                   | `wave_sn`          |   XOF   |           SN           |
+| Free Money Sénégal             | `freemoney_sn`     |   XOF   |           SN           |
+| MTN Nigéria                    | `mtn_ng`           |   NGN   |           NG           |
+| MTN Ghana                      | `mtn_gh`           |   GHS   |           GH           |
+| Mobi Cash Burkina Faso         | `mobi_cash_bf`     |   XOF   |           BF           |
+| Mobi Cash Mali                 | `mobi_cash_ml`     |   XOF   |           ML           |
+| Airtel Niger                   | `airtel_ne`        |   XOF   |           NE           |
+| MTN MoMo Guinée                | `mtn_gf`           |   GNF   |           GN           |
+| Airtel/Tigo Ghana              | `airtel_gh`        |   GHS   |           GH           |
+| Vodafone Ghana                 | `vodafone_gh`      |   GHS   |           GH           |
+| Barter                         | `barter`           |   NGN   |           NG           |
+| USSD NGN                       | `ussd_ngn`         |   NGN   |           NG           |
+| QR Code Nigéria                | `qr_ngn`           |   NGN   |           NG           |
+| Bank Transfer Nigéria          | `bank_transfer_ng` |   NGN   |           NG           |
+
+Nous ajoutons constamment de nouvelles méthodes de paiement. Si vous ne trouvez pas votre mode de paiement préféré, veuillez [nous contacter](https://moneroo.io/contact).
+
+
+# Initialiser un transfert
+
+## Utilisation de l'API de Transfert Moneroo
+
+Avec l'API de transfert Moneroo, vous pouvez envoyer de l'argent à vos clients. Cette API est utile pour les remboursements, les remises, les paiements de salaires, etc.
+
+### Fonctionnement
+
+1. Depuis votre serveur, envoyez une requête POST à l'API de transfert Moneroo avec les détails du transfert.
+2. Moneroo traite la demande via la passerelle de paiement appropriée en fonction de la méthode de transfert définie.
+3. Moneroo vous envoie une réponse indiquant l'état du transfert.
+
+### Étape 1 : Collecte des données du transfert
+
+Tout d'abord, vous devez collecter les détails du transfert qui seront envoyés à notre API sous la forme d'un objet JSON.
+
+Voici les champs à collecter :
+
+<table><thead><tr><th width="248">Nom du champ</th><th width="91" align="center">Type</th><th width="123" align="center">Obligatoire</th><th>Description</th></tr></thead><tbody><tr><td><code>amount</code></td><td align="center">integer</td><td align="center">Oui</td><td>Le montant du transfert.</td></tr><tr><td><code>currency</code></td><td align="center">string</td><td align="center">Oui</td><td>La devise du transfert. La devise doit être une devise prise en charge dans un format <a href="https://en.wikipedia.org/wiki/ISO_4217">ISO 4217</a> valide.</td></tr><tr><td><code>description</code></td><td align="center">string</td><td align="center">Oui</td><td>Description du transfert.</td></tr><tr><td><code>method</code></td><td align="center">string</td><td align="center">Oui</td><td>Méthode de transfert. Il doit s'agir d'une méthode de transfert valide et prise en charge. Veuillez consulter la <a href="methodes-disponibles">liste des méthodes de transfert prises en charge.</a></td></tr><tr><td><code>customer</code></td><td align="center">object</td><td align="center">Oui</td><td>Détails sur les clients.</td></tr><tr><td><code>customer.email</code></td><td align="center">string</td><td align="center">Oui</td><td>Adresse e-mail du client.</td></tr><tr><td><code>customer.first_name</code></td><td align="center">string</td><td align="center">Oui</td><td>Prénom du client.</td></tr><tr><td><code>customer.last_name</code></td><td align="center">string</td><td align="center">Oui</td><td>Nom du client.</td></tr><tr><td><code>customer.phone</code></td><td align="center">integer</td><td align="center">Non</td><td>Numéro de téléphone du client dans le format <a href="https://en.wikipedia.org/wiki/E.164">E164</a>.</td></tr><tr><td><code>customer.address</code></td><td align="center">string</td><td align="center">Non</td><td>Adresse du client.</td></tr><tr><td><code>customer.city</code></td><td align="center">string</td><td align="center">Non</td><td>Ville du client.</td></tr><tr><td><code>customer.state</code></td><td align="center">string</td><td align="center">Non</td><td>État du client.</td></tr><tr><td><code>customer.country</code></td><td align="center">string</td><td align="center">Non</td><td>Pays du client. Il s'agir du code du pays au format <a href="https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2">ISO 3166-1 alpha-2</a> valide.</td></tr><tr><td><code>customer.zip</code></td><td align="center">string</td><td align="center">Non</td><td>Code postal du client.</td></tr><tr><td><code>metadata</code></td><td align="center">array</td><td align="center">Non</td><td>Données supplémentaires pour le transfert.</td></tr></tbody></table>
+
+### Étape 2 : Ajouter des champs obligatoires pour des méthodes de transfert spécifiques
+
+Chaque méthode de paiement a ses propres champs obligatoires. Veuillez consulter [la liste des méthodes de transfert](https://docs.moneroo.io/fr/payments/methodes-disponibles) prises en charge pour connaître les champs requis pour chaque méthode de paiement.&#x20;
+
+Par exemple, pour la méthode `mtn_bj` (MTN Mobile Money Bénin) , vous devez ajouter les champs suivants :
+
+* `msisdn` : Le numéro de téléphone MTN Mobile Money Benin du client où l'argent sera envoyé.
+
+### Étape 3 : Envoi de la demande de transfert
+
+Ensuite, lancez le transfert en appelant notre API avec les détails du transfert collectés (n'oubliez pas d'autoriser la requête avec votre clé secrète).
+
+#### Exemple de demande :
+
+```bash
+POST /v1/payouts/initialize
+Host: https://api.moneroo.io
+Authorization: Bearer YOUR_SECRET_KEY
+Content-Type: application/json
+Accept: application/json
+{
+    "amount": 1000,
+    "currency": "XOF",
+    "description": "Order refund",
+    "customer": {
+        "email": "john@example.com",
+        "first_name": "John",
+        "last_name": "Doe"
+    },
+    "phone": "22912345678",
+    "metadata": {
+        "payout_request": "123",
+        "customer_id": "123"
+    },
+    "method": "mtn_bj"
+}
+```
+
+#### Exemple de réponse :
+
+```json
+{
+  "success": true,
+  "message": "Payout transaction initialized successfully",
+  "data": {
+    "id": "5f7b1b2c-1b2c-5f7b-0000-000000000000"
+  }
+}
+```
+
+### Étape 4 : Après l'envoi de la demande de transfert
+
+D'accord, voici le texte révisé :
+
+***
+
+Une fois le transfert effectué (avec ou sans succès), trois choses se produisent :
+
+1. Nous vous enverrons un Webhook si vous l'avez activé. Pour plus d'informations sur les Webhooks et pour voir des exemples, consultez notre [guide sur les Webhooks](https://docs.moneroo.io/fr/introduction/webhooks).
+2. Nous vous enverrons un email (sauf si vous l'avez désactivé).
+3. Côté serveur, vous pouvez vérifier la transaction en appelant notre API avec l'ID de la transaction.
+
+Si vous avez activé les Webhooks, nous vous enverrons une notification pour chaque transfert échoué. C'est utile si vous souhaitez contacter les clients ultérieurement ou effectuer d'autres actions. Consultez notre guide sur les Webhooks pour un exemple.
+
+### Exemple
+
+{% hint style="warning" %}
+
+* N'oubliez pas de remplacer `YOUR_SECRET_KEY` par votre véritable clé secrète.
+* Tous les exemples suivants doivent être réalisés dans le backend, ne jamais exposer votre clé secrète au public.
+  {% endhint %}
+
+#### cURL
+
+```bash
+curl -X POST https://api.moneroo.io/v1/payments/initialize \
+     -H "Content-Type: application/json" \
+     -H "Authorization: Bearer YOUR_SECRET_KEY" \
+     -H "Accept: application/json" \
+     -d '{
+         "amount": 100,
+         "currency": "USD",
+         "description": "Payment for order #123",
+         "customer": {
+             "email": "john@example.com",
+             "first_name": "John",
+             "last_name": "Doe"
+         },
+         "return_url": "https://example.com/payments/thank-you",
+         "metadata": {
+             "order_id": "123",
+             "customer_id": "123"
+         },
+         "methods": ["qr_ngn", "bank_transfer_ngn"]
+     }'
+```
+# Initialiser un transfert
+
+## Utilisation de l'API de Transfert Moneroo
+
+Avec l'API de transfert Moneroo, vous pouvez envoyer de l'argent à vos clients. Cette API est utile pour les remboursements, les remises, les paiements de salaires, etc.
+
+### Fonctionnement
+
+1. Depuis votre serveur, envoyez une requête POST à l'API de transfert Moneroo avec les détails du transfert.
+2. Moneroo traite la demande via la passerelle de paiement appropriée en fonction de la méthode de transfert définie.
+3. Moneroo vous envoie une réponse indiquant l'état du transfert.
+
+### Étape 1 : Collecte des données du transfert
+
+Tout d'abord, vous devez collecter les détails du transfert qui seront envoyés à notre API sous la forme d'un objet JSON.
+
+Voici les champs à collecter :
+
+<table><thead><tr><th width="248">Nom du champ</th><th width="91" align="center">Type</th><th width="123" align="center">Obligatoire</th><th>Description</th></tr></thead><tbody><tr><td><code>amount</code></td><td align="center">integer</td><td align="center">Oui</td><td>Le montant du transfert.</td></tr><tr><td><code>currency</code></td><td align="center">string</td><td align="center">Oui</td><td>La devise du transfert. La devise doit être une devise prise en charge dans un format <a href="https://en.wikipedia.org/wiki/ISO_4217">ISO 4217</a> valide.</td></tr><tr><td><code>description</code></td><td align="center">string</td><td align="center">Oui</td><td>Description du transfert.</td></tr><tr><td><code>method</code></td><td align="center">string</td><td align="center">Oui</td><td>Méthode de transfert. Il doit s'agir d'une méthode de transfert valide et prise en charge. Veuillez consulter la <a href="methodes-disponibles">liste des méthodes de transfert prises en charge.</a></td></tr><tr><td><code>customer</code></td><td align="center">object</td><td align="center">Oui</td><td>Détails sur les clients.</td></tr><tr><td><code>customer.email</code></td><td align="center">string</td><td align="center">Oui</td><td>Adresse e-mail du client.</td></tr><tr><td><code>customer.first_name</code></td><td align="center">string</td><td align="center">Oui</td><td>Prénom du client.</td></tr><tr><td><code>customer.last_name</code></td><td align="center">string</td><td align="center">Oui</td><td>Nom du client.</td></tr><tr><td><code>customer.phone</code></td><td align="center">integer</td><td align="center">Non</td><td>Numéro de téléphone du client dans le format <a href="https://en.wikipedia.org/wiki/E.164">E164</a>.</td></tr><tr><td><code>customer.address</code></td><td align="center">string</td><td align="center">Non</td><td>Adresse du client.</td></tr><tr><td><code>customer.city</code></td><td align="center">string</td><td align="center">Non</td><td>Ville du client.</td></tr><tr><td><code>customer.state</code></td><td align="center">string</td><td align="center">Non</td><td>État du client.</td></tr><tr><td><code>customer.country</code></td><td align="center">string</td><td align="center">Non</td><td>Pays du client. Il s'agir du code du pays au format <a href="https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2">ISO 3166-1 alpha-2</a> valide.</td></tr><tr><td><code>customer.zip</code></td><td align="center">string</td><td align="center">Non</td><td>Code postal du client.</td></tr><tr><td><code>metadata</code></td><td align="center">array</td><td align="center">Non</td><td>Données supplémentaires pour le transfert.</td></tr></tbody></table>
+
+### Étape 2 : Ajouter des champs obligatoires pour des méthodes de transfert spécifiques
+
+Chaque méthode de paiement a ses propres champs obligatoires. Veuillez consulter [la liste des méthodes de transfert](https://docs.moneroo.io/fr/payments/methodes-disponibles) prises en charge pour connaître les champs requis pour chaque méthode de paiement.&#x20;
+
+Par exemple, pour la méthode `mtn_bj` (MTN Mobile Money Bénin) , vous devez ajouter les champs suivants :
+
+* `msisdn` : Le numéro de téléphone MTN Mobile Money Benin du client où l'argent sera envoyé.
+
+### Étape 3 : Envoi de la demande de transfert
+
+Ensuite, lancez le transfert en appelant notre API avec les détails du transfert collectés (n'oubliez pas d'autoriser la requête avec votre clé secrète).
+
+#### Exemple de demande :
+
+```bash
+POST /v1/payouts/initialize
+Host: https://api.moneroo.io
+Authorization: Bearer YOUR_SECRET_KEY
+Content-Type: application/json
+Accept: application/json
+{
+    "amount": 1000,
+    "currency": "XOF",
+    "description": "Order refund",
+    "customer": {
+        "email": "john@example.com",
+        "first_name": "John",
+        "last_name": "Doe"
+    },
+    "phone": "22912345678",
+    "metadata": {
+        "payout_request": "123",
+        "customer_id": "123"
+    },
+    "method": "mtn_bj"
+}
+```
+
+#### Exemple de réponse :
+
+```json
+{
+  "success": true,
+  "message": "Payout transaction initialized successfully",
+  "data": {
+    "id": "5f7b1b2c-1b2c-5f7b-0000-000000000000"
+  }
+}
+```
+
+### Étape 4 : Après l'envoi de la demande de transfert
+
+D'accord, voici le texte révisé :
+
+***
+
+Une fois le transfert effectué (avec ou sans succès), trois choses se produisent :
+
+1. Nous vous enverrons un Webhook si vous l'avez activé. Pour plus d'informations sur les Webhooks et pour voir des exemples, consultez notre [guide sur les Webhooks](https://docs.moneroo.io/fr/introduction/webhooks).
+2. Nous vous enverrons un email (sauf si vous l'avez désactivé).
+3. Côté serveur, vous pouvez vérifier la transaction en appelant notre API avec l'ID de la transaction.
+
+Si vous avez activé les Webhooks, nous vous enverrons une notification pour chaque transfert échoué. C'est utile si vous souhaitez contacter les clients ultérieurement ou effectuer d'autres actions. Consultez notre guide sur les Webhooks pour un exemple.
+
+### Exemple
+
+{% hint style="warning" %}
+
+* N'oubliez pas de remplacer `YOUR_SECRET_KEY` par votre véritable clé secrète.
+* Tous les exemples suivants doivent être réalisés dans le backend, ne jamais exposer votre clé secrète au public.
+  {% endhint %}
+
+#### cURL
+
+```bash
+curl -X POST https://api.moneroo.io/v1/payments/initialize \
+     -H "Content-Type: application/json" \
+     -H "Authorization: Bearer YOUR_SECRET_KEY" \
+     -H "Accept: application/json" \
+     -d '{
+         "amount": 100,
+         "currency": "USD",
+         "description": "Payment for order #123",
+         "customer": {
+             "email": "john@example.com",
+             "first_name": "John",
+             "last_name": "Doe"
+         },
+         "return_url": "https://example.com/payments/thank-you",
+         "metadata": {
+             "order_id": "123",
+             "customer_id": "123"
+         },
+         "methods": ["qr_ngn", "bank_transfer_ngn"]
+     }'
+```
+# Récupérer un transfert
+
+L'API de la plateforme Moneroo propose une route qui vous permet de récupérer les informations détaillées d'une transaction de transfert spécifique basée sur son identifiant unique de transaction.
+
+\
+Ce guide vous expliquera comment récupérer une transaction de reversement en utilisant l'API de Moneroo.
+
+### Requête
+
+```bash
+GET /v1/payouts/{payoutId} HTTP/1.1
+Host: https://api.moneroo.io
+Authorization: Bearer YOUR_SECRET_KEY
+Content-Type: application/json
+Accept: application/json
+```
+
+#### Paramètres
+
+* Route: `/v1/payouts/{payoutId}`
+* Méthode: `GET`
+
+<table><thead><tr><th width="200">Champ</th><th>Type</th><th>Requis</th><th>Description</th></tr></thead><tbody><tr><td><code>payoutId</code></td><td>String</td><td>Oui</td><td>Identifiant unique de transaction.sutr</td></tr></tbody></table>
+
+### **Structure d'une réponse**
+
+La réponse de cette route de l'API sera au format standard de réponse de l'API Moneroo.\
+Vous recevrez une réponse qui ressemble à ceci :
+
+```json
+{
+  "success": true,
+  "message": "Payout transaction fetched successfully",
+  "data": {
+    // Details of the payout transaction
+  }
+}
+```
+
+**Réponse en cas de réussite** :\
+En cas de récupération réussie, la route de l'API retourne un code de statut HTTP **200** et les détails de la transaction de paiement dans le corps de la réponse.
+
+**Réponses en cas d'échec** :\
+S'il y a un problème avec votre requête, l'API renverra une réponse d'erreur. Le type de réponse d'erreur dépend de la nature du problème. Consultez notre page sur le format des réponses pour plus d'informations.
+
+### Considérations de sécurité
+
+Cette route de l'API nécessite un *jeton Bearer* pour l'authentification. Le jeton Bearer doit être inclus dans l'en-tête `Authorization` de la requête. Assurez-vous que le jeton est gardé en sécurité et qu'il n'est ni partagé ni exposé de manière inappropriée.
+
+### Exemple de requête
+
+{% tabs %}
+{% tab title="Curl" %}
+
+```bash
+curl --location --request GET 'https://api.moneroo.io/v1/payouts/{payoutId}' \
+--header 'Authorization: Bearer YOUR_TOKEN'
+```
+
+{% endtab %}
+
+{% tab title="JavaScript" %}
+
+```javascript
+const axios = require("axios");
+
+const payoutId = "your_payout_public_id";
+const token = "your_token";
+
+axios
+  .get(`https://api.moneroo.io/v1/payouts/${payoutId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  })
+  .then((response) => {
+    if (response.status === 200) {
+      const data = response.data;
+      // Handle successful response and retrieve the payout transaction details
+    } else {
+      // Handle error response
+    }
+  })
+  .catch((error) => {
+    // Handle error
+  });
+```
+
+{% endtab %}
+
+{% tab title="Python" %}
+
+```python
+import requests
+
+payout_public_id = 'your_payout_public_id'
+token = 'your_token'
+
+headers = {
+  'Authorization': f'Bearer {token}'
+}
+
+response = requests.get(f'https://api.moneroo.io/v1/payouts/{payout_public_id}', headers=headers)
+
+if response.status_code == 200:
+  data = response.json()
+  # Handle successful response and retrieve the payout transaction details
+else:
+  # Handle error response
+```
+
+{% endtab %}
+
+{% tab title="Go" %}
+
+```go
+package main
+
+import (
+	"fmt"
+	"net/http"
+	"io/ioutil"
+)
+
+func main() {
+	payoutPublicID := "your_payout_public_id"
+	token := "your_token"
+
+	url := fmt.Sprintf("https://api.moneroo.io/v1/payouts/%s", payoutPublicID)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		// Handle error
+	}
+
+	req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", token))
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		// Handle error
+	}
+	defer resp.Body.Close()
+
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		// Handle error
+	}
+
+	if resp.StatusCode == 200 {
+		// Handle successful response and retrieve the payout transaction details
+	} else {
+		// Handle error response
+	}
+}
+```
+
+{% endtab %}
+
+{% tab title="PHP" %}
+
+```php
+<?php
+
+$payoutId = 'your_payout_public_id';
+$token = 'your_token';
+
+$curl = curl_init();
+
+curl_setopt_array($curl, [
+  CURLOPT_URL => "https://api.moneroo.io/v1/payouts/{$payoutId}",
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_HTTPHEADER => [
+    "Authorization: Bearer {$token}"
+  ]
+]);
+
+$response = curl_exec($curl);
+$httpCode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+
+if ($httpCode === 200) {
+  $responseData = json_decode($response, true);
+  // Handle successful response and retrieve the payout transaction details
+} else {
+  // Handle error response
+}
+
+curl_close($curl)
+```
+
+{% endtab %}
+{% endtabs %}
+
+Please replace `'payoutId'` with the actual payout transaction Id and `'your_token'` with your valid authorization token in the code snippets above.
+
+### Exemple de réponse
+
+Vous recevrez une réponse qui ressemble à ceci :
+
+```json
+{
+  "success": true,
+  "message": "Payout transaction fetched successfully",
+  "data": {
+    "id": "abc123",
+    "status": "success",
+    "is_processed": true,
+    "processed_at": "2023-05-21T12:00:00Z",
+    "amount": 100.0,
+    "currency": "USD",
+    "amount_formatted": "$100.00",
+    "description": "Purchase of goods",
+    "return_url": "https://example.com/return",
+    "environment": "production",
+    "initiated_at": "2023-05-21T11:00:00Z",
+    "payout_phone_number": "+1234567890",
+    "app": {
+      "id": "app1",
+      "name": "Example App",
+      "icon_url": "https://example.com/icon.png"
+    },
+    "customer": {
+      "id": "cust1",
+      "first_name": "John",
+      "last_name": "Doe",
+      "email": "john.doe@example.com",
+      "phone": "+1234567890",
+      "address": "123 Main St",
+      "city": "Springfield",
+      "state": "IL",
+      "country_code": "US",
+      "country": "United States",
+      "zip_code": "62701",
+      "environment": "production",
+      "created_at": "2023-01-01T00:00:00Z",
+      "updated_at": "2023-05-21T00:00:00Z"
+    },
+    "method": {
+      "name": "Credit Card",
+      "code": "cc",
+      "icon_url": "https://example.com/cc.png",
+      "environment": "production"
+    },
+    "gateway": {
+      "name": "Stripe",
+      "account_name": "Acme Corp",
+      "code": "stripe",
+      "icon_url": "https://example.com/stripe.png",
+      "environment": "production"
+    },
+    "metadata": {
+      "custom_field1": "custom_value1",
+      "custom_field2": "custom_value2"
+    },
+    "context": {
+      "ip": "192.0.2.0",
+      "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (HTML, like Gecko) Chrome/58.0.3029.110 Safari/537",
+      "country": "US",
+      "local": "en-US"
+    }
+  }
+}
+```
+
+Le champ `data` contiendra les détails de la transaction. La structure et le contenu spécifiques de ce champ dépendent des détails de la transaction.
+
+# Statut du transfert
+
+Lorsqu'il s'agit de transfert, il est crucial de suivre leur progression. Pour ce faire efficacement, il est important de comprendre les différents statuts de transaction associés à chaque paiement. Chez Moneroo, nous avons catégorisé ces statuts en deux groupes : *transitoires* et *finaux*.
+
+\
+Vue simplifiée des statuts de transaction de reversement :
+
+<figure><img src="https://953366264-files.gitbook.io/~/files/v0/b/gitbook-x-prod.appspot.com/o/spaces%2FwlygsCi74JW2nJTRD6cj%2Fuploads%2FA0tTUxgS3NPkIidXqThK%2Fpayout-transaction-status.png?alt=media&#x26;token=9bbe65ee-f0c9-444d-a3bc-fce5c1210dce" alt=""><figcaption><p>Moneroo.io Payout Status</p></figcaption></figure>
+
+| Statut      | Catégorie   | Description                                                                                                             |
+| ----------- | ----------- | ----------------------------------------------------------------------------------------------------------------------- |
+| `initiated` | Transitoire | La transaction de transfert a été initiée et est actuellement en file d'attente, en attente de traitement.              |
+| `pending`   | Transitoire | La transaction de transfert a été traitée et est maintenant en attente d'un statut final de la passerelle ou du réseau. |
+| `failed`    | Final       | La transaction a échoué, et c'est son statut final.                                                                     |
+| `success`   | Final       | La transaction a été complétée avec succès, et c'est son statut final.                                                  |
+
+En comprenant ces différents statuts de transaction de transfert, vous pourrez surveiller et gérer efficacement vos paiements avec facilité.
+
+# Méthodes Disponibles
+
+Vous trouverez ci-dessous une liste des méthodes de transfert que nous acceptons. Cette liste est en constante évolution, alors revenez nous voir pour des mises à jour.
+
+Pour en savoir plus sur une méthode de transfert spécifique et sur la passerelle de transfert qui la prend en charge, veuillez consulter la section de votre [liste de connexions.](http://moneroo.io/connection)
+
+{% hint style="info" %}
+Vous pouvez obtenir une liste actualisée de toutes les méthodes de transfert disponibles en appelant la route [GET /utils/payout/methods](https://api.moneroo.io/utils/payout/methods).
+
+{% code overflow="wrap" fullWidth="false" %}
+
+```bash
+GET /utils/payout/methods HTTP/1.1
+Host: https://api.moneroo.io
+Accept: application/json
+```
+
+{% endcode %}
+{% endhint %}
+
+***
+
+### Méthodes de transfert
+
+| Noms                       | Codes                 | Devises | Pays |
+| -------------------------- | --------------------- | :-----: | :--: |
+| MTN Mobile Money Bénin     | `mtn_bj`              |   XOF   |  BJ  |
+| Moov Money Bénin           | `moov_bj`             |   XOF   |  BJ  |
+| E-money Sénégal            | `e_money_sn`          |   XOF   |  SN  |
+| Orange Money Sénégal       | `orange_sn`           |   XOF   |  SN  |
+| Wave Sénégal               | `wave_sn`             |   XOF   |  SN  |
+| Free Money Sénégal         | `freemoney_sn`        |   XOF   |  SN  |
+| Orange Money Côte d'Ivoire | `orange_ci`           |   XOF   |  CI  |
+| MTN MoMo Côte d'Ivoire     | `mtn_ci`              |   XOF   |  CI  |
+| Moov Money Côte d'Ivoire   | `moov_ci`             |   XOF   |  CI  |
+| Wave Côte d'Ivoire         | `wave_ci`             |   XOF   |  CI  |
+| T-Money                    | `togocel`             |   XOF   |  TG  |
+| Orange Money Mali          | `orange_ml`           |   XOF   |  ML  |
+| Djamo Côte d'Ivoire        | `djamo_ci`            |   XOF   |  CI  |
+| Djamo Sénégal              | `djamo_sn`            |   XOF   |  SN  |
+| Transfert Demo Moneroo     | `moneroo_payout_demo` |   XOF   |  US  |
+
+Nous ajoutons constamment de nouvelles méthodes de transfert. Si vous ne trouvez pas votre mode de transfert préféré, veuillez [nous contacter](https://moneroo.io/contact).
+
+### Champs obligatoires
+
+Chaque méthode de transfert a son propre ensemble de champs obligatoires, que vous devez fournir dans le corps de la demande lors de la création d'un transfert.
+
+| Codes                 |      Champs      | Type    | Exemple      | Description                                                                               |
+| --------------------- | :--------------: | ------- | ------------ | ----------------------------------------------------------------------------------------- |
+| `mtn_bj`              |     `msisdn`     | integer | 22912345678  | MTN Mobile Money account phone number that will receive money in international format.    |
+| `moov_bj`             |     `msisdn`     | integer | 22912345678  | MTN Mobile Money account phone number that will receive money in international format.    |
+| `orange_sn`           |     `msisdn`     | integer | 22112345678  | Orange Money account phone number that will receive money in international format.        |
+| `e_money_sn`          |     `msisdn`     | integer | 22112345678  | E-Money account phone number that will receive money in international format.             |
+| `wave_sn`             |     `msisdn`     | integer | 22112345678  | Wave Senegal account phone number that will receive money in international format.        |
+| `freemoney_sn`        |     `msisdn`     | integer | 22112345678  | FreeMoney account phone number that will receive money in international format.           |
+| `orange_ci`           |     `msisdn`     | integer | 22512345678  | Orange Money account phone number that will receive money in international format.        |
+| `mtn_ci`              |     `msisdn`     | integer | 22512345678  | MTN Mobile Money account phone number that will receive money in international format.    |
+| `moov_ci`             |     `msisdn`     | integer | 22512345678  | Moov Money account phone number that will receive money in international format.          |
+| `wave_ci`             |     `msisdn`     | integer | 22512345678  | Wave Ivory Coast account phone number that will receive money in international format.    |
+| `togocel`             |     `msisdn`     | integer | 22812345678  | T-Money account phone number that will receive money in international format.             |
+| `orange_ml`           |     `msisdn`     | integer | 22312345678  | Orange Money account phone number that will receive money in international format.        |
+| `djamo_ci`            |     `msisdn`     | integer | 22512345678  | The msisdn of the Djamo client.                                                           |
+| `djamo_sn`            |     `msisdn`     | integer | 22512345678  | The msisdn of the Djamo client.                                                           |
+| `moneroo_payout_demo` | `account_number` | integer | 010101010101 | Moneroo Payout Demo account phone number that will receive money in international format. |
+
+
+# Tests
+
+Tester votre intégration est une étape cruciale pour garantir une expérience de transfert transparente avec Moneroo. Moneroo met à votre disposition un *environnement de test* dédié, vous permettant de valider votre intégration avant de la mettre en production. Dans le mode *sandbox*, vous pouvez simuler des transactions réelles sans traiter de vrais transferts.
+
+Pour effectuer des tests dans l'environnement *sandbox*, vous utiliserez des clés spécifiques appelées **"clés sandbox"** ou **"clés de test"**. Ces clés sont distinctes des clés de production et sont destinées à des fins de test uniquement. Elles fournissent un environnement sécurisé et contrôlé pour expérimenter et valider votre intégration.
+
+En utilisant les clés et l'environnement *sandbox* de Moneroo, vous pouvez tester en profondeur votre intégration, assurer la compatibilité et résoudre les problèmes éventuels avant de la déployer dans l'environnement de production réel.
+
+> **Les données en&#x20;*****sandbox*****&#x20;sont automatiquement supprimées après&#x20;*****90 jours*****. Cela ne concerne que les transactions et les clients.**
+
+### Processeur de transfert par défaut : Passerelle de transfert Moneroo Test
+
+Par défaut, votre application Moneroo inclut la **"Passerelle de transfert test Moneroo"** comme passerelle de transfert par défaut dans l'environnement *sandbox*. Cette passerelle de transfert vous permet de simuler différents scénarios de transaction et d'observer comment votre système réagit dans chaque cas.
+
+Pour simuler différents scénarios de transactions de transfert et tester en profondeur votre intégration, Moneroo fournit des *numéros de téléphone de test* spécifiques. Ces numéros peuvent être utilisés pour simuler des transactions réussies ou échouées, ce qui vous permet d'évaluer la manière dont votre système gère chaque scénario. Au cours de votre processus de test, vous pouvez utiliser ces numéros de téléphone de test pour imiter le comportement des transactions réelles et observer les réponses de votre intégration en fonction de vos besoins.
+
+{% hint style="info" %}
+
+* Les numéros de téléphone de test ne sont disponibles que pour la passerelle de transfert de test Moneroo et ne peuvent pas être utilisés avec d'autres passerelles de transfert en mode sandbox.
+* Ces numéros peuvent être utilisés pour simuler leurs scénarios respectifs pour toutes les méthodes de transfert associées à la passerelle de transfert Moneroo Test.
+  {% endhint %}
+
+<table><thead><tr><th width="213">Numéro de téléphone</th><th>Scenario</th><th width="125">Devises</th><th>Pays</th></tr></thead><tbody><tr><td>4149518161</td><td>Transaction réussie</td><td>USD</td><td>US</td></tr><tr><td>4149518162</td><td>Transaction échouée</td><td>USD</td><td>US</td></tr><tr><td>4149518163</td><td>Transaction en attente</td><td>USD</td><td>US</td></tr></tbody></table>
+
+### Test avec d'autres passerelles de transfert en mode Sandbox
+
+Moneroo offre la possibilité d'intégrer d'autres passerelles de transfert en mode `sandbox`.
+
+Pour chaque passerelle de transfert disponible dans en mode sandbox, vous devez consulter la documentation de la passerelle de transfert en question pour obtenir les instructions de test. Ces instructions vous fourniront les informations nécessaires sur la manière d'intégrer la passerelle de transfert, d'utiliser les clés de test ou les informations d'identification et de simuler différents scénarios de transaction spécifiques à cette passerelle de transfert.
+
+Moneroo travaille continuellement à l'élargissement de la disponibilité des passerelles de transfert supportées dans en mode sandbox. Par conséquent, assurez-vous de rester informé des dernières annonces et mises à jour de Moneroo concernant les nouvelles intégrations et les options de test en sandbox.&#x20;
+
+Voici des lien vers la documentation de chaque passerelle de transfert supportée en mode sandbox :
+
+<table><thead><tr><th width="364">Payment Processor</th><th>Test Instructions</th></tr></thead><tbody><tr><td>KkiaPay (Sandbox)</td><td><a href="https://docs.kkiapay.me/v1/v/en-1.0.0/compte/kkiapay-sandbox-guide-de-test">View Instructions</a></td></tr><tr><td>Flutterwave (Test)</td><td><a href="https://developer.flutterwave.com/docs/integration-guides/testing-helpers">View Instructions</a></td></tr><tr><td>Paydunya (Sandbox)</td><td><a href="https://developers.paydunya.com/doc/EN/introduction#section-3">View Instructions</a></td></tr><tr><td>Paystack (Sandbox)</td><td><a href="https://paystack.com/docs/payments/test-payments/">View Instructions</a></td></tr><tr><td>Stripe (Sandbox)</td><td><a href="https://stripe.com/docs/testing">View Instructions</a></td></tr><tr><td>Fedapay (Sandbox)</td><td><a href="https://docs.fedapay.com/paiements/test">View Instructions</a></td></tr></tbody></table>
+
+
+# PHP SDK
+
+[![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge\&logo=github\&logoColor=white)](https://github.com/MonerooHQ/moneroo-php) [![Star on GitHub](https://img.shields.io/badge/Star-GitHub-blue?style=for-the-badge\&logo=github)](https://github.com/MonerooHQ/moneroo-php/stargazers)\
+[![PHP Version](https://img.shields.io/packagist/php-v/moneroo/moneroo-php.svg)](https://packagist.org/packages/moneroo/moneroo-php) [![Build Status](https://github.com/monerooHQ/moneroo-php/actions/workflows/run-tests.yml/badge.svg?branch=main)](https://github.com/moneroo/moneroo-php/actions?query=branch%3Amain) [![Latest Stable Version](https://poser.pugx.org/moneroo/moneroo-php/v/stable.svg)](https://packagist.org/packages/moneroo/moneroo-php) [![Total Downloads](https://poser.pugx.org/moneroo/moneroo-php/downloads.svg)](https://packagist.org/packages/moneroo/moneroo-php) [![License](https://poser.pugx.org/moneroo/moneroo-php/license.svg)](https://packagist.org/packages/moneroo/moneroo-php)
+
+Le SDK Moneroo PHP est une bibliothèque complète qui permet aux développeurs PHP d'interagir avec le service d'orchestration des paiements Moneroo.
+
+### Besoins
+
+*PHP 7.4 et versions ultérieures.*
+
+### Installation
+
+Vous pouvez installer le paquet via `composer` :
+
+```bash
+composer require moneroo/moneroo-php
+```
+
+### Paiement
+
+La classe `Moneroo\Payment` fournit des méthodes pour initialiser, vérifier, récupérer et marquer les paiements comme traités. Vous pouvez l'utiliser comme suit :
+
+#### Initier le paiement
+
+Pour créer un paiement, vous devez transmettre un tableau de données de paiement à la méthode de création. Le tableau doit contenir les clés suivantes :
+
+Voici les champs obligatoires sous forme de tableau :
+
+<table><thead><tr><th width="240">Nom des champs</th><th width="97">Type</th><th width="117">Obligatoire</th><th>Description</th></tr></thead><tbody><tr><td><code>amount</code></td><td>integer</td><td>Oui</td><td>Le montant du paiement.</td></tr><tr><td><code>currency</code></td><td>string</td><td>Oui</td><td>La devise du paiement.</td></tr><tr><td><code>description</code></td><td>string</td><td>Non</td><td>Description du paiement.</td></tr><tr><td><code>return_url</code></td><td>string</td><td>Oui</td><td>URL de retour où votre client sera redirigé après le paiement.</td></tr><tr><td><code>customer.email</code></td><td>string</td><td>Oui</td><td>Adresse e-mail du client.</td></tr><tr><td><code>customer.first_name</code></td><td>string</td><td>Oui</td><td>Prénom du client.</td></tr><tr><td><code>customer.last_name</code></td><td>string</td><td>Oui</td><td>Nom du client.</td></tr><tr><td><code>customer.phone</code></td><td>string</td><td>Non<strong>¹</strong></td><td>Numéro de téléphone du client dans le format <a href="https://en.wikipedia.org/wiki/E.164">E164</a>.</td></tr><tr><td><code>customer.address</code></td><td>string</td><td>Non<strong>¹</strong></td><td>Adresse du client.</td></tr><tr><td><code>customer.city</code></td><td>string</td><td>Non<strong>¹</strong></td><td>Ville du client.</td></tr><tr><td><code>customer.state</code></td><td>string</td><td>Non<strong>¹</strong></td><td>État du client.</td></tr><tr><td><code>customer.country</code></td><td>string</td><td>Non<strong>¹</strong></td><td>Pays du client. Il s'agir du code du pays au format <a href="https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2">ISO 3166-1 alpha-2</a> valide.</td></tr><tr><td><code>customer.zip</code></td><td>string</td><td>Non<strong>¹</strong></td><td>Code postal du client.</td></tr><tr><td><code>metadata</code></td><td>array</td><td>Non<strong>²</strong></td><td>Données supplémentaires pour le paiement.</td></tr><tr><td><code>methods</code></td><td>array</td><td>Non<strong>³</strong></td><td>Méthodes de paiement autorisées.</td></tr></tbody></table>
+
+1. Si ces informations ne sont pas fournies, le client peut être invité à les saisir au cours de la procédure de paiement, en fonction de la méthode de paiement sélectionnée.
+2. Il s'agit d'un tableau de paires clé-valeur. Seules les chaînes de caractères sont autorisées.
+3. S'il n'est pas fourni, tous les modes de paiement disponibles seront autorisés. Le tableau ne doit contenir que les méthodes de paiement prises en charge.
+
+**Exemple d'utilisation**
+
+```php
+$paymentData = [
+    'amount' => 100,
+    'currency' => 'USD',
+    'customer' => [
+        'email' => 'john.doe@example.com',
+        'first_name' => 'John',
+        'last_name' => 'Doe',
+        'phone' => '123456789',
+        'address' => '123 Main St',
+        'city' => 'Los Angeles',
+        'state' => 'CA',
+        'country' => 'USA',
+        'zip' => '90001',
+    ],
+    'description' => 'Payment for order #123',
+    'return_url' => 'https://yourwebsite.com/thanks',
+    'metadata' => [
+        'order_id' => '123',
+        'customer_id' => '456',
+    ],
+    'methods' => ['card', 'orange_ci'],
+];
+$monerooPayment = new \Moneroo\Payment($publicKey, $secretKey);
+$payment = $monerooPayment->init($paymentData);
+
+// Redirect the customer to the Checkout URL
+header('Location: ' . $payment->checkout_url);
+
+```
+
+La méthode `create` renvoie un objet contenant les détails du paiement, y compris l'identifiant de la transaction et l'URL de paiement vers laquelle vous devez rediriger le client pour qu'il effectue le paiement. Vous pouvez utiliser cet identifiant de transaction pour vérifier le paiement ultérieurement.
+
+#### Vérifier le paiement
+
+Vous pouvez vérifier un paiement à l'aide de son `id`. Cette fonction est utile lorsque vous souhaitez vérifier l'état d'un paiement avant de traiter une commande de votre côté.
+
+```php
+$transactionId = 'your-payment-transaction-id';
+
+$monerooPayment = new \Moneroo\Payment();
+$payment = $monerooPayment->verify($transactionId);
+```
+
+#### Récupération du paiement
+
+Pour obtenir les détails d'un paiement, utilisez la méthode `get` avec l'id de la transaction.
+
+```php
+$transactionId = 'your-payment-transaction-id';
+
+$monerooPayment = new \Moneroo\Payment($publicKey, $secretKey);
+$payment = $monerooPayment->get($transactionId);
+```
+
+#### Marquer le paiement comme traité
+
+Il s'agit actuellement d'une fonctionnalité expérimentale. Veuillez l'utiliser avec prudence et signaler tout problème que vous rencontrez.
+
+Cette méthode est utile lorsque vous souhaitez marquer un paiement comme étant traité après avoir reçu un rappel de l'API Moneroo et avoir traité la commande de votre côté. Cela vous permet également d'éviter les commandes en double ou de stocker les identifiants des transactions dans votre base de données pour référence ultérieure.
+
+Pour marquer un paiement comme traité, utilisez la méthode `makeAsProcessed` avec l'id de la transaction.
+
+Exemple d'usage :
+
+```php
+$transactionId = 'your-payment-transaction-id';
+
+$monerooPayment = new \Moneroo\Payment($publicKey, $secretKey);
+$payment = $monerooPayment->makeAsProcessed($transactionId);
+```
+
+### Transfert
+
+La classe `Moneroo\Payout` fournit des méthodes d'initialisation, de vérification et de récupération des paiements.
+
+#### Initier le paiement
+
+Pour initialiser un tranfert, vous devez transmettre un tableau de données répondant aux règles de validation spécifiées. Le tableau doit contenir les clés suivantes :
+
+Voici les champs obligatoires sous forme de tableau :
+
+<table><thead><tr><th width="257">Nom des champs</th><th width="91">Type</th><th width="120">Obligatoire</th><th>Description</th></tr></thead><tbody><tr><td><code>amount</code></td><td>integer</td><td>Oui</td><td>Le montant du transfert.</td></tr><tr><td><code>currency</code></td><td>string</td><td>Oui</td><td>La devise du transfert. La devise doit être une devise prise en charge dans un format <a href="https://en.wikipedia.org/wiki/ISO_4217">ISO 4217</a> valide.</td></tr><tr><td><code>description</code></td><td>string</td><td>Oui</td><td>Description du transfert.</td></tr><tr><td><code>customer.email</code></td><td>string</td><td>Oui</td><td>Adresse e-mail du client.</td></tr><tr><td><code>customer.first_name</code></td><td>string</td><td>Oui</td><td>Prénom du client.</td></tr><tr><td><code>customer.last_name</code></td><td>string</td><td>Oui</td><td>Nom du client.</td></tr><tr><td><code>return_url</code></td><td>string</td><td>Oui</td><td>URL de retour où votre client sera redirigé après le transfert.</td></tr><tr><td><code>customer.phone</code></td><td>string</td><td>Non</td><td>Numéro de téléphone du client dans le format <a href="https://en.wikipedia.org/wiki/E.164">E164</a>.</td></tr><tr><td><code>customer.address</code></td><td>string</td><td>Non</td><td>Adresse du client.</td></tr><tr><td><code>customer.city</code></td><td>string</td><td>Non</td><td>Ville du client.</td></tr><tr><td><code>customer.state</code></td><td>string</td><td>Non</td><td>État du client.</td></tr><tr><td><code>customer.country</code></td><td>string</td><td>Non</td><td>Pays du client. Il s'agir du code du pays au format <a href="https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2">ISO 3166-1 alpha-2</a> valide.</td></tr><tr><td><code>customer.zip</code></td><td>string</td><td>Non</td><td>Code postal du client.</td></tr><tr><td><code>metadata</code></td><td>array</td><td>Non</td><td>Données supplémentaires pour le transfert.</td></tr><tr><td><code>method</code></td><td>string</td><td>Oui<strong>¹</strong></td><td>Méthodes de transfert autorisées </td></tr><tr><td><code>request_confirmation</code><strong>²</strong></td><td>bool</td><td>Non</td><td>Si vous souhaitez demander une confirmation au client.</td></tr></tbody></table>
+
+{% hint style="info" %}
+
+1. &#x20;Il s'agit d'une [méthode de transfert](https://docs.moneroo.io/fr/payouts/methodes-disponibles) supportée par Moneroo
+2. Cette fonctionnalité est actuellement en phase expérimentale et n'est pas disponible pour tous les utilisateurs/applications. Elle vous permet de demander une confirmation à un client avant de procéder au transfert. Moneroo enverra un e-mail au client contenant un code de confirmation. Le client est alors dirigé vers une page de confirmation où il peut vérifier le montant du paiement et les détails de son compte. Si les informations sont correctes, le client peut saisir le code de confirmation pour approuver ou rejeter la demande de paiement. Cette fonction est un outil précieux pour éviter les informations incorrectes ou les transactions frauduleuses. Si l'utilisateur ne répond pas dans les 15 minutes, la demande de paiement sera automatiquement annulée.
+   {% endhint %}
+
+En plus des informations ci-dessus, vous devez ajouter des champs obligatoires pour les méthodes de tranfert dans les détails du compte. Par exemple, si le mode de paiement est `mtn_bj`, vous devez fournir les champs `msisdn.`
+
+Il s'agit d'une information différente de celle de l'utilisateur, qui indique où l'argent sera versé. Pour plus d'informations, veuillez consulter les champs obligatoires pour chaque méthode de transfert.
+
+```php
+$payoutData = [
+    'amount' => 100,
+    'currency' => 'USD',
+    'customer' => [
+        'email' => 'john.doe@example.com',
+        'first_name' => 'John',
+        'last_name' => 'Doe',
+        // other customer details...
+    ],
+    'description' => 'Salary payment',
+    'method' => 'mtn_bj',
+    'msisdn' => '22912345678', // required field for mtn_bj payout method
+    // other data...
+];
+
+$monerooPayout = new Moneroo\Payout($publicKey, $secretKey);
+$payout = $monerooPayout->init($payoutData);
+```
+
+La méthode `create` renvoie un objet contenant les détails du paiement, y compris l'id de la transaction et le statut du paiement. Vous pouvez utiliser cet identifiant de transaction pour vérifier le paiement ultérieurement.
+
+#### Vérifier le transfert
+
+Vous pouvez vérifier un tranfert grâce à l'id de la transaction.
+
+```php
+$transactionId = 'your-payout-transaction-id';
+
+$monerooPayout = new Moneroo\Payout($publicKey, $secretKey);
+$payout = $monerooPayout->verify($transactionId);
+```
+
+#### Récupérer le tranfert
+
+Pour obtenir les détails d'un tranfert, utilisez la méthode `get` avec l'id de la transaction.
+
+```php
+$transactionId = 'your-payout-transaction-id';
+
+$payout = new \Moneroo\Payout($publicKey, $secretKey);
+$payout = $payout->get($transactionId);
+```
+
+### Traitement des exceptions
+
+Le SDK est livré avec un certain nombre d'exceptions personnalisées pour vous aider à gérer les erreurs potentielles qui peuvent survenir lors de l'utilisation de l'API Moneroo. Ces exceptions sont les suivantes :
+
+* **InvalidPayloadException** : Cette exception est déclenchée lorsque la charge utile envoyée à l'API ne répond pas aux critères attendus.
+* **ForbiddenException** : Cette exception est déclenchée lorsque l'utilisateur authentifié tente d'effectuer une action pour laquelle il ne dispose pas des autorisations nécessaires.
+* **InvalidResourceException** : Cette exception est déclenchée lorsqu'une requête est adressée à une ressource inexistante ou invalide.
+* **ServerErrorException** : Cette exception est déclenchée en cas d'erreur du côté du serveur.
+* **NotAcceptableException** : Cette exception est déclenchée lorsque les caractéristiques du contenu de la demande du client ne sont pas acceptables selon les en-têtes Accept envoyés dans la demande.
+* **ServiceUnavailableException** : Cette exception est déclenchée lorsque le service est actuellement indisponible, peut-être en raison de problèmes de maintenance ou de charge sur le serveur.
+* **UnauthorizedException** : Cette exception est levée lorsque la demande ne comporte pas d'informations d'authentification valides pour la ressource cible.
+
+Pour chaque exception, vous pouvez accéder au message d'erreur en appelant`$exception->getMessage()`, et au code d'erreur (s'il est disponible) en appelant`$exception->getCode()`.
+
+### Support
+
+Si vous avez des questions ou besoin d'aide, n'hésitez pas à [nous contacter](https://moneroo.io/contact). Nous sommes toujours heureux de répondre à vos questions.
+
+### Vulnérabilités sécuritaires
+
+Si vous découvrez une faille de sécurité dans le SDK PHP de Moneroo, veuillez envoyer un e-mail à Moneroo Security via <security@moneroo.io>. Toutes les failles de sécurité seront traitées rapidement.
+
+### Licence
+
+Le SDK Moneroo PHP est un logiciel libre sous licence MIT.
+
+
+# Laravel SDK
+
+[![PHP Version](https://img.shields.io/packagist/php-v/moneroo/moneroo-laravel.svg)](https://packagist.org/packages/moneroo/moneroo-laravel) [![Build Status](https://github.com/moneroohq/moneroo-laravel/actions/workflows/run-tests.yml/badge.svg?branch=main)](https://github.com/moneroohq/moneroo-laravel/actions?query=branch%3Amain) ![Latest Stable Version](https://poser.pugx.org/moneroohq/moneroo-laravel/v/stable.svg) [![Total Downloads](https://poser.pugx.org/moneroo/moneroo-laravel/downloads.svg)](https://packagist.org/packages/moneroo/moneroo-laravel) [![License](https://poser.pugx.org/moneroo/moneroo-laravel/license.svg)](https://packagist.org/packages/moneroo/moneroo-laravel)
+
+Le SDK Moneroo Laravel est une bibliothèque complète qui permet aux développeurs Laravel d'interagir avec le service d'orchestration des paiements Moneroo.
+
+### Besoins
+
+Laravel 9.0 ou plus récent, PHP requise : PHP 8.1 et plus
+
+### Installation
+
+Vous pouvez installer le paquet via composer :
+
+```bash
+composer require moneroo/moneroo-laravel
+```
+
+#### Commande d'installation
+
+Le paquetage fournit une commande pratique pour installer le SDK Moneroo Laravel et publier sa configuration dans votre projet Laravel. Après avoir installé le paquet via composer, vous pouvez exécuter cette commande :
+
+```bash
+php artisan moneroo:install
+```
+
+Cette commande va :
+
+1. Publier un fichier `moneroo.php` dans votre répertoire de configuration
+2. Ajoutez à votre fichier `.env` les variables `MONEROO_PUBLIC_KEY` et `MONEROO_SECRET_KEY` si elles n'existent pas déjà.
+
+Vous devrez remplacer 'your-public-key' et 'your-secret-key' par votre clé publique et votre clé secrète Moneroo.
+
+```env
+MONEROO_PUBLIC_KEY=your-public-key
+MONEROO_SECRET_KEY=your-secret-key
+```
+
+Gardez à l'esprit qu'il s'agit de clés sensibles et qu'elles ne doivent pas être exposées publiquement. Le fichier `.env` de Laravel est ignoré par Git, ce qui en fait un bon endroit pour stocker des informations sensibles.
+
+### Paiement
+
+La classe `Moneroo\Payment` fournit des méthodes pour initialiser, vérifier, récupérer et marquer les paiements comme traités. Vous pouvez l'utiliser comme suit :
+
+#### Initier le paiement
+
+Pour créer un paiement, vous devez transmettre un tableau de données de paiement à la méthode de création. Le tableau doit contenir les clés suivantes :
+
+Voici les champs obligatoires sous forme de tableau :
+
+<table><thead><tr><th width="241">Nom des champs</th><th width="98">Type</th><th width="130">Obligatoire</th><th>Description</th></tr></thead><tbody><tr><td><code>amount</code></td><td>integer</td><td>Oui</td><td>Le montant du paiement.</td></tr><tr><td><code>currency</code></td><td>string</td><td>Oui</td><td>La devise du paiement.</td></tr><tr><td><code>description</code></td><td>string</td><td>Non</td><td>Description du paiement.</td></tr><tr><td><code>return_url</code></td><td>string</td><td>Oui</td><td>URL de retour où votre client sera redirigé après le paiement.</td></tr><tr><td><code>customer.email</code></td><td>string</td><td>Oui</td><td>Adresse e-mail du client.</td></tr><tr><td><code>customer.first_name</code></td><td>string</td><td>Oui</td><td>Prénom du client.</td></tr><tr><td><code>customer.last_name</code></td><td>string</td><td>Oui</td><td>Nom du client.</td></tr><tr><td><code>customer.phone</code></td><td>string</td><td>Non<strong>¹</strong></td><td>Numéro de téléphone du client dans le format <a href="https://en.wikipedia.org/wiki/E.164">E164</a>.</td></tr><tr><td><code>customer.address</code></td><td>string</td><td>Non<strong>¹</strong></td><td>Adresse du client.</td></tr><tr><td><code>customer.city</code></td><td>string</td><td>Non<strong>¹</strong></td><td>Ville du client.</td></tr><tr><td><code>customer.state</code></td><td>string</td><td>Non<strong>¹</strong></td><td>État du client.</td></tr><tr><td><code>customer.country</code></td><td>string</td><td>Non<strong>¹</strong></td><td>Pays du client. Il s'agir du code du pays au format <a href="https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2">ISO 3166-1 alpha-2</a> valide.</td></tr><tr><td><code>customer.zip</code></td><td>string</td><td>Non<strong>¹</strong></td><td>Code postal du client.</td></tr><tr><td><code>metadata</code></td><td>array</td><td>Non<strong>²</strong></td><td>Données supplémentaires pour le paiement.</td></tr><tr><td><code>methods</code></td><td>array</td><td>Non<strong>³</strong></td><td>Méthodes de paiement autorisées.</td></tr></tbody></table>
+
+1. Si ces informations ne sont pas fournies, le client peut être invité à les saisir au cours de la procédure de paiement, en fonction de la méthode de paiement sélectionnée.
+2. Il s'agit d'un tableau de paires clé-valeur. Seules les chaînes de caractères sont autorisées.
+3. S'il n'est pas fourni, tous les modes de paiement disponibles seront autorisés. Le tableau ne doit contenir que les méthodes de paiement prises en charge.
+
+**Exemple d'utilisation**
+
+```php
+$paymentData = [
+    'amount' => 100,
+    'currency' => 'USD',
+    'customer' => [
+        'email' => 'john.doe@example.com',
+        'first_name' => 'John',
+        'last_name' => 'Doe',
+        'phone' => '123456789',
+        'address' => '123 Main St',
+        'city' => 'Los Angeles',
+        'state' => 'CA',
+        'country' => 'USA',
+        'zip' => '90001',
+    ],
+    'description' => 'Payment for order #123',
+    'return_url' => 'https://yourwebsite.com/thanks',
+    'metadata' => [
+        'order_id' => '123',
+        'customer_id' => '456',
+    ],
+    'methods' => ['card', 'orange_ci'],
+];
+$monerooPayment = new Moneroo\Payment();
+$payment = $monerooPayment->init($paymentData);
+
+// Redirect the customer to the Checkout URL
+header('Location: ' . $payment->checkout_url);
+
+```
+
+La méthode `create` renvoie un objet contenant les détails du paiement, y compris l'identifiant de la transaction et l'URL de paiement vers laquelle vous devez rediriger le client pour qu'il effectue le paiement. Vous pouvez utiliser cet identifiant de transaction pour vérifier le paiement ultérieurement.
+
+#### Vérifier le paiement
+
+Vous pouvez vérifier un paiement à l'aide de son `id`. Cette fonction est utile lorsque vous souhaitez vérifier l'état d'un paiement avant de traiter une commande de votre côté.
+
+```php
+$transactionId = 'your-payment-transaction-id';
+
+$monerooPayment = new Moneroo\Payment();
+$payment = $monerooPayment->verify($transactionId);
+```
+
+#### Récupération du paiement
+
+Pour obtenir les détails d'un paiement, utilisez la méthode `get` avec l'id de la transaction.
+
+```php
+$transactionId = 'your-payment-transaction-id';
+
+$monerooPayment = new Moneroo\Payment();
+$payment = $monerooPayment->get($transactionId);
+```
+
+#### Marquer le paiement comme traité
+
+Il s'agit actuellement d'une *fonctionnalité expérimentale*. Veuillez l'utiliser avec prudence et signaler tout problème que vous rencontrez.
+
+Cette méthode est utile lorsque vous souhaitez marquer un paiement comme étant traité après avoir reçu un rappel de l'API Moneroo et avoir traité la commande de votre côté. Cela vous permet également d'éviter les commandes en double ou de stocker les identifiants des transactions dans votre base de données pour référence ultérieure.
+
+Pour marquer un paiement comme traité, utilisez la méthode `makeAsProcessed` avec l'id de la transaction.
+
+Exemple :
+
+```php
+$transactionId = 'your-payment-transaction-id';
+
+$monerooPayment = new Moneroo\Payment();
+$payment = $monerooPayment->makeAsProcessed($transactionId);
+```
+
+### Transfert
+
+La classe `Moneroo\Payout` fournit des méthodes d'initialisation, de vérification et de récupération des paiements.
+
+#### Initier le tranfert
+
+Pour initialiser un tranfert, vous devez transmettre un tableau de données répondant aux règles de validation spécifiées. Le tableau doit contenir les clés suivantes :
+
+Voici les champs obligatoires sous forme de tableau :
+
+1. Il s'agit d'une [méthode de transfert](https://docs.moneroo.io/fr/payouts/methodes-disponibles) supportée par Moneroo
+2. Cette fonctionnalité est actuellement en phase expérimentale et n'est pas disponible pour tous les utilisateurs/applications. Elle vous permet de demander une confirmation à un client avant de procéder au transfert. Moneroo enverra un e-mail au client contenant un code de confirmation. Le client est alors dirigé vers une page de confirmation où il peut vérifier le montant du paiement et les détails de son compte. Si les informations sont correctes, le client peut saisir le code de confirmation pour approuver ou rejeter la demande de paiement. Cette fonction est un outil précieux pour éviter les informations incorrectes ou les transactions frauduleuses. Si l'utilisateur ne répond pas dans les 15 minutes, la demande de paiement sera automatiquement annulée.
+
+En plus des informations ci-dessus, vous devez ajouter des champs obligatoires pour les méthodes de tranfert dans les détails du compte. Par exemple, si le mode de paiement est`mtn_bj`, vous devez fournir des champs pour le`phone.`
+
+Il s'agit d'une information différente de celle de l'utilisateur, qui indique où l'argent sera versé. Pour plus d'informations, veuillez consulter les champs obligatoires pour chaque méthode de transfert.
+
+```php
+$payoutData = [
+    'amount' => 100,
+    'currency' => 'USD',
+    'customer' => [
+        'email' => 'john.doe@example.com',
+        'first_name' => 'John',
+        'last_name' => 'Doe',
+        // other customer details...
+    ],
+    'description' => 'Payout for order #123',
+    'method' => 'bank_transfer',
+    // other data...
+];
+
+$monerooPayout = new Moneroo\Payout();
+$payout = Moneroo\Payout::init($payoutData);
+```
+
+La méthode `create` renvoie un objet contenant les détails du paiement, y compris l'id de la transaction et le statut du paiement. Vous pouvez utiliser cet identifiant de transaction pour vérifier le paiement ultérieurement.
+
+#### Vérifier le transfert
+
+Vous pouvez vérifier un tranfert grâce à l'id de la transaction.
+
+```php
+$transactionId = 'your-payout-transaction-id';
+
+$payout = Moneroo\Payout::verify($transactionId);
+```
+
+#### Récupérer le paiement
+
+Pour obtenir les détails d'un tranfert, utilisez la méthode `get` avec l'id de la transaction.
+
+```php
+$transactionId = 'your-payout-transaction-id';
+
+$payout = Moneroo\Payout::get($transactionId);
+```
+
+Exemple d'usage:
+
+```php
+$payout = new Moneroo\Payout();
+$response = $payout->get('your-payout-transaction-id');
+```
+
+### Traitement des exceptions
+
+Le SDK est livré avec un certain nombre d'exceptions personnalisées pour vous aider à gérer les erreurs potentielles qui peuvent survenir lors de l'utilisation de l'API Moneroo. Ces exceptions sont les suivantes :
+
+* **InvalidPayloadException** : Cette exception est déclenchée lorsque la charge utile envoyée à l'API ne répond pas aux critères attendus.
+* **ForbiddenException** : Cette exception est déclenchée lorsque l'utilisateur authentifié tente d'effectuer une action pour laquelle il ne dispose pas des autorisations nécessaires.
+* **InvalidResourceException** : Cette exception est déclenchée lorsqu'une requête est adressée à une ressource inexistante ou invalide.
+* ServerErrorException : Cette exception est déclenchée en cas d'erreur du côté du serveur.
+* **NotAcceptableException** : Cette exception est déclenchée lorsque les caractéristiques du contenu de la demande du client ne sont pas acceptables selon les en-têtes Accept envoyés dans la demande.
+* **ServiceUnavailableException** : Cette exception est déclenchée lorsque le service est actuellement indisponible, peut-être en raison de problèmes de maintenance ou de charge sur le serveur.
+* **UnauthorizedException** : Cette exception est levée lorsque la demande ne comporte pas d'informations d'authentification valides pour la ressource cible.
+
+Pour chaque exception, vous pouvez accéder au message d'erreur en appelant`$exception->getMessage()`, et au code d'erreur (s'il est disponible) en appelant`$exception->getCode()`.
+
+### Support
+
+Si vous avez des questions ou besoin d'aide, n'hésitez pas à [nous contacter](https://moneroo.io/contact). Nous sommes toujours heureux de répondre à vos questions.
+
+### Vulnérabilités sécuritaires
+
+Si vous découvrez une faille de sécurité dans le SDK Laravel de Moneroo, veuillez envoyer un e-mail à Moneroo Security via <security@moneroo.io>. Toutes les failles de sécurité seront traitées rapidement.
+
+### Licence
+
+Le SDK Moneroo Laravel est un logiciel libre sous licence MIT.

@@ -62,3 +62,5 @@ GOOGLE_CALLBACK_URL=https://VOTRE_URL_BACKEND_RAILWAY.up.railway.app/api/auth/go
 # 3. Railway va automatiquement injecter DATABASE_URL
 # 4. Changez ADMIN_DEFAULT_PASSWORD par un mot de passe fort
 
+
+

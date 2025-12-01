@@ -178,3 +178,5 @@ Une fois le frontend démarré, vous pourrez :
 
 **Backend actif ✅ | Frontend à démarrer manuellement ⚠️ | Base de données opérationnelle ✅**
 
+
+

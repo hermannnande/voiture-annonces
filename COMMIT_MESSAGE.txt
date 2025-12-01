@@ -24,3 +24,5 @@ Fix: Correction majeure pour déploiement production
 - Fichiers .env exclus du repository
 - Secrets JWT à régénérer en production
 
+
+

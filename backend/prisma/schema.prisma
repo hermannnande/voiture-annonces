@@ -71,6 +71,7 @@ model User {
   wallet                      Wallet?              
   buyerBoosts                 Boost[]              @relation("BuyerBoosts")
   walletTransactionsAsActor   WalletTransaction[]  @relation("WalletTransactionActor")
+  creditPurchases             CreditPurchase[]
 
   @@map("users")
 }
@@ -315,6 +316,42 @@ model WalletTransaction {
 enum WalletTransactionType {
   CREDIT // Ajout de crédits
   DEBIT  // Déduction de crédits
+}
+
+// Achats de crédits via Moneroo
+model CreditPurchase {
+  id                String                @id @default(uuid())
+  userId            String                @map("user_id")
+  amount            BigInt                // Montant payé en FCFA
+  creditsAmount     BigInt                @map("credits_amount") // Nombre de crédits achetés
+  currency          String                @default("XOF")
+  monerooPaymentId  String?               @unique @map("moneroo_payment_id") // ID de la transaction Moneroo
+  status            CreditPurchaseStatus  @default(PENDING)
+  paymentMethod     String?               @map("payment_method") // orange_ci, wave_ci, mtn_ci, etc.
+  customerEmail     String                @map("customer_email")
+  customerPhone     String?               @map("customer_phone")
+  returnUrl         String?               @map("return_url")
+  checkoutUrl       String?               @map("checkout_url") // URL de paiement Moneroo
+  metadata          Json?                 // Données supplémentaires
+  createdAt         DateTime              @default(now()) @map("created_at")
+  updatedAt         DateTime              @updatedAt @map("updated_at")
+  completedAt       DateTime?             @map("completed_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([monerooPaymentId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("credit_purchases")
+}
+
+enum CreditPurchaseStatus {
+  PENDING    // En attente de paiement
+  PROCESSING // Paiement en cours de vérification
+  COMPLETED  // Paiement réussi, crédits ajoutés
+  FAILED     // Paiement échoué
+  CANCELLED  // Annulé par l'utilisateur
 }
 
 // Favoris
