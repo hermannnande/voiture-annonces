@@ -1,0 +1,26 @@
+Fix: Correction majeure pour déploiement production
+
+✅ Corrections apportées:
+- Fix verification email automatique pour tous les utilisateurs
+- Correction connexion base de données (migration baseline)
+- Sécurisation des credentials admin (variables d'environnement)
+- Ajout module d'initialisation automatique
+- Fix email verification pour comptes vendeurs
+
+🚀 Prêt pour déploiement:
+- Backend compatible Railway avec PostgreSQL
+- Frontend compatible Vercel
+- Variables d'environnement documentées
+- Guide de déploiement complet
+
+📝 Fichiers modifiés:
+- backend/src/init/* (nouveau module initialisation)
+- backend/prisma/migrations/0_init/* (migration baseline)
+- backend/src/app.module.ts (ajout InitModule)
+- Documentation déploiement Railway/Vercel
+
+🔐 Sécurité:
+- Credentials admin maintenant via variables d'env
+- Fichiers .env exclus du repository
+- Secrets JWT à régénérer en production
+

@@ -4,6 +4,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
 import { ScheduleModule } from '@nestjs/schedule';
 
 import { PrismaModule } from './prisma/prisma.module';
+import { InitModule } from './init/init.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { ListingsModule } from './listings/listings.module';
@@ -38,6 +39,7 @@ import { WalletModule } from './wallet/wallet.module';
 
     // Modules de l'application
     PrismaModule,
+    InitModule, // Doit être après PrismaModule pour avoir accès à la DB
     AuthModule,
     UsersModule,
     ListingsModule,

@@ -1,0 +1,64 @@
+# ========================================
+# VARIABLES D'ENVIRONNEMENT POUR RAILWAY
+# ========================================
+# Copiez ces variables dans Railway Dashboard → Variables
+# Remplacez les valeurs par les vôtres !
+
+# ============ BASE DE DONNÉES ============
+# Cette variable sera automatiquement créée par Railway
+# Ne la modifiez pas manuellement
+DATABASE_URL=${{Postgres.DATABASE_URL}}
+
+# ============ JWT SECRETS ============
+# IMPORTANT : Générez de NOUVEAUX secrets sécurisés !
+# Ne réutilisez PAS ceux du développement local
+JWT_SECRET=GENERER_UN_SECRET_SECURISE_64_CARACTERES_MINIMUM
+JWT_REFRESH_SECRET=GENERER_UN_AUTRE_SECRET_SECURISE_64_CARACTERES_MINIMUM
+JWT_EXPIRATION=24h
+JWT_REFRESH_EXPIRATION=7d
+
+# ============ ADMIN PRINCIPAL ============
+# Vos informations personnelles
+ADMIN_EMAIL=hermannnande@gmail.com
+ADMIN_NAME=Hermann Nande
+ADMIN_PHONE=+2250778030075
+ADMIN_DEFAULT_PASSWORD=Nande19912012.
+
+# ============ APPLICATION ============
+NODE_ENV=production
+PORT=3001
+
+# ============ FRONTEND ============
+# URL de votre domaine final
+FRONTEND_URL=https://annonceauto.ci
+
+# ============ EMAIL (À CONFIGURER) ============
+# Utilisez Gmail ou un service SMTP professionnel
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=annonceautoci@gmail.com
+SMTP_PASS=VOTRE_MOT_DE_PASSE_APPLICATION_GMAIL
+EMAIL_FROM=noreply@annonceauto.ci
+
+# ============ IMAGEKIT (OPTIONNEL) ============
+# Pour héberger les images sur ImageKit.io
+# Laissez vide si vous n'utilisez pas ImageKit
+IMAGEKIT_PUBLIC_KEY=
+IMAGEKIT_PRIVATE_KEY=
+IMAGEKIT_URL_ENDPOINT=
+
+# ============ GOOGLE OAUTH (OPTIONNEL) ============
+# Pour permettre la connexion via Google
+# Laissez vide si vous n'utilisez pas Google OAuth
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=
+GOOGLE_CALLBACK_URL=https://VOTRE_URL_BACKEND_RAILWAY.up.railway.app/api/auth/google/callback
+
+# ========================================
+# NOTES IMPORTANTES
+# ========================================
+# 1. Générez de VRAIS secrets JWT sécurisés avant de déployer
+# 2. Ne partagez JAMAIS ces variables publiquement
+# 3. Railway va automatiquement injecter DATABASE_URL
+# 4. Changez ADMIN_DEFAULT_PASSWORD par un mot de passe fort
+
