@@ -110,10 +110,15 @@ export class PaymentsService {
         },
       );
 
+      console.log('📦 Réponse FedaPay complète:', JSON.stringify(transactionResponse.data, null, 2));
+
       const transaction = transactionResponse.data.v1?.transaction || transactionResponse.data;
+      console.log('📦 Transaction extraite:', JSON.stringify(transaction, null, 2));
+      
       const transactionId = transaction.id;
 
       if (!transactionId) {
+        console.error('❌ Aucun ID trouvé dans:', transaction);
         throw new BadRequestException('ID de transaction FedaPay manquant');
       }
 
