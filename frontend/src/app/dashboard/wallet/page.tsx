@@ -9,6 +9,8 @@ import api from '@/lib/api';
 import { formatDate } from '@/lib/utils';
 import { Wallet, Plus, Clock, ArrowUpCircle, ArrowDownCircle, MessageCircle } from 'lucide-react';
 
+// Version 2.0 - Intégration Moneroo
+
 export default function WalletPage() {
   const router = useRouter();
   const { isAuthenticated } = useAuthStore();
