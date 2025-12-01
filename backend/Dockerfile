@@ -29,5 +29,5 @@ RUN npm run build
 # Exposer le port
 EXPOSE 3001
 
-# Script de démarrage qui exécute db push puis démarre l'app (utilise Prisma local)
-CMD ["sh", "-c", "./node_modules/.bin/prisma db push --accept-data-loss --skip-generate && npm run start:prod"]
+# Script de démarrage qui exécute db push, seed, puis démarre l'app (utilise Prisma local)
+CMD ["sh", "-c", "./node_modules/.bin/prisma db push --accept-data-loss --skip-generate && ./node_modules/.bin/prisma db seed && npm run start:prod"]
