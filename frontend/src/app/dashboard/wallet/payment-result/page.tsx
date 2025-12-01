@@ -1,13 +1,13 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import { CheckCircle, XCircle, Clock, Loader } from 'lucide-react';
 
-export default function PaymentResultPage() {
+function PaymentResultContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [status, setStatus] = useState<'checking' | 'success' | 'failed' | 'pending'>('checking');
@@ -119,6 +119,22 @@ export default function PaymentResultPage() {
 
       <Footer />
     </div>
+  );
+}
+
+export default function PaymentResultPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex flex-col">
+        <Header />
+        <main className="flex-1 bg-gray-50 flex items-center justify-center">
+          <Loader className="w-12 h-12 text-primary-600 animate-spin" />
+        </main>
+        <Footer />
+      </div>
+    }>
+      <PaymentResultContent />
+    </Suspense>
   );
 }
 
