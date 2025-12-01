@@ -110,36 +110,18 @@ export class PaymentsService {
         },
       );
 
-      console.log('📦 Réponse FedaPay complète:', JSON.stringify(transactionResponse.data, null, 2));
-
-      const transaction = transactionResponse.data.v1?.transaction || transactionResponse.data;
-      console.log('📦 Transaction extraite:', JSON.stringify(transaction, null, 2));
-      
+      // FedaPay retourne la transaction dans la clé 'v1/transaction'
+      const transaction = transactionResponse.data['v1/transaction'] || transactionResponse.data;
       const transactionId = transaction.id;
+      const paymentUrl = transaction.payment_url;
 
       if (!transactionId) {
-        console.error('❌ Aucun ID trouvé dans:', transaction);
+        console.error('❌ Erreur FedaPay - Réponse:', JSON.stringify(transactionResponse.data, null, 2));
         throw new BadRequestException('ID de transaction FedaPay manquant');
       }
 
       console.log('✅ Transaction FedaPay créée:', transactionId);
-
-      // Étape 2 : Générer le token pour obtenir l'URL de paiement
-      const tokenResponse = await axios.put(
-        `${this.fedapayApiUrl}/transactions/${transactionId}/token`,
-        {},
-        {
-          headers: {
-            'Authorization': `Bearer ${this.fedapaySecretKey}`,
-            'Content-Type': 'application/json',
-          },
-        },
-      );
-
-      const tokenData = tokenResponse.data.v1?.transaction || tokenResponse.data;
-      const checkoutUrl = tokenData.url || `https://checkout.fedapay.com/${tokenData.token}`;
-
-      console.log('✅ URL de paiement générée:', checkoutUrl);
+      console.log('🔗 URL de paiement:', paymentUrl);
 
       // Créer l'enregistrement dans la base de données
       const purchase = await this.prisma.creditPurchase.create({
@@ -153,14 +135,14 @@ export class PaymentsService {
           customerEmail: user.email,
           customerPhone: user.phone,
           returnUrl,
-          checkoutUrl,
+          checkoutUrl: paymentUrl,
           metadata: transactionData.custom_metadata,
         },
       });
 
       return {
         purchaseId: purchase.id,
-        checkoutUrl,
+        checkoutUrl: paymentUrl,
         fedapayTransactionId: transactionId,
         amount: amountFcfa,
         creditsAmount: dto.creditsAmount,
