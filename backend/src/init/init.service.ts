@@ -10,6 +10,7 @@ export class InitService implements OnModuleInit {
   async onModuleInit() {
     console.log('🔧 Initialisation de l\'application...');
     await this.ensureAdminExists();
+    await this.createMissingWallets();
   }
 
   async ensureAdminExists() {
@@ -89,6 +90,47 @@ export class InitService implements OnModuleInit {
       console.log(`   Wallet: 100 000 crédits`);
     } catch (error) {
       console.error('❌ Erreur lors de la création de l\'admin:', error);
+      // Ne pas bloquer le démarrage de l'application
+    }
+  }
+
+  /**
+   * Créer les wallets manquants pour les utilisateurs existants
+   */
+  async createMissingWallets() {
+    try {
+      // Trouver tous les utilisateurs sans wallet
+      const usersWithoutWallet = await this.prisma.user.findMany({
+        where: {
+          wallet: null,
+        },
+        select: {
+          id: true,
+          name: true,
+          email: true,
+        },
+      });
+
+      if (usersWithoutWallet.length === 0) {
+        console.log('✅ Tous les utilisateurs ont déjà un wallet');
+        return;
+      }
+
+      console.log(`🔧 Création de ${usersWithoutWallet.length} wallets manquants...`);
+
+      // Créer les wallets en batch
+      for (const user of usersWithoutWallet) {
+        await this.prisma.wallet.create({
+          data: {
+            userId: user.id,
+            balanceCredits: BigInt(0),
+          },
+        });
+      }
+
+      console.log(`✅ ${usersWithoutWallet.length} wallets créés avec succès`);
+    } catch (error) {
+      console.error('❌ Erreur lors de la création des wallets manquants:', error);
       // Ne pas bloquer le démarrage de l'application
     }
   }

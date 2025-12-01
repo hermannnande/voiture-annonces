@@ -52,6 +52,17 @@ export class AuthService {
       },
     });
 
+    // Créer automatiquement le wallet pour le nouvel utilisateur
+    await this.prisma.wallet.create({
+      data: {
+        userId: user.id,
+        balanceCredits: BigInt(0), // Commence avec 0 crédits
+      },
+    }).catch(error => {
+      console.error('Erreur création wallet:', error);
+      // Ne pas bloquer l'inscription si le wallet échoue
+    });
+
     // Envoyer l'email de vérification en arrière-plan (sans attendre)
     this.emailService.sendVerificationEmail(
       user.email,
