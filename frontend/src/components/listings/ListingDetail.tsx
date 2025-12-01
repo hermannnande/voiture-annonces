@@ -36,7 +36,12 @@ export default function ListingDetail({ listing }: ListingDetailProps) {
   ];
 
   const handleContactWhatsApp = () => {
-    const message = `Bonjour, je suis intéressé(e) par votre annonce : ${listing.title}`;
+    const listingUrl = `${window.location.origin}/listings/${listing.id}`;
+    const message = `Bonjour, je suis intéressé(e) par votre annonce : ${listing.title}
+
+Prix : ${formatPrice(listing.priceFcfa)} FCFA
+
+Voir l'annonce : ${listingUrl}`;
     window.open(getWhatsAppLink(listing.user.phone, message), '_blank');
   };
 
