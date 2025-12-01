@@ -22,7 +22,8 @@ export class PaymentsService {
     if (!this.fedapaySecretKey || !this.fedapayPublicKey) {
       console.warn('⚠️  Clés FedaPay non configurées. Le système de paiement automatique sera désactivé.');
     } else {
-      console.log('✅ Clés FedaPay configurées - Paiement automatique activé');
+      console.log('✅ FedaPay configuré avec succès - Paiement automatique activé 🚀');
+      console.log('📌 Public Key:', this.fedapayPublicKey.substring(0, 15) + '...');
     }
   }
 
