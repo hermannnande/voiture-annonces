@@ -6,13 +6,19 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   // Configuration CORS
-  const allowedOrigins = process.env.FRONTEND_URL 
-    ? process.env.FRONTEND_URL.split(',') 
-    : ['http://localhost:3000'];
+  const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+  const allowedOrigins = [
+    frontendUrl,
+    'http://localhost:3000',
+    'https://annonceauto.ci',
+    'https://www.annonceauto.ci',
+  ].filter((value, index, self) => self.indexOf(value) === index); // Remove duplicates
   
   app.enableCors({
     origin: allowedOrigins,
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
   });
 
   // Validation globale

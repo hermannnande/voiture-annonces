@@ -1,0 +1,45 @@
+# =======================================================
+# COPIEZ CES VARIABLES DANS RAILWAY
+# Allez sur Railway → Votre Service Backend → Variables
+# =======================================================
+
+# Database (Railway le remplit automatiquement)
+DATABASE_URL=${{Postgres.DATABASE_URL}}
+
+# Application
+NODE_ENV=production
+PORT=3001
+
+# JWT Secrets - GENEREZ DE NOUVEAUX SECRETS SECURISES !
+# Utilisez PowerShell: [Convert]::ToBase64String([System.Security.Cryptography.RandomNumberGenerator]::GetBytes(64))
+JWT_SECRET=REMPLACER_PAR_UN_VRAI_SECRET_SECURISE_64_CARACTERES_MINIMUM
+JWT_REFRESH_SECRET=REMPLACER_PAR_UN_AUTRE_SECRET_SECURISE_64_CARACTERES_MINIMUM
+JWT_EXPIRATION=24h
+JWT_REFRESH_EXPIRATION=7d
+
+# Admin Principal
+ADMIN_EMAIL=hermannnande@gmail.com
+ADMIN_NAME=Hermann Nande
+ADMIN_PHONE=+2250778030075
+ADMIN_DEFAULT_PASSWORD=Nande19912012.
+
+# Frontend
+FRONTEND_URL=https://annonceauto.ci
+
+# Email SMTP (Gmail)
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_USER=annonceautoci@gmail.com
+SMTP_PASS=VOTRE_MOT_DE_PASSE_APPLICATION_GMAIL
+EMAIL_FROM=noreply@annonceauto.ci
+
+# =======================================================
+# IMPORTANT: Comment obtenir un mot de passe Gmail App
+# =======================================================
+# 1. Allez sur https://myaccount.google.com/security
+# 2. Activez la validation en 2 étapes
+# 3. Allez dans "Mots de passe des applications"
+# 4. Générez un mot de passe pour "Mail"
+# 5. Copiez-le dans SMTP_PASS
+# =======================================================
+
