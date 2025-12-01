@@ -7,23 +7,21 @@ import axios from 'axios';
 
 @Injectable()
 export class PaymentsService {
-  private readonly fedapayApiUrl = 'https://api.fedapay.com/v1';
-  private readonly fedapaySecretKey: string;
-  private readonly fedapayPublicKey: string;
+  private readonly monerooApiUrl = 'https://api.moneroo.io/v1';
+  private readonly monerooApiKey: string;
 
   constructor(
     private prisma: PrismaService,
     private walletService: WalletService,
     private auditService: AuditService,
   ) {
-    this.fedapaySecretKey = process.env.FEDAPAY_SECRET_KEY || process.env.MONEROO_SECRET_KEY || '';
-    this.fedapayPublicKey = process.env.FEDAPAY_PUBLIC_KEY || process.env.MONEROO_PUBLIC_KEY || '';
+    this.monerooApiKey = process.env.MONEROO_API_KEY || '';
 
-    if (!this.fedapaySecretKey || !this.fedapayPublicKey) {
-      console.warn('⚠️  Clés FedaPay non configurées. Le système de paiement automatique sera désactivé.');
+    if (!this.monerooApiKey) {
+      console.warn('⚠️  Clé Moneroo non configurée. Le système de paiement automatique sera désactivé.');
     } else {
-      console.log('✅ FedaPay configuré avec succès - Paiement automatique activé 🚀');
-      console.log('📌 Public Key:', this.fedapayPublicKey.substring(0, 15) + '...');
+      console.log('✅ Moneroo configuré avec succès - Paiement automatique activé 🚀');
+      console.log('📌 API Key:', this.monerooApiKey.substring(0, 15) + '...');
     }
   }
 
@@ -45,7 +43,7 @@ export class PaymentsService {
    * Initialiser un paiement FedaPay pour acheter des crédits
    */
   async initializePayment(userId: string, dto: InitializePaymentDto) {
-    if (!this.fedapaySecretKey || !this.fedapayPublicKey) {
+    if (!this.monerooApiKey) {
       throw new BadRequestException('Le système de paiement automatique n\'est pas configuré');
     }
 
@@ -66,29 +64,21 @@ export class PaymentsService {
 
     // Extraire le prénom et nom
     const nameParts = user.name.split(' ');
-    const firstname = nameParts[0] || user.name;
-    const lastname = nameParts.slice(1).join(' ') || 'Client';
+    const firstName = nameParts[0] || user.name;
+    const lastName = nameParts.slice(1).join(' ') || 'Client';
 
-    // Préparer les données pour FedaPay
-    const transactionData = {
-      description: `Achat de ${dto.creditsAmount} crédits - ${dto.packName || 'Pack personnalisé'}`,
+    // Préparer les données pour Moneroo
+    const paymentData = {
       amount: amountFcfa,
-      currency: {
-        iso: 'XOF', // Franc CFA
-      },
-      callback_url: returnUrl,
+      currency: 'XOF', // Franc CFA
+      description: `Achat de ${dto.creditsAmount} crédits - ${dto.packName || 'Pack personnalisé'}`,
+      return_url: returnUrl,
       customer: {
-        firstname,
-        lastname,
         email: user.email,
-        ...(user.phone && {
-          phone_number: {
-            number: user.phone,
-            country: 'ci', // Côte d'Ivoire
-          },
-        }),
+        first_name: firstName,
+        last_name: lastName,
       },
-      custom_metadata: {
+      metadata: {
         user_id: userId,
         credits_amount: dto.creditsAmount.toString(),
         pack_name: dto.packName || 'custom',
@@ -96,32 +86,38 @@ export class PaymentsService {
     };
 
     try {
-      console.log('🔄 Initialisation paiement FedaPay...', { amount: amountFcfa, credits: dto.creditsAmount });
+      console.log('🔄 Initialisation paiement Moneroo...', { amount: amountFcfa, credits: dto.creditsAmount });
 
-      // Étape 1 : Créer la transaction FedaPay
-      const transactionResponse = await axios.post(
-        `${this.fedapayApiUrl}/transactions`,
-        transactionData,
+      // Appeler l'API Moneroo pour initialiser le paiement
+      const response = await axios.post(
+        `${this.monerooApiUrl}/payments/initialize`,
+        paymentData,
         {
           headers: {
-            'Authorization': `Bearer ${this.fedapaySecretKey}`,
+            'Authorization': `Bearer ${this.monerooApiKey}`,
             'Content-Type': 'application/json',
+            'Accept': 'application/json',
           },
         },
       );
 
-      // FedaPay retourne la transaction dans la clé 'v1/transaction'
-      const transaction = transactionResponse.data['v1/transaction'] || transactionResponse.data;
-      const transactionId = transaction.id;
-      const paymentUrl = transaction.payment_url;
+      const monerooResponse = response.data;
 
-      if (!transactionId) {
-        console.error('❌ Erreur FedaPay - Réponse:', JSON.stringify(transactionResponse.data, null, 2));
-        throw new BadRequestException('ID de transaction FedaPay manquant');
+      if (!monerooResponse.success) {
+        console.error('❌ Erreur Moneroo:', monerooResponse);
+        throw new BadRequestException('Erreur lors de l\'initialisation du paiement');
       }
 
-      console.log('✅ Transaction FedaPay créée:', transactionId);
-      console.log('🔗 URL de paiement:', paymentUrl);
+      const paymentId = monerooResponse.data.id;
+      const checkoutUrl = monerooResponse.data.checkout_url;
+
+      if (!paymentId || !checkoutUrl) {
+        console.error('❌ Données Moneroo manquantes:', JSON.stringify(monerooResponse, null, 2));
+        throw new BadRequestException('Données de paiement Moneroo incomplètes');
+      }
+
+      console.log('✅ Paiement Moneroo créé:', paymentId);
+      console.log('🔗 URL de paiement:', checkoutUrl);
 
       // Créer l'enregistrement dans la base de données
       const purchase = await this.prisma.creditPurchase.create({
@@ -130,25 +126,25 @@ export class PaymentsService {
           amount: BigInt(amountFcfa),
           creditsAmount: BigInt(dto.creditsAmount),
           currency: 'XOF',
-          monerooPaymentId: transactionId.toString(), // On garde ce champ pour l'ID FedaPay
+          monerooPaymentId: paymentId,
           status: 'PENDING',
           customerEmail: user.email,
           customerPhone: user.phone,
           returnUrl,
-          checkoutUrl: paymentUrl,
-          metadata: transactionData.custom_metadata,
+          checkoutUrl,
+          metadata: paymentData.metadata,
         },
       });
 
       return {
         purchaseId: purchase.id,
-        checkoutUrl: paymentUrl,
-        fedapayTransactionId: transactionId,
+        checkoutUrl,
+        monerooPaymentId: paymentId,
         amount: amountFcfa,
         creditsAmount: dto.creditsAmount,
       };
     } catch (error) {
-      console.error('❌ Erreur FedaPay:', error.response?.data || error.message);
+      console.error('❌ Erreur Moneroo:', error.response?.data || error.message);
       throw new BadRequestException(
         error.response?.data?.message || 'Erreur lors de la création du paiement',
       );
@@ -156,54 +152,51 @@ export class PaymentsService {
   }
 
   /**
-   * Vérifier un paiement FedaPay
+   * Vérifier un paiement Moneroo
    */
-  async verifyPayment(fedapayTransactionId: string) {
-    if (!this.fedapaySecretKey) {
-      throw new BadRequestException('Clés FedaPay non configurées');
+  async verifyPayment(monerooPaymentId: string) {
+    if (!this.monerooApiKey) {
+      throw new BadRequestException('Clé Moneroo non configurée');
     }
 
     try {
       const response = await axios.get(
-        `${this.fedapayApiUrl}/transactions/${fedapayTransactionId}`,
+        `${this.monerooApiUrl}/payments/${monerooPaymentId}`,
         {
           headers: {
-            'Authorization': `Bearer ${this.fedapaySecretKey}`,
-            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${this.monerooApiKey}`,
+            'Accept': 'application/json',
           },
         },
       );
 
       return response.data;
     } catch (error) {
-      console.error('Erreur vérification FedaPay:', error.response?.data || error.message);
+      console.error('Erreur vérification Moneroo:', error.response?.data || error.message);
       throw new BadRequestException('Erreur lors de la vérification du paiement');
     }
   }
 
   /**
-   * Traiter le webhook de FedaPay après paiement
+   * Traiter le webhook de Moneroo après paiement
    */
   async handleWebhook(webhookData: any) {
     try {
-      // FedaPay envoie les données dans différents formats possibles
-      const transaction = webhookData.entity || webhookData.transaction || webhookData;
-      const fedapayTransactionId = transaction.id?.toString();
-      const status = transaction.status;
+      const { id: monerooPaymentId, status, metadata } = webhookData;
 
-      if (!fedapayTransactionId) {
-        console.error('ID de transaction FedaPay manquant dans le webhook');
-        return { success: false, message: 'ID de transaction manquant' };
+      if (!monerooPaymentId) {
+        console.error('ID de paiement Moneroo manquant dans le webhook');
+        return { success: false, message: 'ID de paiement manquant' };
       }
 
       // Trouver l'achat de crédits correspondant
       const purchase = await this.prisma.creditPurchase.findUnique({
-        where: { monerooPaymentId: fedapayTransactionId }, // On utilise ce champ pour FedaPay aussi
+        where: { monerooPaymentId },
         include: { user: true },
       });
 
       if (!purchase) {
-        console.error('Achat introuvable pour la transaction FedaPay:', fedapayTransactionId);
+        console.error('Achat introuvable pour le paiement Moneroo:', monerooPaymentId);
         return { success: false, message: 'Achat introuvable' };
       }
 
@@ -212,8 +205,8 @@ export class PaymentsService {
         return { success: true, message: 'Déjà traité' };
       }
 
-      // Vérifier le statut du paiement FedaPay
-      if (status === 'approved' || status === 'transferred') {
+      // Vérifier le statut du paiement Moneroo
+      if (status === 'success' || status === 'successful' || status === 'completed') {
         // Paiement réussi, créditer le wallet
         await this.prisma.$transaction(async (tx) => {
           // Mettre à jour le statut de l'achat
@@ -245,30 +238,39 @@ export class PaymentsService {
               walletId: wallet.id,
               type: 'CREDIT',
               amount: purchase.creditsAmount,
-              reason: `Achat de ${purchase.creditsAmount} crédits via FedaPay (${purchase.amount.toString()} FCFA)`,
+              reason: `Achat de ${purchase.creditsAmount} crédits via Moneroo (${purchase.amount.toString()} FCFA)`,
               relatedEntityType: 'CREDIT_PURCHASE',
               relatedEntityId: purchase.id,
             },
           });
         });
 
-        console.log(`✅ Paiement FedaPay réussi - ${purchase.creditsAmount} crédits ajoutés à ${purchase.user.email}`);
+        console.log(`✅ Paiement Moneroo réussi - ${purchase.creditsAmount} crédits ajoutés à ${purchase.user.email}`);
 
         return { success: true, message: 'Crédits ajoutés avec succès' };
-      } else if (status === 'declined' || status === 'canceled') {
-        // Paiement échoué ou annulé
+      } else if (status === 'failed' || status === 'error') {
+        // Paiement échoué
         await this.prisma.creditPurchase.update({
           where: { id: purchase.id },
-          data: { status: status === 'declined' ? 'FAILED' : 'CANCELLED' },
+          data: { status: 'FAILED' },
         });
 
-        console.log(`❌ Paiement FedaPay ${status} pour ${purchase.user.email}`);
-        return { success: false, message: `Paiement ${status}` };
+        console.log(`❌ Paiement Moneroo échoué pour ${purchase.user.email}`);
+        return { success: false, message: 'Paiement échoué' };
+      } else if (status === 'cancelled' || status === 'canceled') {
+        // Paiement annulé
+        await this.prisma.creditPurchase.update({
+          where: { id: purchase.id },
+          data: { status: 'CANCELLED' },
+        });
+
+        console.log(`⚠️  Paiement Moneroo annulé pour ${purchase.user.email}`);
+        return { success: false, message: 'Paiement annulé' };
       }
 
       return { success: false, message: 'Statut inconnu: ' + status };
     } catch (error) {
-      console.error('Erreur traitement webhook FedaPay:', error);
+      console.error('Erreur traitement webhook Moneroo:', error);
       throw error;
     }
   }
