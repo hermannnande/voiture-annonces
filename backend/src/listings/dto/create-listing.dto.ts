@@ -15,12 +15,12 @@ import { Type } from 'class-transformer';
 export class CreateListingDto {
   @IsString({ message: 'Le titre doit être une chaîne de caractères' })
   @IsNotEmpty({ message: 'Le titre est obligatoire' })
-  @MinLength(10, { message: 'Le titre doit contenir au moins 10 caractères' })
+  @MinLength(5, { message: 'Le titre doit contenir au moins 5 caractères' })
   title: string;
 
   @IsString({ message: 'La description doit être une chaîne de caractères' })
   @IsNotEmpty({ message: 'La description est obligatoire' })
-  @MinLength(50, { message: 'La description doit contenir au moins 50 caractères' })
+  @MinLength(10, { message: 'La description doit contenir au moins 10 caractères' })
   description: string;
 
   @IsNumber({}, { message: 'Le prix doit être un nombre' })
