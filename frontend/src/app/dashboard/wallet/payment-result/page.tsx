@@ -14,23 +14,29 @@ function PaymentResultContent() {
   const [message, setMessage] = useState('Vérification du paiement...');
 
   useEffect(() => {
-    const monerooPaymentId = searchParams.get('monerooPaymentId');
-    const monerooPaymentStatus = searchParams.get('monerooPaymentStatus');
+    // Support pour Payfonte (nouveau) et Moneroo (ancien)
+    const paymentId = searchParams.get('reference') || searchParams.get('monerooPaymentId');
+    const paymentStatus = searchParams.get('status') || searchParams.get('monerooPaymentStatus');
+    const amount = searchParams.get('amount');
 
-    if (!monerooPaymentId) {
+    if (!paymentId) {
       setStatus('failed');
       setMessage('ID de paiement manquant');
       return;
     }
 
-    // Déterminer le statut basé sur le paramètre Moneroo
-    if (monerooPaymentStatus === 'success' || monerooPaymentStatus === 'successful') {
+    // Déterminer le statut basé sur le paramètre
+    if (paymentStatus === 'success' || paymentStatus === 'successful' || paymentStatus === 'SUCCESSFUL') {
       setStatus('success');
-      setMessage('Paiement réussi ! Vos crédits ont été ajoutés à votre wallet.');
-    } else if (monerooPaymentStatus === 'failed' || monerooPaymentStatus === 'error') {
+      const creditsText = amount ? `${amount} crédits ont` : 'Vos crédits ont';
+      setMessage(`Paiement réussi ! ${creditsText} été ajoutés à votre wallet.`);
+    } else if (paymentStatus === 'failed' || paymentStatus === 'FAILED' || paymentStatus === 'error') {
       setStatus('failed');
       setMessage('Le paiement a échoué. Veuillez réessayer.');
-    } else if (monerooPaymentStatus === 'pending' || monerooPaymentStatus === 'processing') {
+    } else if (paymentStatus === 'cancelled' || paymentStatus === 'canceled' || paymentStatus === 'CANCELLED') {
+      setStatus('failed');
+      setMessage('Le paiement a été annulé.');
+    } else if (paymentStatus === 'pending' || paymentStatus === 'processing') {
       setStatus('pending');
       setMessage('Paiement en cours de traitement. Vos crédits seront ajoutés sous peu.');
     } else {
