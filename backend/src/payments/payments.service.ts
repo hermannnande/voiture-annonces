@@ -37,6 +37,8 @@ export class PaymentsService {
       console.log('📌 Client ID:', this.payfonteClientId);
       console.log('📌 Environment:', isProduction ? 'PRODUCTION' : 'SANDBOX');
       console.log('📌 API URL:', this.payfonteApiUrl);
+      console.log('📌 Frontend URL:', this.frontendUrl);
+      console.log('📌 Backend URL:', this.backendUrl);
     }
   }
 
