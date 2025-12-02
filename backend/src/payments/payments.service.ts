@@ -613,5 +613,116 @@ export class PaymentsService {
     }
   }
 
+  /**
+   * Gérer le callback de retour boost Payfonte
+   */
+  async handleCallbackBoost(reference: string, status: string) {
+    console.log('🔄 Callback Payfonte BOOST reçu:', { reference, status });
+
+    if (!reference) {
+      return {
+        redirect: `${this.frontendUrl}/dashboard/listings?payment=error&message=Référence manquante`,
+      };
+    }
+
+    try {
+      // Trouver l'achat correspondant
+      const purchase = await this.prisma.creditPurchase.findUnique({
+        where: { monerooPaymentId: reference },
+        include: { user: true },
+      });
+
+      if (!purchase) {
+        return {
+          redirect: `${this.frontendUrl}/dashboard/listings?payment=error&message=Paiement introuvable`,
+        };
+      }
+
+      // Vérifier le statut auprès de Payfonte
+      let verifiedStatus = status;
+      try {
+        const verification = await this.verifyPayment(reference);
+        verifiedStatus = verification.data?.status || status;
+        console.log('✅ Statut vérifié auprès de Payfonte:', verifiedStatus);
+      } catch (error) {
+        console.warn('⚠️  Impossible de vérifier auprès de Payfonte, utilisation du statut reçu');
+      }
+
+      const metadata = purchase.metadata as any;
+
+      // Traiter selon le statut
+      if (verifiedStatus === 'success' || verifiedStatus === 'successful' || verifiedStatus === 'completed' || verifiedStatus === 'SUCCESSFUL') {
+        console.log('✅ Paiement boost réussi, activation du boost...');
+        console.log('📊 Détails:', {
+          userId: purchase.userId,
+          listingId: metadata.listing_id,
+          boostProductId: metadata.boost_product_id,
+          durationDays: metadata.boost_duration_days,
+        });
+
+        // Activer le boost
+        await this.prisma.$transaction(async (tx) => {
+          // Mettre à jour le statut de l'achat
+          await tx.creditPurchase.update({
+            where: { id: purchase.id },
+            data: {
+              status: 'COMPLETED',
+              completedAt: new Date(),
+            },
+          });
+
+          // Activer le boost pour l'annonce
+          await tx.boost.create({
+            data: {
+              listingId: metadata.listing_id,
+              userId: purchase.userId,
+              boostProductId: metadata.boost_product_id,
+              status: 'ACTIVE',
+              startDate: new Date(),
+              endDate: new Date(Date.now() + metadata.boost_duration_days * 24 * 60 * 60 * 1000),
+              paymentProvider: 'payfonte',
+              paymentReference: reference,
+            },
+          });
+
+          console.log('  ✓ Boost activé avec succès');
+        });
+
+        console.log(`✅ Boost Payfonte réussi pour ${purchase.user.email}`);
+
+        return {
+          redirect: `${this.frontendUrl}/dashboard/listings?payment=success&boost=activated`,
+        };
+      } else if (verifiedStatus === 'failed' || verifiedStatus === 'FAILED') {
+        await this.prisma.creditPurchase.update({
+          where: { id: purchase.id },
+          data: { status: 'FAILED' },
+        });
+
+        return {
+          redirect: `${this.frontendUrl}/dashboard/listings?payment=failed`,
+        };
+      } else if (verifiedStatus === 'cancelled' || verifiedStatus === 'canceled' || verifiedStatus === 'CANCELLED') {
+        await this.prisma.creditPurchase.update({
+          where: { id: purchase.id },
+          data: { status: 'CANCELLED' },
+        });
+
+        return {
+          redirect: `${this.frontendUrl}/dashboard/listings?payment=cancelled`,
+        };
+      } else {
+        return {
+          redirect: `${this.frontendUrl}/dashboard/listings?payment=pending`,
+        };
+      }
+    } catch (error) {
+      console.error('❌ Erreur callback boost Payfonte:', error);
+      return {
+        redirect: `${this.frontendUrl}/dashboard/listings?payment=error&message=${encodeURIComponent(error.message)}`,
+      };
+    }
+  }
+
 }
 
