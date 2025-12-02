@@ -39,6 +39,7 @@ export class PaymentsService {
       console.log('📌 API URL:', this.payfonteApiUrl);
       console.log('📌 Frontend URL:', this.frontendUrl);
       console.log('📌 Backend URL:', this.backendUrl);
+      console.log('🔄 Version: 2024-12-02 (Boost Payfonte intégré)');
     }
   }
 
