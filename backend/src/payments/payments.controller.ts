@@ -45,10 +45,14 @@ export class PaymentsController {
     @Query('status') status: string,
     @Res() res: Response,
   ) {
+    console.log('🔄 Controller callback Payfonte - Paramètres:', { reference, status });
+    
     const result = await this.paymentsService.handleCallback(reference, status);
     
-    // Rediriger vers le frontend avec le résultat
-    return res.redirect(result.redirect);
+    console.log('➡️  Redirection vers:', result.redirect);
+    
+    // Rediriger vers le frontend avec le résultat (SANS return)
+    res.redirect(result.redirect);
   }
 
   /**

@@ -105,7 +105,15 @@ export class PaymentsService {
     };
 
     try {
-      console.log('🔄 Initialisation paiement Payfonte...', { amount: amountFcfa, credits: dto.creditsAmount, reference });
+      console.log('🔄 Initialisation paiement Payfonte...');
+      console.log('  📊 Détails:', {
+        userId,
+        userEmail: user.email,
+        creditsAmount: dto.creditsAmount,
+        amountFcfa,
+        reference,
+      });
+      console.log('  💰 MONTANT ENVOYÉ À PAYFONTE:', amountFcfa, 'FCFA');
 
       // Appeler l'API Payfonte pour créer un checkout
       const response = await axios.post(
@@ -231,6 +239,8 @@ export class PaymentsService {
 
       // Vérifier le statut du paiement Payfonte
       if (status === 'success' || status === 'successful' || status === 'completed' || status === 'SUCCESSFUL') {
+        console.log('💳 Début de la transaction de créditation...');
+        
         // Paiement réussi, créditer le wallet
         await this.prisma.$transaction(async (tx) => {
           // Mettre à jour le statut de l'achat
@@ -241,6 +251,7 @@ export class PaymentsService {
               completedAt: new Date(),
             },
           });
+          console.log('  ✓ Statut purchase mis à jour: COMPLETED');
 
           // Créditer le wallet de l'utilisateur
           const wallet = await tx.wallet.upsert({
@@ -255,6 +266,7 @@ export class PaymentsService {
               },
             },
           });
+          console.log(`  ✓ Wallet mis à jour: +${purchase.creditsAmount} crédits (nouveau solde: ${wallet.balanceCredits.toString()})`);
 
           // Créer une transaction wallet
           await tx.walletTransaction.create({
@@ -267,9 +279,11 @@ export class PaymentsService {
               relatedEntityId: purchase.id,
             },
           });
+          console.log('  ✓ Transaction wallet créée');
         });
 
         console.log(`✅ Paiement Payfonte réussi - ${purchase.creditsAmount} crédits ajoutés à ${purchase.user.email}`);
+        console.log(`💰 Montant payé: ${purchase.amount.toString()} FCFA`);
 
         return { success: true, message: 'Crédits ajoutés avec succès' };
       } else if (status === 'failed' || status === 'FAILED' || status === 'error') {
@@ -398,12 +412,22 @@ export class PaymentsService {
 
       // Traiter le paiement selon le statut
       if (verifiedStatus === 'success' || verifiedStatus === 'successful' || verifiedStatus === 'completed' || verifiedStatus === 'SUCCESSFUL') {
+        console.log('✅ Paiement réussi, créditation du wallet en cours...');
+        console.log('📊 Détails:', {
+          userId: purchase.userId,
+          userEmail: purchase.user.email,
+          creditsAmount: purchase.creditsAmount.toString(),
+          amountPaid: purchase.amount.toString(),
+        });
+        
         // Créditer le wallet
         await this.handleWebhook({
           reference,
           status: verifiedStatus,
           amount: purchase.amount.toString(),
         });
+
+        console.log('✅ Wallet crédité avec succès !');
 
         return {
           redirect: `${this.frontendUrl}/dashboard/wallet/payment-result?status=success&amount=${purchase.creditsAmount.toString()}&reference=${reference}`,
