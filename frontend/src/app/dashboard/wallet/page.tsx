@@ -364,7 +364,7 @@ Merci de me recontacter pour organiser le paiement.`;
             </div>
 
             <p className="text-center text-xs text-gray-500 mt-4">
-              🔒 Paiement sécurisé par Moneroo • WhatsApp : +225 07 78 03 00 75
+              🔒 Paiement sécurisé par Annonce auto Ci • WhatsApp : +225 07 78 03 00 75
             </p>
           </div>
         </div>
