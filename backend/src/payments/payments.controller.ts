@@ -7,7 +7,9 @@ import {
   Query,
   UseGuards,
   Req,
+  Res,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { PaymentsService } from './payments.service';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
@@ -32,7 +34,25 @@ export class PaymentsController {
   }
 
   /**
-   * Vérifier un paiement FedaPay
+   * Callback de retour après paiement Moneroo
+   * GET /api/payments/moneroo/callback
+   * Moneroo redirige ici avec: ?monerooPaymentId=xxx&monerooPaymentStatus=xxx
+   */
+  @Get('moneroo/callback')
+  @Public() // Public car appelé par redirection Moneroo
+  async monerooCallback(
+    @Query('monerooPaymentId') paymentId: string,
+    @Query('monerooPaymentStatus') status: string,
+    @Res() res: Response,
+  ) {
+    const result = await this.paymentsService.handleCallback(paymentId, status);
+    
+    // Rediriger vers le frontend avec le résultat
+    return res.redirect(result.redirect);
+  }
+
+  /**
+   * Vérifier un paiement Moneroo
    * GET /api/payments/verify/:transactionId
    */
   @Get('verify/:transactionId')
@@ -67,27 +87,30 @@ export class PaymentsController {
   }
 
   /**
-   * Webhook de FedaPay (appelé automatiquement après paiement)
-   * POST /api/payments/webhook/fedapay
-   */
-  @Post('webhook/fedapay')
-  @Public() // Public car appelé par FedaPay
-  async handleFedaPayWebhook(@Req() req: any, @Body() webhookData: any) {
-    console.log('📥 Webhook FedaPay reçu:', JSON.stringify(webhookData, null, 2));
-
-    // TODO: Ajouter vérification de signature FedaPay pour sécurité
-    
-    return this.paymentsService.handleWebhook(webhookData);
-  }
-
-  /**
-   * Webhook Moneroo (rétrocompatibilité)
+   * Webhook de Moneroo (appelé automatiquement après paiement)
    * POST /api/payments/webhook/moneroo
+   * IMPORTANT: Configurer cette URL dans le dashboard Moneroo
+   * URL: https://api.annonceauto.ci/api/payments/webhook/moneroo
    */
   @Post('webhook/moneroo')
-  @Public()
+  @Public() // Public car appelé par Moneroo
   async handleMonerooWebhook(@Req() req: any, @Body() webhookData: any) {
-    console.log('📥 Webhook Moneroo/FedaPay reçu:', JSON.stringify(webhookData, null, 2));
+    console.log('📥 Webhook Moneroo reçu:', JSON.stringify(webhookData, null, 2));
+    
+    // Récupérer la signature depuis les headers
+    const signature = req.headers['x-moneroo-signature'];
+    
+    // Vérifier la signature pour sécurité
+    const isValid = await this.paymentsService.verifyWebhookSignature(
+      JSON.stringify(webhookData),
+      signature,
+    );
+    
+    if (!isValid) {
+      console.error('❌ Signature webhook Moneroo invalide');
+      return { success: false, message: 'Signature invalide' };
+    }
+    
     return this.paymentsService.handleWebhook(webhookData);
   }
 }

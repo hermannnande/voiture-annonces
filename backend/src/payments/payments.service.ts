@@ -4,11 +4,14 @@ import { WalletService } from '../wallet/wallet.service';
 import { AuditService } from '../audit/audit.service';
 import { InitializePaymentDto } from './dto';
 import axios from 'axios';
+import * as crypto from 'crypto';
 
 @Injectable()
 export class PaymentsService {
   private readonly monerooApiUrl = 'https://api.moneroo.io/v1';
   private readonly monerooApiKey: string;
+  private readonly monerooWebhookSecret: string;
+  private readonly frontendUrl: string;
 
   constructor(
     private prisma: PrismaService,
@@ -16,12 +19,18 @@ export class PaymentsService {
     private auditService: AuditService,
   ) {
     this.monerooApiKey = process.env.MONEROO_API_KEY || '';
+    this.monerooWebhookSecret = process.env.MONEROO_WEBHOOK_SECRET || '';
+    this.frontendUrl = process.env.FRONTEND_URL || 'https://www.annonceauto.ci';
 
     if (!this.monerooApiKey) {
       console.warn('⚠️  Clé Moneroo non configurée. Le système de paiement automatique sera désactivé.');
     } else {
       console.log('✅ Moneroo configuré avec succès - Paiement automatique activé 🚀');
       console.log('📌 API Key:', this.monerooApiKey.substring(0, 15) + '...');
+    }
+
+    if (!this.monerooWebhookSecret) {
+      console.warn('⚠️  Secret webhook Moneroo non configuré. Les webhooks ne seront pas vérifiés.');
     }
   }
 
@@ -59,8 +68,11 @@ export class PaymentsService {
     // Calculer le montant en FCFA
     const amountFcfa = this.calculatePrice(dto.creditsAmount);
 
-    // URL de retour par défaut
-    const returnUrl = dto.returnUrl || `${process.env.FRONTEND_URL}/dashboard/wallet/payment-result`;
+    // URL de callback backend (Moneroo redirige ici après paiement)
+    const backendCallbackUrl = `${process.env.BACKEND_URL || 'https://api.annonceauto.ci/api'}/payments/moneroo/callback`;
+    
+    // URL de retour frontend (après traitement du callback)
+    const returnUrl = dto.returnUrl || `${this.frontendUrl}/dashboard/wallet/payment-result`;
 
     // Extraire le prénom et nom
     const nameParts = user.name.split(' ');
@@ -72,16 +84,18 @@ export class PaymentsService {
       amount: amountFcfa,
       currency: 'XOF', // Franc CFA
       description: `Achat de ${dto.creditsAmount} crédits - ${dto.packName || 'Pack personnalisé'}`,
-      return_url: returnUrl,
+      return_url: backendCallbackUrl, // Moneroo redirige vers le backend d'abord
       customer: {
         email: user.email,
         first_name: firstName,
         last_name: lastName,
+        phone: user.phone || undefined, // Optionnel
       },
       metadata: {
         user_id: userId,
         credits_amount: dto.creditsAmount.toString(),
         pack_name: dto.packName || 'custom',
+        frontend_return_url: returnUrl, // URL frontend finale
       },
     };
 
@@ -334,6 +348,118 @@ export class PaymentsService {
 
     // Traiter selon le statut
     return this.handleWebhook(monerooStatus.data);
+  }
+
+  /**
+   * Gérer le callback de retour de Moneroo
+   * Moneroo redirige vers cette URL avec ?monerooPaymentId=xxx&monerooPaymentStatus=xxx
+   */
+  async handleCallback(monerooPaymentId: string, status: string) {
+    console.log('🔄 Callback Moneroo reçu:', { monerooPaymentId, status });
+
+    if (!monerooPaymentId) {
+      return {
+        redirect: `${this.frontendUrl}/dashboard/wallet/payment-result?status=error&message=ID manquant`,
+      };
+    }
+
+    try {
+      // Trouver l'achat correspondant
+      const purchase = await this.prisma.creditPurchase.findUnique({
+        where: { monerooPaymentId },
+        include: { user: true },
+      });
+
+      if (!purchase) {
+        return {
+          redirect: `${this.frontendUrl}/dashboard/wallet/payment-result?status=error&message=Achat introuvable`,
+        };
+      }
+
+      // Vérifier le statut auprès de Moneroo pour sécurité
+      const verification = await this.verifyPayment(monerooPaymentId);
+      const verifiedStatus = verification.data?.status || status;
+
+      console.log('✅ Statut vérifié:', verifiedStatus);
+
+      // Traiter le paiement selon le statut
+      if (verifiedStatus === 'success' || verifiedStatus === 'successful' || verifiedStatus === 'completed') {
+        // Créditer le wallet
+        await this.handleWebhook({
+          id: monerooPaymentId,
+          status: verifiedStatus,
+          metadata: purchase.metadata,
+        });
+
+        // Récupérer l'URL de retour frontend depuis les metadata
+        const frontendReturnUrl = (purchase.metadata as any)?.frontend_return_url || `${this.frontendUrl}/dashboard/wallet/payment-result`;
+
+        return {
+          redirect: `${frontendReturnUrl}?status=success&amount=${purchase.creditsAmount.toString()}&monerooPaymentId=${monerooPaymentId}`,
+        };
+      } else if (verifiedStatus === 'failed' || verifiedStatus === 'error') {
+        await this.prisma.creditPurchase.update({
+          where: { id: purchase.id },
+          data: { status: 'FAILED' },
+        });
+
+        return {
+          redirect: `${this.frontendUrl}/dashboard/wallet/payment-result?status=failed&monerooPaymentId=${monerooPaymentId}`,
+        };
+      } else if (verifiedStatus === 'cancelled' || verifiedStatus === 'canceled') {
+        await this.prisma.creditPurchase.update({
+          where: { id: purchase.id },
+          data: { status: 'CANCELLED' },
+        });
+
+        return {
+          redirect: `${this.frontendUrl}/dashboard/wallet/payment-result?status=cancelled&monerooPaymentId=${monerooPaymentId}`,
+        };
+      } else {
+        // Statut en attente ou inconnu
+        return {
+          redirect: `${this.frontendUrl}/dashboard/wallet/payment-result?status=pending&monerooPaymentId=${monerooPaymentId}`,
+        };
+      }
+    } catch (error) {
+      console.error('❌ Erreur callback Moneroo:', error);
+      return {
+        redirect: `${this.frontendUrl}/dashboard/wallet/payment-result?status=error&message=${encodeURIComponent(error.message)}`,
+      };
+    }
+  }
+
+  /**
+   * Vérifier la signature d'un webhook Moneroo (HMAC-SHA256)
+   * Doc: https://docs.moneroo.io/webhooks/verify-signature
+   */
+  async verifyWebhookSignature(payload: string, signature: string): Promise<boolean> {
+    if (!this.monerooWebhookSecret) {
+      console.warn('⚠️  Secret webhook non configuré, signature non vérifiée');
+      return true; // Accepter quand même si pas configuré (pour développement)
+    }
+
+    if (!signature) {
+      console.error('❌ Signature manquante dans le webhook');
+      return false;
+    }
+
+    try {
+      // Calculer la signature HMAC-SHA256
+      const expectedSignature = crypto
+        .createHmac('sha256', this.monerooWebhookSecret)
+        .update(payload)
+        .digest('hex');
+
+      // Comparer les signatures de manière sécurisée
+      return crypto.timingSafeEqual(
+        Buffer.from(signature),
+        Buffer.from(expectedSignature),
+      );
+    } catch (error) {
+      console.error('❌ Erreur vérification signature:', error);
+      return false;
+    }
   }
 }
 
