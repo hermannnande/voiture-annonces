@@ -88,7 +88,8 @@ export class PaymentsService {
     const reference = `CREDIT_${userId.substring(0, 8)}_${Date.now()}`;
 
     // URLs de callback et webhook
-    const redirectURL = `${this.backendUrl}/payments/payfonte/callback`;
+    // ✅ Payfonte redirige DIRECTEMENT vers le frontend (pas d'étape intermédiaire sur API)
+    const redirectURL = `${this.frontendUrl}/dashboard/wallet/payment-result`;
     const webhookURL = `${this.backendUrl}/payments/webhook/payfonte`;
 
     // Nettoyer le numéro de téléphone (format international avec +)
@@ -229,7 +230,8 @@ export class PaymentsService {
     const reference = `BOOST_${userId.substring(0, 8)}_${Date.now()}`;
 
     // URLs de callback et webhook
-    const redirectURL = `${this.backendUrl}/payments/payfonte/callback-boost`;
+    // ✅ Payfonte redirige DIRECTEMENT vers le frontend (pas d'étape intermédiaire sur API)
+    const redirectURL = `${this.frontendUrl}/dashboard/listings`;
     const webhookURL = `${this.backendUrl}/payments/webhook/payfonte`;
 
     // Nettoyer le numéro de téléphone
