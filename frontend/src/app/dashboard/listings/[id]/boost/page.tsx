@@ -23,7 +23,7 @@ export default function BoostListingPage() {
   const [loading, setLoading] = useState(true);
   const [purchasing, setPurchasing] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<any>(null);
-  const [paymentMethod, setPaymentMethod] = useState<'credits' | 'whatsapp'>('credits');
+  const [paymentMethod, setPaymentMethod] = useState<'credits' | 'whatsapp' | 'payfonte'>('credits');
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -58,7 +58,7 @@ export default function BoostListingPage() {
     setSelectedProduct(product);
     // Déterminer la méthode de paiement par défaut selon le solde
     const hasEnoughCredits = wallet && parseInt(wallet.balanceCredits) >= parseInt(product.creditsCost);
-    setPaymentMethod(hasEnoughCredits ? 'credits' : 'whatsapp');
+    setPaymentMethod(hasEnoughCredits ? 'credits' : 'payfonte');
   };
 
   const handlePurchaseWithCredits = async () => {
@@ -110,9 +110,38 @@ Je souhaite promouvoir cette annonce. Merci de me contacter pour finaliser le pa
     setSelectedProduct(null);
   };
 
+  const handlePurchaseWithPayfonte = async () => {
+    if (!selectedProduct) return;
+
+    setPurchasing(true);
+    try {
+      // Initialiser le paiement Payfonte
+      const response = await api.post('/payments/initialize-boost', {
+        listingId,
+        boostProductId: selectedProduct.id,
+        packName: selectedProduct.name,
+        returnUrl: `${window.location.origin}/dashboard/listings`,
+      });
+
+      // Rediriger vers la page de paiement Payfonte
+      if (response.data.checkoutUrl) {
+        window.location.href = response.data.checkoutUrl;
+      } else {
+        alert('Erreur lors de la création du paiement');
+      }
+    } catch (error: any) {
+      console.error('Erreur paiement:', error);
+      alert(error.response?.data?.message || 'Erreur lors de l\'initialisation du paiement');
+    } finally {
+      setPurchasing(false);
+    }
+  };
+
   const handleConfirmPurchase = () => {
     if (paymentMethod === 'credits') {
       handlePurchaseWithCredits();
+    } else if (paymentMethod === 'payfonte') {
+      handlePurchaseWithPayfonte();
     } else {
       handlePurchaseWithWhatsApp();
     }
@@ -465,6 +494,38 @@ Je souhaite promouvoir cette annonce. Merci de me contacter pour finaliser le pa
                   )}
                 </button>
 
+                {/* Option Payfonte */}
+                <button
+                  onClick={() => setPaymentMethod('payfonte')}
+                  className={`w-full p-4 rounded-lg border-2 transition-all ${
+                    paymentMethod === 'payfonte'
+                      ? 'border-primary-500 bg-primary-50'
+                      : 'border-gray-200 hover:border-gray-300'
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className={`p-2 rounded-full ${
+                        paymentMethod === 'payfonte' ? 'bg-primary-600' : 'bg-gray-200'
+                      }`}>
+                        <CreditCard className={`w-5 h-5 ${
+                          paymentMethod === 'payfonte' ? 'text-white' : 'text-gray-600'
+                        }`} />
+                      </div>
+                      <div className="text-left">
+                        <p className="font-semibold text-gray-900">Payer avec Payfonte</p>
+                        <p className="text-sm text-gray-600">Paiement sécurisé en ligne</p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-2xl font-bold text-primary-600">
+                        {formatPrice(selectedProduct.priceFcfa)}
+                      </p>
+                      <p className="text-xs text-gray-600">FCFA</p>
+                    </div>
+                  </div>
+                </button>
+
                 {/* Option WhatsApp */}
                 <button
                   onClick={() => setPaymentMethod('whatsapp')}
@@ -491,7 +552,7 @@ Je souhaite promouvoir cette annonce. Merci de me contacter pour finaliser le pa
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-2xl font-bold text-primary-600">
+                      <p className="text-2xl font-bold text-green-600">
                         {formatPrice(selectedProduct.priceFcfa)}
                       </p>
                       <p className="text-xs text-gray-600">FCFA</p>
@@ -523,7 +584,11 @@ Je souhaite promouvoir cette annonce. Merci de me contacter pour finaliser le pa
                 ) : (
                   <>
                     <Check className="w-5 h-5" />
-                    <span>{paymentMethod === 'credits' ? 'Acheter avec crédits' : 'Contacter sur WhatsApp'}</span>
+                    <span>
+                      {paymentMethod === 'credits' && 'Acheter avec crédits'}
+                      {paymentMethod === 'payfonte' && 'Payer avec Payfonte'}
+                      {paymentMethod === 'whatsapp' && 'Contacter sur WhatsApp'}
+                    </span>
                   </>
                 )}
               </button>

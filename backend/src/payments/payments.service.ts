@@ -188,6 +188,149 @@ export class PaymentsService {
   }
 
   /**
+   * Initialiser un paiement Payfonte pour boost d'annonce
+   */
+  async initializeBoostPayment(userId: string, dto: any) {
+    if (!this.payfonteClientId || !this.payfonteClientSecret) {
+      throw new BadRequestException('Le système de paiement automatique n\'est pas configuré');
+    }
+
+    // Récupérer l'utilisateur et le produit boost
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+
+    if (!user) {
+      throw new BadRequestException('Utilisateur introuvable');
+    }
+
+    // Récupérer le produit boost
+    const boostProduct = await this.prisma.boostProduct.findUnique({
+      where: { id: dto.boostProductId },
+    });
+
+    if (!boostProduct) {
+      throw new BadRequestException('Produit de boost introuvable');
+    }
+
+    // Calculer le montant en FCFA (multiplié par 100 pour Payfonte)
+    const amountFcfa = parseInt(boostProduct.priceFcfa.toString());
+    const amountPayfonte = amountFcfa * 100;
+
+    // Générer une référence unique
+    const reference = `BOOST_${userId.substring(0, 8)}_${Date.now()}`;
+
+    // URLs de callback et webhook
+    const redirectURL = `${this.backendUrl}/payments/payfonte/callback-boost`;
+    const webhookURL = `${this.backendUrl}/payments/webhook/payfonte`;
+
+    // Nettoyer le numéro de téléphone
+    let phoneNumber = user.phone || '+2250778030075';
+    if (!phoneNumber.startsWith('+')) {
+      phoneNumber = '+' + phoneNumber.replace(/\D/g, '');
+    }
+
+    // Préparer les données pour Payfonte
+    const paymentData = {
+      reference,
+      amount: amountPayfonte, // Multiplier par 100 pour Payfonte
+      redirectURL,
+      country: 'CI',
+      currency: 'XOF',
+      customerBearsCharge: false,
+      webhook: webhookURL,
+      user: {
+        email: user.email,
+        phoneNumber,
+        name: user.name,
+      },
+      narration: `Boost annonce - ${boostProduct.name} (${boostProduct.durationDays} jours)`,
+    };
+
+    try {
+      console.log('🔄 Initialisation paiement Payfonte (boost)...');
+      console.log('  📊 Détails:', {
+        userId,
+        userEmail: user.email,
+        boostProductId: dto.boostProductId,
+        boostProductName: boostProduct.name,
+        listingId: dto.listingId,
+        amountFcfa,
+        amountPayfonte,
+        reference,
+      });
+      console.log('  💰 MONTANT RÉEL:', amountFcfa, 'FCFA');
+      console.log('  💰 MONTANT ENVOYÉ À PAYFONTE (×100):', amountPayfonte);
+
+      // Appeler l'API Payfonte
+      const response = await axios.post(
+        `${this.payfonteApiUrl}/checkouts`,
+        paymentData,
+        {
+          headers: {
+            'client-id': this.payfonteClientId,
+            'client-secret': this.payfonteClientSecret,
+            'Content-Type': 'application/json',
+          },
+        },
+      );
+
+      const payfonteResponse = response.data;
+
+      if (!payfonteResponse.data || !payfonteResponse.data.shortURL) {
+        console.error('❌ Données Payfonte manquantes:', JSON.stringify(payfonteResponse, null, 2));
+        throw new BadRequestException('Données de paiement Payfonte incomplètes');
+      }
+
+      const paymentId = payfonteResponse.data.id;
+      const checkoutUrl = payfonteResponse.data.shortURL || payfonteResponse.data.url;
+
+      console.log('✅ Paiement Payfonte créé:', paymentId);
+      console.log('🔗 URL de paiement:', checkoutUrl);
+      console.log('📝 Référence:', reference);
+
+      // Enregistrer dans la base (on réutilise creditPurchase avec metadata spécifique)
+      const purchase = await this.prisma.creditPurchase.create({
+        data: {
+          userId,
+          amount: BigInt(amountFcfa),
+          creditsAmount: BigInt(0), // Pas de crédits, c'est un boost direct
+          currency: 'XOF',
+          monerooPaymentId: reference,
+          status: 'PENDING',
+          customerEmail: user.email,
+          customerPhone: user.phone,
+          returnUrl: dto.returnUrl || `${this.frontendUrl}/dashboard/listings`,
+          checkoutUrl,
+          metadata: {
+            payfonte_payment_id: paymentId,
+            payfonte_reference: reference,
+            type: 'BOOST',
+            user_id: userId,
+            listing_id: dto.listingId,
+            boost_product_id: dto.boostProductId,
+            boost_product_name: boostProduct.name,
+            boost_duration_days: boostProduct.durationDays,
+          },
+        },
+      });
+
+      return {
+        purchaseId: purchase.id,
+        checkoutUrl,
+        payfontePaymentId: paymentId,
+        reference,
+        amount: amountFcfa,
+      };
+    } catch (error) {
+      console.error('❌ Erreur Payfonte:', error.response?.data || error.message);
+      throw new BadRequestException(
+        error.response?.data?.message || 'Erreur lors de la création du paiement',
+      );
+    }
+  }
+
+  /**
    * Vérifier un paiement Payfonte par référence
    */
   async verifyPayment(reference: string) {

@@ -34,7 +34,19 @@ export class PaymentsController {
   }
 
   /**
-   * Callback de retour après paiement Payfonte
+   * Initialiser un paiement pour boost d'annonce
+   * POST /api/payments/initialize-boost
+   */
+  @Post('initialize-boost')
+  async initializeBoostPayment(
+    @CurrentUser('id') userId: string,
+    @Body() dto: any,
+  ) {
+    return this.paymentsService.initializeBoostPayment(userId, dto);
+  }
+
+  /**
+   * Callback de retour après paiement Payfonte (crédits)
    * GET /api/payments/payfonte/callback
    * Payfonte redirige ici avec: ?reference=xxx&status=xxx
    */
@@ -52,6 +64,27 @@ export class PaymentsController {
     console.log('➡️  Redirection vers:', result.redirect);
     
     // Rediriger vers le frontend avec le résultat (SANS return)
+    res.redirect(result.redirect);
+  }
+
+  /**
+   * Callback de retour après paiement Payfonte (boost)
+   * GET /api/payments/payfonte/callback-boost
+   * Payfonte redirige ici avec: ?reference=xxx&status=xxx
+   */
+  @Get('payfonte/callback-boost')
+  @Public()
+  async payfonteCallbackBoost(
+    @Query('reference') reference: string,
+    @Query('status') status: string,
+    @Res() res: Response,
+  ) {
+    console.log('🔄 Controller callback Payfonte (BOOST) - Paramètres:', { reference, status });
+    
+    const result = await this.paymentsService.handleCallbackBoost(reference, status);
+    
+    console.log('➡️  Redirection vers:', result.redirect);
+    
     res.redirect(result.redirect);
   }
 
