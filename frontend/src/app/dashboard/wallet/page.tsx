@@ -243,58 +243,58 @@ Merci de me recontacter pour organiser le paiement.`;
 
       {/* Modal d'achat de crédits */}
       {showBuyModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 overflow-y-auto">
-          <div className="bg-white rounded-lg max-w-2xl w-full p-6 my-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+          <div className="bg-white rounded-lg max-w-2xl w-full p-4 sm:p-6 my-4 sm:my-8 max-h-[95vh] overflow-y-auto">
+            <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">
               💰 Acheter des crédits
             </h2>
 
-            <p className="text-gray-600 mb-6">
+            <p className="text-sm sm:text-base text-gray-600 mb-4 sm:mb-6">
               Choisissez un pack et payez directement en ligne ou contactez l'admin via WhatsApp.
             </p>
 
-            {/* Packs de crédits */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            {/* Packs de crédits - Version compacte mobile */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4 mb-4 sm:mb-6">
               {creditPacks.map((pack) => (
                 <div
                   key={pack.id}
                   onClick={() => setSelectedPack(pack)}
-                  className={`relative cursor-pointer rounded-lg border-2 p-4 transition-all hover:shadow-lg ${
+                  className={`relative cursor-pointer rounded-lg border-2 p-3 sm:p-4 transition-all hover:shadow-lg ${
                     selectedPack?.id === pack.id
                       ? 'border-primary-500 bg-primary-50'
                       : 'border-gray-200 hover:border-primary-300'
                   }`}
                 >
                   {pack.popular && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                      <span className="bg-primary-600 text-white text-xs font-bold px-3 py-1 rounded-full">
+                    <div className="absolute -top-2 sm:-top-3 left-1/2 -translate-x-1/2">
+                      <span className="bg-primary-600 text-white text-xs font-bold px-2 sm:px-3 py-0.5 sm:py-1 rounded-full">
                         ⭐ Populaire
                       </span>
                     </div>
                   )}
-                  <div className={`bg-gradient-to-br ${pack.color} text-white rounded-lg p-3 mb-3`}>
-                    <div className="text-3xl font-bold">{pack.credits}</div>
-                    <div className="text-sm opacity-90">crédits</div>
+                  <div className={`bg-gradient-to-br ${pack.color} text-white rounded-lg p-2 sm:p-3 mb-2 sm:mb-3`}>
+                    <div className="text-2xl sm:text-3xl font-bold">{pack.credits}</div>
+                    <div className="text-xs sm:text-sm opacity-90">crédits</div>
                   </div>
-                  <div className="font-semibold text-gray-900 mb-1">{pack.name}</div>
-                  <div className="text-2xl font-bold text-primary-600 mb-2">
-                    {pack.price.toLocaleString()} <span className="text-sm">FCFA</span>
+                  <div className="font-semibold text-gray-900 mb-1 text-sm sm:text-base">{pack.name}</div>
+                  <div className="text-xl sm:text-2xl font-bold text-primary-600 mb-1 sm:mb-2">
+                    {pack.price.toLocaleString()} <span className="text-xs sm:text-sm">FCFA</span>
                   </div>
-                  <div className="text-xs text-gray-600">{pack.description}</div>
+                  <div className="text-xs text-gray-600 line-clamp-2">{pack.description}</div>
                 </div>
               ))}
             </div>
 
             {selectedPack && (
-              <div className="mb-6 p-4 bg-blue-50 rounded-lg border border-blue-200">
-                <div className="flex items-center justify-between">
+              <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-blue-50 rounded-lg border border-blue-200">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                   <div>
-                    <div className="font-semibold text-blue-900">{selectedPack.name}</div>
-                    <div className="text-sm text-blue-700">
+                    <div className="font-semibold text-blue-900 text-sm sm:text-base">{selectedPack.name}</div>
+                    <div className="text-xs sm:text-sm text-blue-700">
                       {selectedPack.credits} crédits = {selectedPack.price.toLocaleString()} FCFA
                     </div>
                   </div>
-                  <div className="text-sm text-blue-600">
+                  <div className="text-xs sm:text-sm text-blue-600 font-medium">
                     {(selectedPack.price / selectedPack.credits).toFixed(0)} FCFA/crédit
                   </div>
                 </div>
@@ -302,39 +302,39 @@ Merci de me recontacter pour organiser le paiement.`;
             )}
 
             {/* Moyens de paiement disponibles */}
-            <div className="mb-6 p-4 bg-green-50 rounded-lg border border-green-200">
-              <h3 className="font-semibold text-green-900 mb-2">💳 Paiements acceptés</h3>
-              <div className="grid grid-cols-2 gap-2 text-sm">
+            <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-green-50 rounded-lg border border-green-200">
+              <h3 className="font-semibold text-green-900 mb-2 text-sm sm:text-base">💳 Paiements acceptés</h3>
+              <div className="grid grid-cols-2 gap-2 text-xs sm:text-sm">
                 <div className="flex items-center text-green-800">
-                  <span className="mr-2">🧡</span> Orange Money
+                  <span className="mr-1 sm:mr-2">🧡</span> Orange Money
                 </div>
                 <div className="flex items-center text-green-800">
-                  <span className="mr-2">💙</span> Wave
+                  <span className="mr-1 sm:mr-2">💙</span> Wave
                 </div>
                 <div className="flex items-center text-green-800">
-                  <span className="mr-2">💛</span> MTN Money
+                  <span className="mr-1 sm:mr-2">💛</span> MTN Money
                 </div>
                 <div className="flex items-center text-green-800">
-                  <span className="mr-2">💜</span> Moov Money
+                  <span className="mr-1 sm:mr-2">💜</span> Moov Money
                 </div>
               </div>
             </div>
 
             {/* Boutons d'action */}
-            <div className="space-y-3">
+            <div className="space-y-2 sm:space-y-3">
               {/* Bouton Payer par mobile money */}
               {selectedPack && (
                 <button
                   onClick={() => handlePayNow(selectedPack)}
                   disabled={paymentProcessing}
-                  className="w-full btn-primary bg-primary-600 hover:bg-primary-700 flex items-center justify-center space-x-2 text-lg py-4"
+                  className="w-full btn-primary bg-primary-600 hover:bg-primary-700 flex items-center justify-center space-x-2 text-sm sm:text-base py-3 sm:py-4"
                 >
                   {paymentProcessing ? (
                     <span>Chargement...</span>
                   ) : (
                     <>
-                      <span className="text-2xl">📱</span>
-                      <span>Payer {selectedPack.price.toLocaleString()} FCFA par mobile money</span>
+                      <span className="text-xl sm:text-2xl">📱</span>
+                      <span className="text-sm sm:text-base">Payer {selectedPack.price.toLocaleString()} FCFA</span>
                     </>
                   )}
                 </button>
@@ -344,10 +344,10 @@ Merci de me recontacter pour organiser le paiement.`;
               <button
                 onClick={handleWhatsAppContact}
                 disabled={!selectedPack && !amount}
-                className="w-full bg-green-600 hover:bg-green-700 text-white px-4 py-3 rounded-lg flex items-center justify-center space-x-2 font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full bg-green-600 hover:bg-green-700 text-white px-3 sm:px-4 py-2.5 sm:py-3 rounded-lg flex items-center justify-center space-x-2 font-semibold transition disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
               >
-                <MessageCircle className="w-5 h-5" />
-                <span>Ou contacter l'admin via WhatsApp</span>
+                <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="text-xs sm:text-sm">Ou contacter l'admin WhatsApp</span>
               </button>
 
               {/* Bouton Annuler */}
@@ -357,14 +357,14 @@ Merci de me recontacter pour organiser le paiement.`;
                   setSelectedPack(null);
                   setAmount('');
                 }}
-                className="w-full btn-outline"
+                className="w-full btn-outline py-2 sm:py-3 text-sm sm:text-base"
               >
                 Annuler
               </button>
             </div>
 
-            <p className="text-center text-xs text-gray-500 mt-4">
-              🔒 Paiement sécurisé par Annonce auto Ci • WhatsApp : +225 07 78 03 00 75
+            <p className="text-center text-xs text-gray-500 mt-3 sm:mt-4">
+              🔒 Annonce auto Ci • +225 07 78 03 00 75
             </p>
           </div>
         </div>
