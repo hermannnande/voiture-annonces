@@ -675,13 +675,13 @@ export class PaymentsService {
           await tx.boost.create({
             data: {
               listingId: metadata.listing_id,
-              userId: purchase.userId,
+              buyerId: purchase.userId,
               boostProductId: metadata.boost_product_id,
-              status: 'ACTIVE',
-              startDate: new Date(),
-              endDate: new Date(Date.now() + metadata.boost_duration_days * 24 * 60 * 60 * 1000),
+              startsAt: new Date(),
+              endsAt: new Date(Date.now() + metadata.boost_duration_days * 24 * 60 * 60 * 1000),
+              paymentStatus: 'COMPLETED',
+              paymentAmount: purchase.amount,
               paymentProvider: 'payfonte',
-              paymentReference: reference,
             },
           });
 
