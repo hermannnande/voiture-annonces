@@ -88,9 +88,11 @@ export class PaymentsService {
     }
 
     // Préparer les données pour Payfonte
+    // IMPORTANT : Payfonte attend le montant en "plus petite unité" (centimes)
+    // Donc pour 500 FCFA, on envoie 50000 (500 × 100)
     const paymentData = {
       reference,
-      amount: amountFcfa,
+      amount: amountFcfa * 100, // Multiplier par 100 pour Payfonte
       redirectURL,
       country: 'CI', // Côte d'Ivoire
       currency: 'XOF', // Franc CFA
@@ -111,9 +113,11 @@ export class PaymentsService {
         userEmail: user.email,
         creditsAmount: dto.creditsAmount,
         amountFcfa,
+        amountPayfonte: amountFcfa * 100,
         reference,
       });
-      console.log('  💰 MONTANT ENVOYÉ À PAYFONTE:', amountFcfa, 'FCFA');
+      console.log('  💰 MONTANT RÉEL:', amountFcfa, 'FCFA');
+      console.log('  💰 MONTANT ENVOYÉ À PAYFONTE (×100):', amountFcfa * 100);
 
       // Appeler l'API Payfonte pour créer un checkout
       const response = await axios.post(
