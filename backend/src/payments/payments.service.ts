@@ -79,8 +79,19 @@ export class PaymentsService {
     const firstName = nameParts[0] || user.name;
     const lastName = nameParts.slice(1).join(' ') || 'Client';
 
+    // Nettoyer le numéro de téléphone (Moneroo veut un entier sans +)
+    let cleanPhone: string | undefined = undefined;
+    if (user.phone) {
+      // Retirer tous les caractères non numériques
+      cleanPhone = user.phone.replace(/\D/g, '');
+      // Si le numéro ne commence pas par l'indicatif pays, on ne l'envoie pas
+      if (cleanPhone.length < 10) {
+        cleanPhone = undefined;
+      }
+    }
+
     // Préparer les données pour Moneroo
-    const paymentData = {
+    const paymentData: any = {
       amount: amountFcfa,
       currency: 'XOF', // Franc CFA
       description: `Achat de ${dto.creditsAmount} crédits - ${dto.packName || 'Pack personnalisé'}`,
@@ -89,7 +100,6 @@ export class PaymentsService {
         email: user.email,
         first_name: firstName,
         last_name: lastName,
-        phone: user.phone || undefined, // Optionnel
       },
       metadata: {
         user_id: userId,
@@ -98,6 +108,11 @@ export class PaymentsService {
         frontend_return_url: returnUrl, // URL frontend finale
       },
     };
+
+    // Ajouter le téléphone seulement s'il est valide
+    if (cleanPhone) {
+      paymentData.customer.phone = cleanPhone;
+    }
 
     try {
       console.log('🔄 Initialisation paiement Moneroo...', { amount: amountFcfa, credits: dto.creditsAmount });
@@ -117,13 +132,16 @@ export class PaymentsService {
 
       const monerooResponse = response.data;
 
-      if (!monerooResponse.success) {
+      // Moneroo retourne errors: null en cas de succès, pas success: true
+      if (monerooResponse.errors !== null) {
         console.error('❌ Erreur Moneroo:', monerooResponse);
-        throw new BadRequestException('Erreur lors de l\'initialisation du paiement');
+        throw new BadRequestException(
+          monerooResponse.message || 'Erreur lors de l\'initialisation du paiement'
+        );
       }
 
-      const paymentId = monerooResponse.data.id;
-      const checkoutUrl = monerooResponse.data.checkout_url;
+      const paymentId = monerooResponse.data?.id;
+      const checkoutUrl = monerooResponse.data?.checkout_url;
 
       if (!paymentId || !checkoutUrl) {
         console.error('❌ Données Moneroo manquantes:', JSON.stringify(monerooResponse, null, 2));
