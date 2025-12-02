@@ -11,7 +11,7 @@ import { TrendingUp, Zap, Star, Crown } from 'lucide-react';
 
 export default function BoostsPage() {
   const router = useRouter();
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, user } = useAuthStore();
   const [products, setProducts] = useState([]);
   const [myBoosts, setMyBoosts] = useState([]);
   const [myListings, setMyListings] = useState([]);
@@ -33,7 +33,13 @@ export default function BoostsPage() {
       const [productsRes, boostsRes, listingsRes] = await Promise.all([
         api.get('/boosts/products'),
         api.get('/boosts/my-boosts'),
-        api.get('/listings', { params: { status: 'APPROUVEE' } }),
+        // Filtrer uniquement les annonces du vendeur connecté
+        api.get('/listings', { 
+          params: { 
+            status: 'APPROUVEE',
+            userId: user?.id // ✅ Ne charger que SES annonces
+          } 
+        }),
       ]);
 
       setProducts(productsRes.data);
