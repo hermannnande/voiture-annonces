@@ -513,8 +513,8 @@ Je souhaite promouvoir cette annonce. Merci de me contacter pour finaliser le pa
                         }`} />
                       </div>
                       <div className="text-left">
-                        <p className="font-semibold text-gray-900">Payer avec Payfonte</p>
-                        <p className="text-sm text-gray-600">Paiement sécurisé en ligne</p>
+                        <p className="font-semibold text-gray-900">Payer par mobile money</p>
+                        <p className="text-sm text-gray-600">MTN, Orange, Moov, Wave</p>
                       </div>
                     </div>
                     <div className="text-right">
@@ -586,7 +586,7 @@ Je souhaite promouvoir cette annonce. Merci de me contacter pour finaliser le pa
                     <Check className="w-5 h-5" />
                     <span>
                       {paymentMethod === 'credits' && 'Acheter avec crédits'}
-                      {paymentMethod === 'payfonte' && 'Payer avec Payfonte'}
+                      {paymentMethod === 'payfonte' && 'Payer par mobile money'}
                       {paymentMethod === 'whatsapp' && 'Contacter sur WhatsApp'}
                     </span>
                   </>

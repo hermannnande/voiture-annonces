@@ -322,7 +322,7 @@ Merci de me recontacter pour organiser le paiement.`;
 
             {/* Boutons d'action */}
             <div className="space-y-3">
-              {/* Bouton Payer maintenant (Moneroo) */}
+              {/* Bouton Payer par mobile money */}
               {selectedPack && (
                 <button
                   onClick={() => handlePayNow(selectedPack)}
@@ -333,8 +333,8 @@ Merci de me recontacter pour organiser le paiement.`;
                     <span>Chargement...</span>
                   ) : (
                     <>
-                      <span className="text-2xl">💳</span>
-                      <span>Payer {selectedPack.price.toLocaleString()} FCFA maintenant</span>
+                      <span className="text-2xl">📱</span>
+                      <span>Payer {selectedPack.price.toLocaleString()} FCFA par mobile money</span>
                     </>
                   )}
                 </button>
