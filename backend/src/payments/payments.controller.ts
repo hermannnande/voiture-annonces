@@ -34,18 +34,18 @@ export class PaymentsController {
   }
 
   /**
-   * Callback de retour après paiement Moneroo
-   * GET /api/payments/moneroo/callback
-   * Moneroo redirige ici avec: ?monerooPaymentId=xxx&monerooPaymentStatus=xxx
+   * Callback de retour après paiement Payfonte
+   * GET /api/payments/payfonte/callback
+   * Payfonte redirige ici avec: ?reference=xxx&status=xxx
    */
-  @Get('moneroo/callback')
-  @Public() // Public car appelé par redirection Moneroo
-  async monerooCallback(
-    @Query('monerooPaymentId') paymentId: string,
-    @Query('monerooPaymentStatus') status: string,
+  @Get('payfonte/callback')
+  @Public() // Public car appelé par redirection Payfonte
+  async payfonteCallback(
+    @Query('reference') reference: string,
+    @Query('status') status: string,
     @Res() res: Response,
   ) {
-    const result = await this.paymentsService.handleCallback(paymentId, status);
+    const result = await this.paymentsService.handleCallback(reference, status);
     
     // Rediriger vers le frontend avec le résultat
     return res.redirect(result.redirect);
@@ -87,29 +87,15 @@ export class PaymentsController {
   }
 
   /**
-   * Webhook de Moneroo (appelé automatiquement après paiement)
-   * POST /api/payments/webhook/moneroo
-   * IMPORTANT: Configurer cette URL dans le dashboard Moneroo
-   * URL: https://api.annonceauto.ci/api/payments/webhook/moneroo
+   * Webhook de Payfonte (appelé automatiquement après paiement)
+   * POST /api/payments/webhook/payfonte
+   * IMPORTANT: Cette URL est automatiquement appelée par Payfonte lors de la création du checkout
+   * URL: https://api.annonceauto.ci/api/payments/webhook/payfonte
    */
-  @Post('webhook/moneroo')
-  @Public() // Public car appelé par Moneroo
-  async handleMonerooWebhook(@Req() req: any, @Body() webhookData: any) {
-    console.log('📥 Webhook Moneroo reçu:', JSON.stringify(webhookData, null, 2));
-    
-    // Récupérer la signature depuis les headers
-    const signature = req.headers['x-moneroo-signature'];
-    
-    // Vérifier la signature pour sécurité
-    const isValid = await this.paymentsService.verifyWebhookSignature(
-      JSON.stringify(webhookData),
-      signature,
-    );
-    
-    if (!isValid) {
-      console.error('❌ Signature webhook Moneroo invalide');
-      return { success: false, message: 'Signature invalide' };
-    }
+  @Post('webhook/payfonte')
+  @Public() // Public car appelé par Payfonte
+  async handlePayfonteWebhook(@Req() req: any, @Body() webhookData: any) {
+    console.log('📥 Webhook Payfonte reçu:', JSON.stringify(webhookData, null, 2));
     
     return this.paymentsService.handleWebhook(webhookData);
   }
