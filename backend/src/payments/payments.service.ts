@@ -21,8 +21,14 @@ export class PaymentsService {
   ) {
     this.payfonteClientId = process.env.PAYFONTE_CLIENT_ID || '';
     this.payfonteClientSecret = process.env.PAYFONTE_CLIENT_SECRET || '';
-    this.frontendUrl = process.env.FRONTEND_URL || 'https://www.annonceauto.ci';
-    this.backendUrl = process.env.BACKEND_URL || 'https://api.annonceauto.ci/api';
+    
+    // ✅ Nettoyer FRONTEND_URL pour ne garder que la première URL (au cas où plusieurs URLs séparées par virgule)
+    const rawFrontendUrl = process.env.FRONTEND_URL || 'https://www.annonceauto.ci';
+    this.frontendUrl = rawFrontendUrl.split(',')[0].trim();
+    
+    // ✅ Nettoyer BACKEND_URL de la même façon
+    const rawBackendUrl = process.env.BACKEND_URL || 'https://api.annonceauto.ci/api';
+    this.backendUrl = rawBackendUrl.split(',')[0].trim();
 
     // Déterminer l'environnement (sandbox ou production)
     const isProduction = this.payfonteClientSecret.startsWith('live_');
@@ -39,7 +45,7 @@ export class PaymentsService {
       console.log('📌 API URL:', this.payfonteApiUrl);
       console.log('📌 Frontend URL:', this.frontendUrl);
       console.log('📌 Backend URL:', this.backendUrl);
-      console.log('🔄 Version: 2024-12-02 (Boost Payfonte intégré)');
+      console.log('🔄 Version: 2024-12-02 (Redirection mobile corrigée)');
     }
   }
 
