@@ -45,7 +45,8 @@ export class PaymentsService {
       console.log('📌 API URL:', this.payfonteApiUrl);
       console.log('📌 Frontend URL:', this.frontendUrl);
       console.log('📌 Backend URL:', this.backendUrl);
-      console.log('🔄 Version: 2024-12-02 (Redirection mobile corrigée)');
+      console.log('🔄 Version: 2024-12-02 13:00 (Redirection mobile corrigée - FORCE DEPLOY)');
+      console.log('🎯 FRONTEND_URL nettoyée pour éviter URLs multiples séparées par virgule');
     }
   }
 
