@@ -27,26 +27,10 @@ export default function AdminPage() {
   const [stats, setStats] = useState<any>(null);
   const [pendingListings, setPendingListings] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [isInitializing, setIsInitializing] = useState(true);
-
-  // 🔧 FIX: Attendre que la session soit complètement chargée
-  useEffect(() => {
-    // Petit délai pour laisser le store se charger depuis localStorage
-    const timer = setTimeout(() => {
-      setIsInitializing(false);
-    }, 100);
-    
-    return () => clearTimeout(timer);
-  }, []);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Ne rien faire tant que l'initialisation n'est pas terminée
-    if (isInitializing) {
-      console.log('⏳ Initialisation du dashboard admin...');
-      return;
-    }
-
-    console.log('🔍 Vérification auth admin:', { 
+    console.log('🔍 AdminPage - Auth check:', { 
       isAuthenticated, 
       userRole: user?.role,
       userEmail: user?.email 
@@ -64,42 +48,35 @@ export default function AdminPage() {
       return;
     }
 
-    // Ne charger les données qu'une seule fois
-    if (!stats && !loading) {
-      console.log('✅ Accès admin autorisé, chargement des données...');
-      setLoading(true);
-      fetchData();
-    }
-  }, [isInitializing, isAuthenticated, user]);
+    // Charger les données une seule fois
+    fetchData();
+  }, [isAuthenticated, user, router]);
 
-  const fetchData = async (retryCount = 0) => {
+  const fetchData = async () => {
+    console.log('📊 Début chargement données admin...');
+    setLoading(true);
+    setError(null);
+    
     try {
-      console.log(`📊 Chargement données admin (tentative ${retryCount + 1}/3)...`);
-      
       const [statsRes, pendingRes] = await Promise.all([
         api.get('/admin/stats'),
         api.get('/admin/moderation/pending', { params: { limit: 5 } }),
       ]);
 
+      console.log('✅ Données reçues:', { stats: !!statsRes.data, pending: pendingRes.data.listings?.length });
+      
       setStats(statsRes.data);
-      setPendingListings(pendingRes.data.listings);
-      setLoading(false);
-      
-      console.log('✅ Données admin chargées avec succès');
+      setPendingListings(pendingRes.data.listings || []);
     } catch (error: any) {
-      console.error('❌ Erreur lors du chargement:', error.response?.status, error.message);
-      
-      // 🔄 Retry automatique si échec (max 3 tentatives)
-      if (retryCount < 2) {
-        console.log(`🔄 Nouvelle tentative dans 1 seconde...`);
-        setTimeout(() => {
-          fetchData(retryCount + 1);
-        }, 1000);
-      } else {
-        // Dernière tentative échouée
-        console.error('❌ Échec après 3 tentatives');
-        setLoading(false);
-      }
+      console.error('❌ Erreur chargement:', {
+        status: error.response?.status,
+        message: error.message,
+        data: error.response?.data
+      });
+      setError(error.response?.data?.message || error.message || 'Erreur de chargement');
+    } finally {
+      console.log('🏁 Fin chargement (loading=false)');
+      setLoading(false);
     }
   };
 
@@ -155,17 +132,25 @@ export default function AdminPage() {
               <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
               <p className="text-gray-600 mt-4">Chargement des données...</p>
             </div>
-          ) : !stats ? (
+          ) : error ? (
             <div className="text-center py-12">
-              <p className="text-red-600 mb-4">❌ Erreur lors du chargement des données</p>
+              <p className="text-red-600 mb-2 text-xl">❌ Erreur de chargement</p>
+              <p className="text-gray-600 mb-4">{error}</p>
               <button 
-                onClick={() => {
-                  setLoading(true);
-                  fetchData();
-                }}
+                onClick={fetchData}
                 className="btn-primary"
               >
                 🔄 Réessayer
+              </button>
+            </div>
+          ) : !stats ? (
+            <div className="text-center py-12">
+              <p className="text-gray-600 mb-4">Aucune donnée</p>
+              <button 
+                onClick={fetchData}
+                className="btn-primary"
+              >
+                🔄 Charger
               </button>
             </div>
           ) : (
