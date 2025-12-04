@@ -124,6 +124,18 @@ export class PaymentsController {
   }
 
   /**
+   * 🔄 RÉCONCILIATION AUTOMATIQUE
+   * Vérifie tous les paiements PENDING et les crédite automatiquement si payés
+   * POST /api/payments/reconcile-pending
+   * À appeler via un cron job toutes les 5-10 minutes
+   */
+  @Post('reconcile-pending')
+  @Public() // Public pour permettre l'appel par un cron externe
+  async reconcilePendingPayments() {
+    return this.paymentsService.reconcilePendingPayments();
+  }
+
+  /**
    * Webhook de Payfonte (appelé automatiquement après paiement)
    * POST /api/payments/webhook/payfonte
    * IMPORTANT: Cette URL est automatiquement appelée par Payfonte lors de la création du checkout

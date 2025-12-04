@@ -473,6 +473,154 @@ export class PaymentsService {
   }
 
   /**
+   * 🔄 SYSTÈME DE RÉCONCILIATION AUTOMATIQUE
+   * Vérifie tous les paiements PENDING auprès de Payfonte et les crédite si payés
+   * À appeler périodiquement (ex: toutes les 5 minutes via cron ou manuellement)
+   */
+  async reconcilePendingPayments() {
+    console.log('🔄 Début réconciliation des paiements en attente...');
+    
+    try {
+      // Récupérer tous les paiements en attente (PENDING) des dernières 24h
+      const pendingPayments = await this.prisma.creditPurchase.findMany({
+        where: {
+          status: 'PENDING',
+          createdAt: {
+            gte: new Date(Date.now() - 24 * 60 * 60 * 1000), // Dernières 24h
+          },
+        },
+        include: { user: true },
+      });
+
+      console.log(`📊 ${pendingPayments.length} paiement(s) en attente trouvé(s)`);
+
+      if (pendingPayments.length === 0) {
+        return { 
+          success: true, 
+          message: 'Aucun paiement en attente',
+          checked: 0,
+          credited: 0,
+          failed: 0,
+        };
+      }
+
+      let credited = 0;
+      let failed = 0;
+
+      // Vérifier chaque paiement auprès de Payfonte
+      for (const payment of pendingPayments) {
+        try {
+          console.log(`🔍 Vérification paiement ${payment.id} (ref: ${payment.monerooPaymentId})...`);
+
+          if (!payment.monerooPaymentId) {
+            console.log(`⚠️  Pas de référence Payfonte pour ${payment.id}, skip`);
+            continue;
+          }
+
+          // Vérifier le statut auprès de Payfonte
+          const response = await axios.get(
+            `${this.payfonteApiUrl}/checkouts/${payment.monerooPaymentId}`,
+            {
+              headers: {
+                'client-id': this.payfonteClientId,
+                'client-secret': this.payfonteClientSecret,
+                'Content-Type': 'application/json',
+              },
+            }
+          );
+
+          const payfonteStatus = response.data?.status;
+          console.log(`📌 Statut Payfonte pour ${payment.id}: ${payfonteStatus}`);
+
+          // Si le paiement est réussi, créditer le compte
+          if (payfonteStatus === 'successful' || payfonteStatus === 'success' || payfonteStatus === 'succe-s') {
+            // Vérifier que le paiement n'a pas déjà été traité (idempotence)
+            const currentPayment = await this.prisma.creditPurchase.findUnique({
+              where: { id: payment.id },
+            });
+
+            if (currentPayment.status === 'COMPLETED') {
+              console.log(`✅ Paiement ${payment.id} déjà complété, skip`);
+              continue;
+            }
+
+            // Créditer le wallet
+            await this.prisma.$transaction(async (prisma) => {
+              // 1. Mettre à jour le statut du paiement
+              await prisma.creditPurchase.update({
+                where: { id: payment.id },
+                data: {
+                  status: 'COMPLETED',
+                  completedAt: new Date(),
+                },
+              });
+
+              // 2. Créditer le wallet
+              const wallet = await prisma.wallet.findUnique({
+                where: { userId: payment.userId },
+              });
+
+              if (wallet) {
+                await prisma.wallet.update({
+                  where: { userId: payment.userId },
+                  data: {
+                    balanceCredits: {
+                      increment: payment.creditsAmount,
+                    },
+                  },
+                });
+
+                console.log(`💰 ${payment.creditsAmount} crédits ajoutés au wallet de ${payment.user.email}`);
+              } else {
+                // Créer le wallet s'il n'existe pas
+                await prisma.wallet.create({
+                  data: {
+                    userId: payment.userId,
+                    balanceCredits: payment.creditsAmount,
+                  },
+                });
+                console.log(`💰 Wallet créé avec ${payment.creditsAmount} crédits pour ${payment.user.email}`);
+              }
+            });
+
+            credited++;
+            console.log(`✅ Paiement ${payment.id} crédité automatiquement via réconciliation`);
+          } else if (payfonteStatus === 'failed' || payfonteStatus === 'error') {
+            // Marquer comme échoué
+            await this.prisma.creditPurchase.update({
+              where: { id: payment.id },
+              data: {
+                status: 'FAILED',
+              },
+            });
+            failed++;
+            console.log(`❌ Paiement ${payment.id} marqué comme échoué`);
+          } else {
+            console.log(`⏳ Paiement ${payment.id} toujours en attente (statut: ${payfonteStatus})`);
+          }
+        } catch (error) {
+          console.error(`❌ Erreur vérification paiement ${payment.id}:`, error.message);
+          continue;
+        }
+      }
+
+      const result = {
+        success: true,
+        message: 'Réconciliation terminée',
+        checked: pendingPayments.length,
+        credited,
+        failed,
+      };
+
+      console.log('✅ Réconciliation terminée:', result);
+      return result;
+    } catch (error) {
+      console.error('❌ Erreur réconciliation:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Récupérer l'historique des achats de crédits d'un utilisateur
    */
   async getPurchaseHistory(userId: string, page = 1, limit = 20) {

@@ -270,16 +270,20 @@ export class AuthService {
       role: user.role,
     };
 
-    const accessToken = this.jwtService.sign(payload);
+    // ✅ Access token valide 30 jours (au lieu de 15 minutes)
+    const accessToken = this.jwtService.sign(payload, {
+      expiresIn: '30d',
+    });
 
+    // ✅ Refresh token valide 90 jours (au lieu de 7 jours)
     const refreshToken = this.jwtService.sign(payload, {
       secret: this.configService.get('JWT_REFRESH_SECRET'),
-      expiresIn: this.configService.get('JWT_REFRESH_EXPIRATION') || '7d',
+      expiresIn: '90d',
     });
 
     // Stocker le refresh token
     const expiresAt = new Date();
-    expiresAt.setDate(expiresAt.getDate() + 7);
+    expiresAt.setDate(expiresAt.getDate() + 90); // 90 jours
 
     await this.prisma.refreshToken.create({
       data: {

@@ -58,6 +58,8 @@ export default function WalletPage() {
     }
 
     fetchWalletData();
+    // 🔄 Réconcilier automatiquement les paiements en attente
+    reconcilePendingPayments();
   }, [isAuthenticated, router]);
 
   const fetchWalletData = async () => {
@@ -73,6 +75,23 @@ export default function WalletPage() {
       console.error('Erreur:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  // 🔄 Réconcilier automatiquement les paiements en attente
+  const reconcilePendingPayments = async () => {
+    try {
+      const response = await api.post('/payments/reconcile-pending');
+      const result = response.data;
+      
+      if (result.credited > 0) {
+        console.log(`✅ ${result.credited} paiement(s) crédité(s) automatiquement`);
+        // Rafraîchir le solde après la réconciliation
+        setTimeout(() => fetchWalletData(), 2000);
+      }
+    } catch (error) {
+      console.error('Erreur réconciliation:', error);
+      // Ne pas afficher d'erreur à l'utilisateur, c'est un processus en arrière-plan
     }
   };
 
