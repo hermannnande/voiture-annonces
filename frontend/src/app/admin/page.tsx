@@ -64,9 +64,13 @@ export default function AdminPage() {
       return;
     }
 
-    console.log('✅ Accès admin autorisé, chargement des données...');
-    fetchData();
-  }, [isInitializing, isAuthenticated, user, router]);
+    // Ne charger les données qu'une seule fois
+    if (!stats && !loading) {
+      console.log('✅ Accès admin autorisé, chargement des données...');
+      setLoading(true);
+      fetchData();
+    }
+  }, [isInitializing, isAuthenticated, user]);
 
   const fetchData = async (retryCount = 0) => {
     try {
@@ -79,6 +83,7 @@ export default function AdminPage() {
 
       setStats(statsRes.data);
       setPendingListings(pendingRes.data.listings);
+      setLoading(false);
       
       console.log('✅ Données admin chargées avec succès');
     } catch (error: any) {
@@ -90,13 +95,9 @@ export default function AdminPage() {
         setTimeout(() => {
           fetchData(retryCount + 1);
         }, 1000);
-        return; // Ne pas mettre loading à false
       } else {
+        // Dernière tentative échouée
         console.error('❌ Échec après 3 tentatives');
-      }
-    } finally {
-      // Seulement mettre loading à false après la dernière tentative
-      if (retryCount >= 2 || stats !== null) {
         setLoading(false);
       }
     }
