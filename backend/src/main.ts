@@ -3,7 +3,17 @@ import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
+  console.log('🚀 [STARTUP] Début du bootstrap...');
+  console.log('🔍 [STARTUP] Variables d\'env:', {
+    NODE_ENV: process.env.NODE_ENV,
+    PORT: process.env.PORT,
+    DATABASE_URL: process.env.DATABASE_URL ? '✅ Présent' : '❌ Manquant',
+    FRONTEND_URL: process.env.FRONTEND_URL,
+    JWT_SECRET: process.env.JWT_SECRET ? '✅ Présent' : '❌ Manquant',
+  });
+  
   const app = await NestFactory.create(AppModule);
+  console.log('✅ [STARTUP] AppModule créé');
 
   // Configuration CORS
   const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
@@ -58,7 +68,11 @@ async function bootstrap() {
   console.log(`📌 Backend URL: ${process.env.BACKEND_URL || 'non défini'}`);
 }
 
-bootstrap();
+bootstrap().catch((error) => {
+  console.error('💥 [FATAL] Erreur au démarrage:', error);
+  console.error('💥 [FATAL] Stack:', error.stack);
+  process.exit(1);
+});
 
 
 
