@@ -359,6 +359,7 @@ export class PaymentsService {
         },
       );
 
+      console.log(`🔍 VERIFY API RAW RESPONSE for ${reference}:`, JSON.stringify(response.data, null, 2));
       return response.data;
     } catch (error) {
       console.error('Erreur vérification Payfonte:', error.response?.data || error.message);
@@ -536,15 +537,21 @@ export class PaymentsService {
             }
           );
 
-          // ✅ Correction: Payfonte renvoie souvent { data: { status: 'success' } }
-          // On vérifie les deux niveaux pour être sûr
-          const payfonteData = response.data?.data || response.data;
+          console.log(`🔍 RECONCILE API RAW RESPONSE for ${payment.monerooPaymentId}:`, JSON.stringify(response.data, null, 2));
+
+          // ✅ Extraction intelligente des données
+          // Payfonte peut renvoyer { data: { status: 'success' } } ou juste { status: 'success' }
+          let payfonteData = response.data;
+          if (response.data && response.data.data) {
+            payfonteData = response.data.data;
+          }
+          
           const payfonteStatus = payfonteData?.status;
           
-          console.log(`📌 Statut Payfonte pour ${payment.id}: ${payfonteStatus} (Brut: ${JSON.stringify(payfonteData)})`);
+          console.log(`📌 Statut Payfonte extrait pour ${payment.id}: ${payfonteStatus}`);
 
           // Si le paiement est réussi, créditer le compte
-          if (payfonteStatus === 'successful' || payfonteStatus === 'success' || payfonteStatus === 'succe-s') {
+          if (payfonteStatus === 'successful' || payfonteStatus === 'success' || payfonteStatus === 'succe-s' || payfonteStatus === 'completed') {
             // Vérifier que le paiement n'a pas déjà été traité (idempotence)
             const currentPayment = await this.prisma.creditPurchase.findUnique({
               where: { id: payment.id },
