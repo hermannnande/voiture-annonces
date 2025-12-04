@@ -45,13 +45,19 @@ export const useAuthStore = create<AuthState>((set, get) => ({
           refreshToken,
           isAuthenticated: true,
         });
-        console.log('✅ Session restaurée depuis localStorage');
+        console.log('✅ Session restaurée:', { 
+          userName: user.name, 
+          userEmail: user.email,
+          userRole: user.role 
+        });
       } catch (error) {
         console.error('❌ Erreur restauration session:', error);
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
         localStorage.removeItem('user');
       }
+    } else {
+      console.log('⚠️  Pas de session à restaurer (un ou plusieurs tokens manquants)');
     }
   },
 
@@ -128,4 +134,47 @@ export const useAuthStore = create<AuthState>((set, get) => ({
 // Initialiser automatiquement au chargement de l'app
 if (typeof window !== 'undefined') {
   useAuthStore.getState().initializeAuth();
+  
+  // 🔄 Synchroniser le localStorage entre les onglets
+  window.addEventListener('storage', (e) => {
+    // Détecter les changements de localStorage dans d'autres onglets
+    if (e.key === 'accessToken' || e.key === 'refreshToken' || e.key === 'user') {
+      console.log('🔄 Changement localStorage détecté dans un autre onglet:', e.key);
+      
+      // Si un token a été supprimé (déconnexion), déconnecter aussi ici
+      if (e.key === 'accessToken' && !e.newValue) {
+        console.log('🚪 Déconnexion détectée dans un autre onglet');
+        useAuthStore.getState().logout();
+        return;
+      }
+      
+      // Sinon, réinitialiser l'auth pour synchroniser
+      setTimeout(() => {
+        useAuthStore.getState().initializeAuth();
+      }, 100);
+    }
+  });
+  
+  // 🔄 Synchroniser aussi au focus de la fenêtre (quand l'utilisateur revient sur l'onglet)
+  window.addEventListener('focus', () => {
+    console.log('👀 Focus sur l\'onglet, vérification de la session...');
+    const currentUser = useAuthStore.getState().user;
+    const storedUserStr = localStorage.getItem('user');
+    
+    if (storedUserStr) {
+      try {
+        const storedUser = JSON.parse(storedUserStr);
+        // Si l'utilisateur en mémoire est différent de celui dans localStorage
+        if (currentUser?.id !== storedUser?.id) {
+          console.log('⚠️  Utilisateur différent détecté, resynchronisation...', {
+            currentUser: currentUser?.email,
+            storedUser: storedUser?.email
+          });
+          useAuthStore.getState().initializeAuth();
+        }
+      } catch (error) {
+        console.error('❌ Erreur parsing user lors du focus:', error);
+      }
+    }
+  });
 }

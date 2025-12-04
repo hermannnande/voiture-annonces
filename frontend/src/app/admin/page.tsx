@@ -27,23 +27,51 @@ export default function AdminPage() {
   const [stats, setStats] = useState<any>(null);
   const [pendingListings, setPendingListings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [isInitializing, setIsInitializing] = useState(true);
+
+  // 🔧 FIX: Attendre que la session soit complètement chargée
+  useEffect(() => {
+    // Petit délai pour laisser le store se charger depuis localStorage
+    const timer = setTimeout(() => {
+      setIsInitializing(false);
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
+    // Ne rien faire tant que l'initialisation n'est pas terminée
+    if (isInitializing) {
+      console.log('⏳ Initialisation du dashboard admin...');
+      return;
+    }
+
+    console.log('🔍 Vérification auth admin:', { 
+      isAuthenticated, 
+      userRole: user?.role,
+      userEmail: user?.email 
+    });
+
     if (!isAuthenticated) {
+      console.log('❌ Non authentifié, redirection vers login');
       router.push('/auth/login');
       return;
     }
 
     if (user?.role !== 'SUPER_ADMIN') {
+      console.log('❌ Pas SUPER_ADMIN, redirection vers dashboard');
       router.push('/dashboard');
       return;
     }
 
+    console.log('✅ Accès admin autorisé, chargement des données...');
     fetchData();
-  }, [isAuthenticated, user, router]);
+  }, [isInitializing, isAuthenticated, user, router]);
 
-  const fetchData = async () => {
+  const fetchData = async (retryCount = 0) => {
     try {
+      console.log(`📊 Chargement données admin (tentative ${retryCount + 1}/3)...`);
+      
       const [statsRes, pendingRes] = await Promise.all([
         api.get('/admin/stats'),
         api.get('/admin/moderation/pending', { params: { limit: 5 } }),
@@ -51,10 +79,26 @@ export default function AdminPage() {
 
       setStats(statsRes.data);
       setPendingListings(pendingRes.data.listings);
-    } catch (error) {
-      console.error('Erreur lors du chargement:', error);
+      
+      console.log('✅ Données admin chargées avec succès');
+    } catch (error: any) {
+      console.error('❌ Erreur lors du chargement:', error.response?.status, error.message);
+      
+      // 🔄 Retry automatique si échec (max 3 tentatives)
+      if (retryCount < 2) {
+        console.log(`🔄 Nouvelle tentative dans 1 seconde...`);
+        setTimeout(() => {
+          fetchData(retryCount + 1);
+        }, 1000);
+        return; // Ne pas mettre loading à false
+      } else {
+        console.error('❌ Échec après 3 tentatives');
+      }
     } finally {
-      setLoading(false);
+      // Seulement mettre loading à false après la dernière tentative
+      if (retryCount >= 2 || stats !== null) {
+        setLoading(false);
+      }
     }
   };
 
@@ -100,11 +144,28 @@ export default function AdminPage() {
             <p className="text-gray-600">
               Vue d'ensemble et gestion de la plateforme
             </p>
+            <p className="text-sm text-gray-500 mt-1">
+              Connecté en tant que: <strong>{user?.email}</strong> ({user?.role})
+            </p>
           </div>
 
           {loading ? (
             <div className="text-center py-12">
               <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+              <p className="text-gray-600 mt-4">Chargement des données...</p>
+            </div>
+          ) : !stats ? (
+            <div className="text-center py-12">
+              <p className="text-red-600 mb-4">❌ Erreur lors du chargement des données</p>
+              <button 
+                onClick={() => {
+                  setLoading(true);
+                  fetchData();
+                }}
+                className="btn-primary"
+              >
+                🔄 Réessayer
+              </button>
             </div>
           ) : (
             <>
