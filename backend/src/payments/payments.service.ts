@@ -518,16 +518,23 @@ export class PaymentsService {
       // Vérifier chaque paiement auprès de Payfonte
       for (const payment of pendingPayments) {
         try {
-          console.log(`🔍 Vérification paiement ${payment.id} (ref: ${payment.monerooPaymentId})...`);
-
-          if (!payment.monerooPaymentId) {
-            console.log(`⚠️  Pas de référence Payfonte pour ${payment.id}, skip`);
-            continue;
+          // 🎯 CORRECTION CRITIQUE : Utiliser l'ID Payfonte (metadata) au lieu de la référence externe
+          // Payfonte /checkouts/:id attend l'ID Payfonte (ex: 6931da6f...)
+          let checkIdentifier = payment.monerooPaymentId;
+          const metadata = payment.metadata as any;
+          
+          if (metadata && metadata.payfonte_payment_id) {
+            checkIdentifier = metadata.payfonte_payment_id;
+            console.log(`🔍 Utilisation ID Payfonte pour vérification: ${checkIdentifier} (au lieu de ref: ${payment.monerooPaymentId})`);
+          } else {
+            console.log(`⚠️ ID Payfonte manquant dans metadata, utilisation référence: ${checkIdentifier}`);
           }
+
+          console.log(`🔍 Vérification paiement ${payment.id}...`);
 
           // Vérifier le statut auprès de Payfonte
           const response = await axios.get(
-            `${this.payfonteApiUrl}/checkouts/${payment.monerooPaymentId}`,
+            `${this.payfonteApiUrl}/checkouts/${checkIdentifier}`,
             {
               headers: {
                 'client-id': this.payfonteClientId,
@@ -537,7 +544,8 @@ export class PaymentsService {
             }
           );
 
-          console.log(`🔍 RECONCILE API RAW RESPONSE for ${payment.monerooPaymentId}:`, JSON.stringify(response.data, null, 2));
+          // Log de la réponse brute pour débogage
+          // console.log(`📥 Réponse brute Payfonte pour ${checkIdentifier}:`, JSON.stringify(response.data));
 
           // ✅ Extraction intelligente des données
           // Payfonte peut renvoyer { data: { status: 'success' } } ou juste { status: 'success' }
@@ -548,7 +556,7 @@ export class PaymentsService {
           
           const payfonteStatus = payfonteData?.status;
           
-          console.log(`📌 Statut Payfonte extrait pour ${payment.id}: ${payfonteStatus}`);
+          console.log(`📌 Statut Payfonte pour ${payment.id}: ${payfonteStatus}`);
 
           // Si le paiement est réussi, créditer le compte
           if (payfonteStatus === 'successful' || payfonteStatus === 'success' || payfonteStatus === 'succe-s' || payfonteStatus === 'completed') {
@@ -574,31 +582,32 @@ export class PaymentsService {
               });
 
               // 2. Créditer le wallet
-              const wallet = await prisma.wallet.findUnique({
+              const wallet = await prisma.wallet.upsert({
                 where: { userId: payment.userId },
+                create: {
+                  userId: payment.userId,
+                  balanceCredits: payment.creditsAmount,
+                },
+                update: {
+                  balanceCredits: {
+                    increment: payment.creditsAmount,
+                  },
+                },
               });
 
-              if (wallet) {
-                await prisma.wallet.update({
-                  where: { userId: payment.userId },
-                  data: {
-                    balanceCredits: {
-                      increment: payment.creditsAmount,
-                    },
-                  },
-                });
-
-                console.log(`💰 ${payment.creditsAmount} crédits ajoutés au wallet de ${payment.user.email}`);
-              } else {
-                // Créer le wallet s'il n'existe pas
-                await prisma.wallet.create({
-                  data: {
-                    userId: payment.userId,
-                    balanceCredits: payment.creditsAmount,
-                  },
-                });
-                console.log(`💰 Wallet créé avec ${payment.creditsAmount} crédits pour ${payment.user.email}`);
-              }
+              console.log(`💰 ${payment.creditsAmount} crédits ajoutés au wallet de ${payment.user.email} (Solde: ${wallet.balanceCredits})`);
+              
+              // 3. Créer transaction wallet
+              await prisma.walletTransaction.create({
+                data: {
+                  walletId: wallet.id,
+                  type: 'CREDIT',
+                  amount: payment.creditsAmount,
+                  reason: `Achat crédits (Réconciliation) - ${payment.creditsAmount} crédits`,
+                  relatedEntityType: 'CREDIT_PURCHASE',
+                  relatedEntityId: payment.id,
+                },
+              });
             });
 
             credited++;
@@ -618,6 +627,9 @@ export class PaymentsService {
           }
         } catch (error) {
           console.error(`❌ Erreur vérification paiement ${payment.id}:`, error.message);
+          if (error.response) {
+             console.error('   Détails API:', error.response.data);
+          }
           continue;
         }
       }
@@ -728,7 +740,16 @@ export class PaymentsService {
       // Vérifier le statut auprès de Payfonte pour sécurité
       let verifiedStatus = status;
       try {
-        const verification = await this.verifyPayment(reference);
+        // Utiliser l'ID Payfonte si disponible dans les métadonnées (prioritaire)
+        let checkIdentifier = reference;
+        const metadata = purchase.metadata as any;
+        
+        if (metadata && metadata.payfonte_payment_id) {
+          checkIdentifier = metadata.payfonte_payment_id;
+          console.log(`🔍 Callback: Utilisation ID Payfonte pour vérification: ${checkIdentifier}`);
+        }
+
+        const verification = await this.verifyPayment(checkIdentifier);
         verifiedStatus = verification.data?.status || status;
         console.log('✅ Statut vérifié auprès de Payfonte:', verifiedStatus);
       } catch (error) {
@@ -814,17 +835,25 @@ export class PaymentsService {
         };
       }
 
+      const metadata = purchase.metadata as any;
+
       // Vérifier le statut auprès de Payfonte
       let verifiedStatus = status;
       try {
-        const verification = await this.verifyPayment(reference);
+        // Utiliser l'ID Payfonte si disponible dans les métadonnées (prioritaire)
+        let checkIdentifier = reference;
+        
+        if (metadata && metadata.payfonte_payment_id) {
+          checkIdentifier = metadata.payfonte_payment_id;
+          console.log(`🔍 Callback Boost: Utilisation ID Payfonte pour vérification: ${checkIdentifier}`);
+        }
+
+        const verification = await this.verifyPayment(checkIdentifier);
         verifiedStatus = verification.data?.status || status;
         console.log('✅ Statut vérifié auprès de Payfonte:', verifiedStatus);
       } catch (error) {
         console.warn('⚠️  Impossible de vérifier auprès de Payfonte, utilisation du statut reçu');
       }
-
-      const metadata = purchase.metadata as any;
 
       // Traiter selon le statut
       if (verifiedStatus === 'success' || verifiedStatus === 'successful' || verifiedStatus === 'completed' || verifiedStatus === 'SUCCESSFUL') {
