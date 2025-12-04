@@ -371,14 +371,21 @@ export class PaymentsService {
    */
   async handleWebhook(webhookData: any) {
     try {
-      const { reference, status, amount } = webhookData;
+      console.log('📥 Webhook Payfonte reçu (raw):', JSON.stringify(webhookData, null, 2));
 
-      if (!reference) {
-        console.error('Référence de paiement Payfonte manquante dans le webhook');
-        return { success: false, message: 'Référence de paiement manquante' };
+      // ✅ Extraction intelligente des données
+      // Payfonte envoie souvent { data: { ... } }
+      let data = webhookData;
+      if (webhookData.data) {
+        data = webhookData.data;
       }
 
-      console.log('📥 Webhook Payfonte reçu:', { reference, status, amount });
+      const { reference, status, amount } = data;
+
+      if (!reference) {
+        console.error('❌ Référence de paiement Payfonte manquante dans le webhook');
+        return { success: false, message: 'Référence de paiement manquante' };
+      }
 
       // Trouver l'achat de crédits correspondant
       const purchase = await this.prisma.creditPurchase.findUnique({
@@ -529,8 +536,12 @@ export class PaymentsService {
             }
           );
 
-          const payfonteStatus = response.data?.status;
-          console.log(`📌 Statut Payfonte pour ${payment.id}: ${payfonteStatus}`);
+          // ✅ Correction: Payfonte renvoie souvent { data: { status: 'success' } }
+          // On vérifie les deux niveaux pour être sûr
+          const payfonteData = response.data?.data || response.data;
+          const payfonteStatus = payfonteData?.status;
+          
+          console.log(`📌 Statut Payfonte pour ${payment.id}: ${payfonteStatus} (Brut: ${JSON.stringify(payfonteData)})`);
 
           // Si le paiement est réussi, créditer le compte
           if (payfonteStatus === 'successful' || payfonteStatus === 'success' || payfonteStatus === 'succe-s') {
