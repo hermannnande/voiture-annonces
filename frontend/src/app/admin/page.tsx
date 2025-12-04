@@ -68,12 +68,33 @@ export default function AdminPage() {
       setStats(statsRes.data);
       setPendingListings(pendingRes.data.listings || []);
     } catch (error: any) {
-      console.error('❌ Erreur chargement:', {
+      console.error('❌ Erreur chargement admin:', {
         status: error.response?.status,
         message: error.message,
-        data: error.response?.data
+        data: error.response?.data,
+        code: error.code
       });
-      setError(error.response?.data?.message || error.message || 'Erreur de chargement');
+      
+      // 🔍 Message d'erreur détaillé selon le type
+      let errorMessage = 'Erreur de chargement';
+      
+      if (error.code === 'ERR_NETWORK' || error.message === 'Network Error') {
+        errorMessage = '❌ L\'API backend ne répond pas. Vérifiez que Railway est déployé et actif.';
+      } else if (error.response?.status === 401) {
+        errorMessage = '🔒 Session expirée. Reconnexion nécessaire.';
+        // Rediriger vers login après 2 secondes
+        setTimeout(() => {
+          router.push('/auth/login');
+        }, 2000);
+      } else if (error.response?.status === 403) {
+        errorMessage = '🚫 Accès refusé. Vous devez être SUPER_ADMIN.';
+      } else if (error.response?.status === 500) {
+        errorMessage = '⚠️ Erreur serveur. L\'API rencontre un problème.';
+      } else if (error.response?.data?.message) {
+        errorMessage = error.response.data.message;
+      }
+      
+      setError(errorMessage);
     } finally {
       console.log('🏁 Fin chargement (loading=false)');
       setLoading(false);

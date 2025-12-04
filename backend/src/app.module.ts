@@ -13,6 +13,7 @@ import { CategoriesModule } from './categories/categories.module';
 import { MessagesModule } from './messages/messages.module';
 import { BoostsModule } from './boosts/boosts.module';
 import { AdminModule } from './admin/admin.module';
+import { HealthModule } from './health/health.module';
 import { UploadsModule } from './uploads/uploads.module';
 import { AuditModule } from './audit/audit.module';
 import { WalletModule } from './wallet/wallet.module';
@@ -49,6 +50,7 @@ import { PaymentsModule } from './payments/payments.module';
     MessagesModule,
     BoostsModule,
     AdminModule,
+    HealthModule,
     UploadsModule,
     AuditModule,
     WalletModule,
