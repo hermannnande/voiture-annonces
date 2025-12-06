@@ -128,6 +128,7 @@ export default function LoginPage() {
           </form>
 
           {/* Divider */}
+          {/* TEMPORAIREMENT MASQUÉ - À tester en prévisualisation
           <div className="my-6 flex items-center">
             <div className="flex-1 border-t border-gray-300"></div>
             <span className="px-4 text-sm text-gray-500">OU</span>
@@ -135,7 +136,7 @@ export default function LoginPage() {
           </div>
 
           {/* Bouton Google */}
-          <GoogleButton text="Se connecter avec Google" />
+          {/* <GoogleButton text="Se connecter avec Google" /> */}
 
           <div className="mt-6 text-center text-sm text-gray-600">
             Pas encore de compte ?{' '}

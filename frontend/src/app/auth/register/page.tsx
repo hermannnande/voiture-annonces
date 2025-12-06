@@ -200,6 +200,7 @@ export default function RegisterPage() {
           </form>
 
           {/* Divider */}
+          {/* TEMPORAIREMENT MASQUÉ - À tester en prévisualisation
           <div className="my-6 flex items-center">
             <div className="flex-1 border-t border-gray-300"></div>
             <span className="px-4 text-sm text-gray-500">OU</span>
@@ -207,7 +208,7 @@ export default function RegisterPage() {
           </div>
 
           {/* Bouton Google */}
-          <GoogleButton text="S'inscrire avec Google" />
+          {/* <GoogleButton text="S'inscrire avec Google" /> */}
 
           <div className="mt-6 text-center text-sm text-gray-600">
             Déjà un compte ?{' '}
