@@ -146,15 +146,6 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Comptes de test */}
-        <div className="mt-6 card p-4 bg-blue-50 border border-blue-200">
-          <p className="text-sm font-semibold text-blue-900 mb-2">Comptes de test :</p>
-          <div className="text-xs text-blue-800 space-y-1">
-            <p><strong>Admin :</strong> admin@voiture.com / admin123</p>
-            <p><strong>Vendeur :</strong> vendeur1@gmail.com / seller123</p>
-          </div>
-        </div>
-
         <div className="mt-6 text-center">
           <Link href="/" className="text-white hover:text-primary-100 text-sm">
             ← Retour à l'accueil
