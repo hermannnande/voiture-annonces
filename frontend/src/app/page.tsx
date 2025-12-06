@@ -15,11 +15,11 @@ export default function HomePage() {
         <Hero />
         
         {/* Section Dernières Annonces */}
-        <section className="py-12 bg-white">
-          <div className="container-custom">
-            <div className="flex justify-between items-center mb-8">
-              <h2 className="text-3xl font-bold text-gray-900">Dernières Annonces</h2>
-              <a href="/listings" className="bg-accent-500 hover:bg-accent-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors text-sm shadow-md">
+        <section className="py-8 md:py-12 bg-white">
+          <div className="container-custom px-4">
+            <div className="flex justify-between items-center mb-6 md:mb-8">
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">Dernières Annonces</h2>
+              <a href="/listings" className="bg-accent-500 hover:bg-accent-600 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-semibold transition-colors text-xs sm:text-sm shadow-md whitespace-nowrap">
                 Voir tout →
               </a>
             </div>
@@ -30,10 +30,10 @@ export default function HomePage() {
         </section>
 
         {/* Section Annonces Premium */}
-        <section className="py-12 bg-gray-50">
-          <div className="container-custom">
-            <div className="flex justify-between items-center mb-8">
-              <h2 className="text-3xl font-bold text-gray-900 flex items-center space-x-2">
+        <section className="py-8 md:py-12 bg-gray-50">
+          <div className="container-custom px-4">
+            <div className="flex justify-between items-center mb-6 md:mb-8">
+              <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900 flex items-center space-x-2">
                 <span>⭐</span>
                 <span>Annonces Premium</span>
               </h2>
@@ -45,20 +45,20 @@ export default function HomePage() {
         </section>
 
         {/* CTA Section - Style affiche */}
-        <section className="py-16 bg-gradient-to-r from-accent-600 via-accent-500 to-accent-600 text-white relative overflow-hidden">
+        <section className="py-12 md:py-16 bg-gradient-to-r from-accent-600 via-accent-500 to-accent-600 text-white relative overflow-hidden">
           {/* Effet de fond */}
           <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,.05)_50%,transparent_75%,transparent_100%)] bg-[length:250px_250px] animate-pulse"></div>
           
-          <div className="container-custom text-center relative z-10">
-            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+          <div className="container-custom text-center relative z-10 px-4">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-3 md:mb-4">
               Prêt à vendre votre véhicule ?
             </h2>
-            <p className="text-xl mb-8 text-white/90 max-w-2xl mx-auto">
-              Créez votre annonce en 2 minutes et touchez des milliers d'acheteurs potentiels partout en Côte d'Ivoire
+            <p className="text-sm sm:text-base md:text-lg mb-6 md:mb-8 text-white/90 max-w-2xl mx-auto px-4">
+              Créez votre annonce en 2 minutes et touchez des milliers d'acheteurs potentiels en Côte d'Ivoire
             </p>
             <a
               href="/auth/register"
-              className="inline-block bg-white hover:bg-gray-100 text-accent-600 px-8 py-4 rounded-xl font-bold text-lg shadow-2xl transition-all transform hover:scale-105"
+              className="inline-block bg-white hover:bg-gray-100 text-accent-600 px-6 sm:px-8 py-3 sm:py-4 rounded-xl font-bold text-sm sm:text-base md:text-lg shadow-2xl transition-all transform hover:scale-105 mx-2"
             >
               📱 Publier une annonce maintenant
             </a>
@@ -66,9 +66,9 @@ export default function HomePage() {
         </section>
 
         {/* Section Avantages - Style moderne */}
-        <section className="py-12 bg-white">
-          <div className="container-custom">
-            <div className="grid md:grid-cols-3 gap-8 text-center">
+        <section className="py-8 md:py-12 bg-white">
+          <div className="container-custom px-4">
+            <div className="grid md:grid-cols-3 gap-6 md:gap-8 text-center">
               <div className="p-6 bg-gray-50 rounded-2xl border border-gray-200 hover:border-accent-500 hover:shadow-lg transition-all">
                 <div className="w-16 h-16 bg-gradient-to-br from-accent-500 to-accent-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                   <svg className="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -17,9 +17,9 @@ export default function Logo({ variant = 'dark', showText = true, size = 'md' }:
   const accentColor = variant === 'light' ? 'text-accent-400' : 'text-accent-500';
 
   return (
-    <Link href="/" className="flex items-center space-x-2 group">
+    <Link href="/" className="flex items-center space-x-1.5 sm:space-x-2 group">
       {/* Icône de voiture - Style mobile moderne */}
-      <div className={`${sizeClasses[size]} relative flex items-center justify-center`}>
+      <div className={`${sizeClasses[size]} relative flex items-center justify-center flex-shrink-0`}>
         <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
           {/* Fond du logo */}
           <rect width="40" height="40" rx="8" className={variant === 'light' ? 'fill-white/10' : 'fill-gray-100'} />
@@ -48,7 +48,7 @@ export default function Logo({ variant = 'dark', showText = true, size = 'md' }:
       {/* Texte du logo */}
       {showText && (
         <div className="flex items-center">
-          <span className={`text-xl font-bold ${textColor}`}>
+          <span className={`text-base sm:text-lg md:text-xl font-bold ${textColor} whitespace-nowrap`}>
             Annonce<span className={accentColor}>Auto</span><span className={textColor}>.ci</span>
           </span>
         </div>

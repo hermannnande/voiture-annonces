@@ -12,10 +12,10 @@ export default function Header() {
 
   return (
     <header className="bg-white shadow-md sticky top-0 z-50 border-b border-gray-200">
-      <div className="container-custom">
-        <div className="flex items-center justify-between h-16">
+      <div className="container-custom px-4">
+        <div className="flex items-center justify-between h-14 sm:h-16">
           {/* Logo */}
-          <Logo variant="dark" showText={true} size="md" />
+          <Logo variant="dark" showText={true} size="sm" />
 
           {/* Navigation Desktop */}
           <nav className="hidden md:flex items-center space-x-6">
@@ -98,10 +98,10 @@ export default function Header() {
               </>
             ) : (
               <>
-                <Link href="/auth/login" className="text-gray-700 hover:text-accent-500 font-medium">
+                <Link href="/auth/login" className="text-gray-700 hover:text-accent-500 font-medium text-sm sm:text-base">
                   Connexion
                 </Link>
-                <Link href="/auth/register" className="bg-accent-500 hover:bg-accent-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors shadow-md">
+                <Link href="/auth/register" className="bg-accent-500 hover:bg-accent-600 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-semibold transition-colors shadow-md text-sm sm:text-base">
                   Inscription
                 </Link>
               </>

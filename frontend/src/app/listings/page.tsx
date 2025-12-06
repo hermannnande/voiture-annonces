@@ -14,25 +14,25 @@ export default function ListingsPage() {
       <Header />
       
       <main className="flex-1">
-        <div className="container-custom py-4 md:py-8">
-          <div className="flex items-center justify-between mb-4 md:mb-6">
-            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+        <div className="container-custom py-4 md:py-8 px-4">
+          <div className="flex items-center justify-between mb-4 md:mb-6 gap-2">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-900">
               Toutes les Annonces
             </h1>
             
             {/* Bouton Filtrer - Mobile uniquement */}
             <button
               onClick={() => setShowFilters(true)}
-              className="lg:hidden bg-accent-500 hover:bg-accent-600 text-white px-4 py-2 rounded-lg font-semibold flex items-center gap-2 text-sm transition-colors shadow-md"
+              className="lg:hidden bg-accent-500 hover:bg-accent-600 text-white px-3 sm:px-4 py-2 rounded-lg font-semibold flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm transition-colors shadow-md whitespace-nowrap"
             >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
               </svg>
               Filtrer
             </button>
           </div>
 
-          <div className="grid lg:grid-cols-4 gap-6">
+          <div className="grid lg:grid-cols-4 gap-4 lg:gap-6">
             {/* Filtres - Desktop */}
             <aside className="hidden lg:block lg:col-span-1">
               <div className="bg-white rounded-2xl p-6 sticky top-20 shadow-md border border-gray-200">
