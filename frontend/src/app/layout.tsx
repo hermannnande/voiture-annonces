@@ -5,14 +5,22 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Annonces Auto CI - Achetez et Vendez des Véhicules en Côte d\'Ivoire',
-  description: 'Plateforme d\'annonces de vente de véhicules en Côte d\'Ivoire. Trouvez votre voiture d\'occasion ou neuve, berlines, SUV, véhicules de transport et plus encore.',
-  keywords: 'voiture, véhicule, occasion, neuf, Côte d\'Ivoire, Abidjan, achat, vente, auto',
+  title: 'AnnonceAuto.ci - Achetez et Vendez des Véhicules en Côte d\'Ivoire',
+  description: 'La plateforme auto des particuliers & car dealers en Côte d\'Ivoire. Trouvez votre voiture en quelques clics !',
+  keywords: 'voiture, véhicule, occasion, neuf, Côte d\'Ivoire, Abidjan, achat, vente, auto, annonce',
+  applicationName: 'AnnonceAuto.ci',
+  authors: [{ name: 'AnnonceAuto.ci' }],
   openGraph: {
-    title: 'Annonces Auto CI',
-    description: 'Achetez et vendez des véhicules en Côte d\'Ivoire',
+    title: 'AnnonceAuto.ci',
+    description: 'La plateforme auto des particuliers & car dealers en Côte d\'Ivoire',
     type: 'website',
+    siteName: 'AnnonceAuto.ci',
   },
+  icons: {
+    icon: '/icon',
+    apple: '/apple-icon',
+  },
+  manifest: '/manifest.json',
 };
 
 export default function RootLayout({
