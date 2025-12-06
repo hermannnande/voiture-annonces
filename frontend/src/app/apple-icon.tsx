@@ -18,20 +18,19 @@ export default function AppleIcon() {
       // ImageResponse JSX element
       <div
         style={{
-          fontSize: 80,
-          background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
+          fontSize: 90,
+          background: '#1e3a8a',
           width: '100%',
           height: '100%',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          color: 'white',
           fontWeight: 900,
-          letterSpacing: '-3px',
           borderRadius: '32px',
         }}
       >
-        Aac
+        <span style={{ color: 'white' }}>A</span>
+        <span style={{ color: '#f97316' }}>A</span>
       </div>
     ),
     // ImageResponse options

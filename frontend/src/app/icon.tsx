@@ -18,8 +18,8 @@ export default function Icon() {
       // ImageResponse JSX element
       <div
         style={{
-          fontSize: 18,
-          background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
+          fontSize: 20,
+          background: '#1e3a8a',
           width: '100%',
           height: '100%',
           display: 'flex',
@@ -27,11 +27,11 @@ export default function Icon() {
           justifyContent: 'center',
           color: 'white',
           fontWeight: 900,
-          letterSpacing: '-1px',
-          borderRadius: '6px',
+          borderRadius: '4px',
         }}
       >
-        Aac
+        <span style={{ color: 'white' }}>A</span>
+        <span style={{ color: '#f97316' }}>A</span>
       </div>
     ),
     // ImageResponse options
