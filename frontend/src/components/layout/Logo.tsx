@@ -45,10 +45,10 @@ export default function Logo({ variant = 'dark', showText = true, size = 'md' }:
         </svg>
       </div>
 
-      {/* Texte du logo */}
+      {/* Texte du logo - Masqué sur très petit écran */}
       {showText && (
-        <div className="flex items-center">
-          <span className={`text-base sm:text-lg md:text-xl font-bold ${textColor} whitespace-nowrap`}>
+        <div className="hidden sm:flex items-center">
+          <span className={`text-lg md:text-xl font-bold ${textColor} whitespace-nowrap`}>
             Annonce<span className={accentColor}>Auto</span><span className={textColor}>.ci</span>
           </span>
         </div>

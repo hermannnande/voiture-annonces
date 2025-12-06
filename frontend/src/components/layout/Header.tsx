@@ -12,7 +12,7 @@ export default function Header() {
 
   return (
     <header className="bg-white shadow-md sticky top-0 z-50 border-b border-gray-200">
-      <div className="container-custom px-4">
+      <div className="container-custom px-3 sm:px-4">
         <div className="flex items-center justify-between h-14 sm:h-16">
           {/* Logo */}
           <Logo variant="dark" showText={true} size="sm" />
@@ -40,7 +40,7 @@ export default function Header() {
           </nav>
 
           {/* Actions */}
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2 sm:space-x-4">
             {isAuthenticated ? (
               <>
                 <Link href="/dashboard/listings/create" className="bg-accent-500 hover:bg-accent-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors hidden sm:flex items-center space-x-2 shadow-md">
@@ -98,10 +98,10 @@ export default function Header() {
               </>
             ) : (
               <>
-                <Link href="/auth/login" className="text-gray-700 hover:text-accent-500 font-medium text-sm sm:text-base">
+                <Link href="/auth/login" className="text-gray-700 hover:text-accent-500 font-medium text-xs sm:text-sm md:text-base">
                   Connexion
                 </Link>
-                <Link href="/auth/register" className="bg-accent-500 hover:bg-accent-600 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-semibold transition-colors shadow-md text-sm sm:text-base">
+                <Link href="/auth/register" className="bg-accent-500 hover:bg-accent-600 text-white px-2.5 sm:px-3 md:px-4 py-1.5 sm:py-2 rounded-lg font-semibold transition-colors shadow-md text-xs sm:text-sm md:text-base whitespace-nowrap">
                   Inscription
                 </Link>
               </>
