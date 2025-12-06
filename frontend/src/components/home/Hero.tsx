@@ -18,12 +18,12 @@ export default function Hero() {
   };
 
   return (
-    <div className="relative bg-gradient-to-br from-navy-950 via-navy-900 to-navy-800 text-white overflow-hidden">
+    <div className="relative bg-gradient-to-br from-blue-600 via-blue-700 to-blue-800 text-white overflow-hidden">
       {/* Effet de grille futuriste en arrière-plan */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e3a5f_1px,transparent_1px),linear-gradient(to_bottom,#1e3a5f_1px,transparent_1px)] bg-[size:4rem_4rem] opacity-20"></div>
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,rgba(255,255,255,0.05)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.05)_1px,transparent_1px)] bg-[size:4rem_4rem]"></div>
       
       {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-navy-950/50 to-navy-950"></div>
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-800/30 to-blue-900/50"></div>
       
       <div className="relative container-custom py-16 md:py-24">
         <div className="max-w-4xl mx-auto text-center">

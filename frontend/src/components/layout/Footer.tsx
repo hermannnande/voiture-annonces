@@ -3,13 +3,13 @@ import { Facebook, Mail, Phone } from 'lucide-react';
 
 export default function Footer() {
   return (
-    <footer className="bg-navy-900 text-gray-300 border-t border-navy-800">
+    <footer className="bg-gray-900 text-gray-300 border-t border-gray-800">
       <div className="container-custom py-12">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* À propos */}
           <div>
             <h3 className="text-white font-bold text-lg mb-4 flex items-center space-x-2">
-              <span className="text-accent-400">Annonce</span><span>Auto.ci</span>
+              <span className="text-accent-500">Annonce</span><span>Auto.ci</span>
             </h3>
             <p className="text-sm mb-4 text-gray-400">
               La plateforme auto des particuliers & car dealers en Côte d'Ivoire.
@@ -27,22 +27,22 @@ export default function Footer() {
             <h4 className="text-white font-semibold mb-4">Liens Rapides</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/listings" className="hover:text-accent-400 transition-colors">
+                <Link href="/listings" className="hover:text-accent-500 transition-colors">
                   Toutes les annonces
                 </Link>
               </li>
               <li>
-                <Link href="/listings?state=NEUF" className="hover:text-accent-400 transition-colors">
+                <Link href="/listings?state=NEUF" className="hover:text-accent-500 transition-colors">
                   Véhicules neufs
                 </Link>
               </li>
               <li>
-                <Link href="/listings?state=OCCASION" className="hover:text-accent-400 transition-colors">
+                <Link href="/listings?state=OCCASION" className="hover:text-accent-500 transition-colors">
                   Véhicules d'occasion
                 </Link>
               </li>
               <li>
-                <Link href="/auth/register" className="hover:text-accent-400 transition-colors">
+                <Link href="/auth/register" className="hover:text-accent-500 transition-colors">
                   Publier une annonce
                 </Link>
               </li>
@@ -54,22 +54,22 @@ export default function Footer() {
             <h4 className="text-white font-semibold mb-4">Catégories</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link href="/listings?category=berlines" className="hover:text-accent-400 transition-colors">
+                <Link href="/listings?category=berlines" className="hover:text-accent-500 transition-colors">
                   Berlines
                 </Link>
               </li>
               <li>
-                <Link href="/listings?category=suv" className="hover:text-accent-400 transition-colors">
+                <Link href="/listings?category=suv" className="hover:text-accent-500 transition-colors">
                   SUV
                 </Link>
               </li>
               <li>
-                <Link href="/listings?category=pickup" className="hover:text-accent-400 transition-colors">
+                <Link href="/listings?category=pickup" className="hover:text-accent-500 transition-colors">
                   Pick-up
                 </Link>
               </li>
               <li>
-                <Link href="/listings?category=vehicules-transport" className="hover:text-accent-400 transition-colors">
+                <Link href="/listings?category=vehicules-transport" className="hover:text-accent-500 transition-colors">
                   Transport
                 </Link>
               </li>
@@ -81,14 +81,14 @@ export default function Footer() {
             <h4 className="text-white font-semibold mb-4">Contact</h4>
             <ul className="space-y-3 text-sm">
               <li className="flex items-center space-x-2">
-                <Mail className="w-4 h-4 text-accent-400" />
-                <a href="mailto:annonceautoci@gmail.com" className="hover:text-accent-400 transition-colors">
+                <Mail className="w-4 h-4 text-accent-500" />
+                <a href="mailto:annonceautoci@gmail.com" className="hover:text-accent-500 transition-colors">
                   annonceautoci@gmail.com
                 </a>
               </li>
               <li className="flex items-center space-x-2">
-                <Phone className="w-4 h-4 text-accent-400" />
-                <a href="tel:+2250778030075" className="hover:text-accent-400 transition-colors">
+                <Phone className="w-4 h-4 text-accent-500" />
+                <a href="tel:+2250778030075" className="hover:text-accent-500 transition-colors">
                   +225 07 78 03 00 75
                 </a>
               </li>
@@ -109,19 +109,19 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="border-t border-navy-800 mt-8 pt-8 text-sm text-center">
+        <div className="border-t border-gray-800 mt-8 pt-8 text-sm text-center">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-2 md:space-y-0">
-            <p className="text-gray-400">&copy; 2025 <span className="text-accent-400">AnnonceAuto.ci</span>. Tous droits réservés.</p>
+            <p className="text-gray-400">&copy; 2025 <span className="text-accent-500">AnnonceAuto.ci</span>. Tous droits réservés.</p>
             <div className="flex space-x-6">
-              <Link href="/legal/terms" className="hover:text-accent-400 transition-colors">
+              <Link href="/legal/terms" className="hover:text-accent-500 transition-colors">
                 Conditions d'utilisation
               </Link>
-              <Link href="/legal/privacy" className="hover:text-accent-400 transition-colors">
+              <Link href="/legal/privacy" className="hover:text-accent-500 transition-colors">
                 Politique de confidentialité
               </Link>
             </div>
           </div>
-          <p className="mt-4 text-xs text-gray-500">📱 Rendez-vous sur : <span className="text-accent-400 font-semibold">www.annonceauto.ci</span></p>
+          <p className="mt-4 text-xs text-gray-500">📱 Rendez-vous sur : <span className="text-accent-500 font-semibold">www.annonceauto.ci</span></p>
         </div>
       </div>
     </footer>

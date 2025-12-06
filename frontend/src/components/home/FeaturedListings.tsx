@@ -44,7 +44,7 @@ export default function FeaturedListings() {
 
   if (listings.length === 0) {
     return (
-      <div className="text-center py-12 text-gray-400">
+      <div className="text-center py-12 text-gray-600">
         <p>Aucune annonce premium pour le moment</p>
       </div>
     );

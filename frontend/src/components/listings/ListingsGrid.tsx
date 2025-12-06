@@ -61,7 +61,7 @@ export default function ListingsGrid() {
   return (
     <>
       {/* Résultats */}
-      <div className="mb-3 sm:mb-4 text-xs sm:text-sm text-gray-300 px-1">
+      <div className="mb-3 sm:mb-4 text-xs sm:text-sm text-gray-600 px-1">
         {pagination && (
           <p>
             {pagination.total} annonce{pagination.total > 1 ? 's' : ''} trouvée{pagination.total > 1 ? 's' : ''}

@@ -11,29 +11,29 @@ export default function Header() {
   const { user, isAuthenticated, logout } = useAuthStore();
 
   return (
-    <header className="bg-navy-900 shadow-lg sticky top-0 z-50 border-b border-navy-800">
+    <header className="bg-white shadow-md sticky top-0 z-50 border-b border-gray-200">
       <div className="container-custom">
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
-          <Logo variant="light" showText={true} size="md" />
+          <Logo variant="dark" showText={true} size="md" />
 
           {/* Navigation Desktop */}
           <nav className="hidden md:flex items-center space-x-6">
             <Link
               href="/listings"
-              className="text-white hover:text-accent-400 font-medium transition-colors"
+              className="text-gray-700 hover:text-accent-500 font-medium transition-colors"
             >
               Annonces
             </Link>
             <Link
               href="/listings?state=NEUF"
-              className="text-white hover:text-accent-400 font-medium transition-colors"
+              className="text-gray-700 hover:text-accent-500 font-medium transition-colors"
             >
               Véhicules Neufs
             </Link>
             <Link
               href="/listings?state=OCCASION"
-              className="text-white hover:text-accent-400 font-medium transition-colors"
+              className="text-gray-700 hover:text-accent-500 font-medium transition-colors"
             >
               Occasions
             </Link>
@@ -43,52 +43,52 @@ export default function Header() {
           <div className="flex items-center space-x-4">
             {isAuthenticated ? (
               <>
-                <Link href="/dashboard/listings/create" className="bg-accent-500 hover:bg-accent-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors hidden sm:flex items-center space-x-2 shadow-lg">
+                <Link href="/dashboard/listings/create" className="bg-accent-500 hover:bg-accent-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors hidden sm:flex items-center space-x-2 shadow-md">
                   <Plus className="w-4 h-4" />
                   <span>Publier</span>
                 </Link>
 
-                <Link href="/dashboard/messages" className="p-2 text-white hover:text-accent-400 transition-colors relative">
+                <Link href="/dashboard/messages" className="p-2 text-gray-700 hover:text-accent-500 transition-colors relative">
                   <MessageSquare className="w-5 h-5" />
                 </Link>
 
                 <div className="relative group">
-                  <button className="flex items-center space-x-2 p-2 rounded-lg hover:bg-navy-800 transition-colors text-white">
+                  <button className="flex items-center space-x-2 p-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-700">
                     <User className="w-5 h-5" />
                     <span className="hidden sm:block text-sm font-medium">{user?.name}</span>
                   </button>
 
-                  <div className="absolute right-0 mt-2 w-48 bg-navy-800 rounded-lg shadow-xl border border-navy-700 py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-xl border border-gray-200 py-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
                     <Link
                       href="/dashboard"
-                      className="block px-4 py-2 text-sm text-white hover:bg-navy-700"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                     >
                       Tableau de bord
                     </Link>
                     <Link
                       href="/dashboard/listings"
-                      className="block px-4 py-2 text-sm text-white hover:bg-navy-700"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                     >
                       Mes annonces
                     </Link>
                     <Link
                       href="/dashboard/messages"
-                      className="block px-4 py-2 text-sm text-white hover:bg-navy-700"
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                     >
                       Messages
                     </Link>
                     {user?.role === 'SUPER_ADMIN' && (
                       <Link
                         href="/admin"
-                        className="block px-4 py-2 text-sm text-accent-400 hover:bg-navy-700 font-medium"
+                        className="block px-4 py-2 text-sm text-accent-500 hover:bg-gray-50 font-medium"
                       >
                         Administration
                       </Link>
                     )}
-                    <hr className="my-2 border-navy-700" />
+                    <hr className="my-2 border-gray-200" />
                     <button
                       onClick={logout}
-                      className="w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-navy-700 flex items-center space-x-2"
+                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50 flex items-center space-x-2"
                     >
                       <LogOut className="w-4 h-4" />
                       <span>Déconnexion</span>
@@ -98,10 +98,10 @@ export default function Header() {
               </>
             ) : (
               <>
-                <Link href="/auth/login" className="text-white hover:text-accent-400 font-medium">
+                <Link href="/auth/login" className="text-gray-700 hover:text-accent-500 font-medium">
                   Connexion
                 </Link>
-                <Link href="/auth/register" className="bg-accent-500 hover:bg-accent-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors shadow-lg">
+                <Link href="/auth/register" className="bg-accent-500 hover:bg-accent-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors shadow-md">
                   Inscription
                 </Link>
               </>
@@ -110,7 +110,7 @@ export default function Header() {
             {/* Menu Mobile */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 text-white"
+              className="md:hidden p-2 text-gray-700"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
             </button>
@@ -119,25 +119,25 @@ export default function Header() {
 
         {/* Menu Mobile */}
         {mobileMenuOpen && (
-          <div className="md:hidden py-4 border-t border-navy-800 animate-slide-in-up bg-navy-900">
+          <div className="md:hidden py-4 border-t border-gray-200 animate-slide-in-up bg-white">
             <nav className="flex flex-col space-y-3">
               <Link
                 href="/listings"
-                className="text-white hover:text-accent-400 font-medium"
+                className="text-gray-700 hover:text-accent-500 font-medium"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Toutes les annonces
               </Link>
               <Link
                 href="/listings?state=NEUF"
-                className="text-white hover:text-accent-400 font-medium"
+                className="text-gray-700 hover:text-accent-500 font-medium"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Véhicules Neufs
               </Link>
               <Link
                 href="/listings?state=OCCASION"
-                className="text-white hover:text-accent-400 font-medium"
+                className="text-gray-700 hover:text-accent-500 font-medium"
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Occasions
@@ -145,7 +145,7 @@ export default function Header() {
               {isAuthenticated && (
                 <Link
                   href="/dashboard/listings/create"
-                  className="bg-accent-500 hover:bg-accent-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors text-center"
+                  className="bg-accent-500 hover:bg-accent-600 text-white px-4 py-2 rounded-lg font-semibold transition-colors text-center shadow-md"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Publier une annonce
