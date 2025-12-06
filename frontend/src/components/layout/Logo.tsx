@@ -8,53 +8,48 @@ interface LogoProps {
 
 export default function Logo({ variant = 'dark', showText = true, size = 'md' }: LogoProps) {
   const sizeClasses = {
-    sm: 'h-8',
-    md: 'h-10',
-    lg: 'h-12',
+    sm: 'h-7',
+    md: 'h-9',
+    lg: 'h-11',
   };
 
-  const textColor = variant === 'light' ? 'text-white' : 'text-navy-900';
+  const textColor = variant === 'light' ? 'text-white' : 'text-gray-800';
   const accentColor = variant === 'light' ? 'text-accent-400' : 'text-accent-500';
 
   return (
     <Link href="/" className="flex items-center space-x-2 group">
-      {/* Icône de voiture stylisée */}
-      <div className={`${sizeClasses[size]} aspect-square relative`}>
-        <svg viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-          {/* Carrosserie */}
-          <path
-            d="M12 32L16 22H48L52 32V44C52 46.2 50.2 48 48 48H16C13.8 48 12 46.2 12 44V32Z"
-            className={variant === 'light' ? 'fill-white' : 'fill-accent-500'}
-          />
-          {/* Toit */}
-          <path
-            d="M20 22L24 14H40L44 22H20Z"
-            className={variant === 'light' ? 'fill-white opacity-80' : 'fill-accent-600'}
-          />
-          {/* Roue gauche */}
-          <circle cx="22" cy="46" r="6" className={variant === 'light' ? 'fill-navy-900' : 'fill-navy-800'} />
-          <circle cx="22" cy="46" r="3" className={variant === 'light' ? 'fill-white' : 'fill-accent-400'} />
-          {/* Roue droite */}
-          <circle cx="42" cy="46" r="6" className={variant === 'light' ? 'fill-navy-900' : 'fill-navy-800'} />
-          <circle cx="42" cy="46" r="3" className={variant === 'light' ? 'fill-white' : 'fill-accent-400'} />
-          {/* Fenêtres */}
-          <path
-            d="M22 20L25 15H39L42 20H22Z"
-            className={variant === 'light' ? 'fill-navy-900 opacity-30' : 'fill-navy-600 opacity-40'}
-          />
-          {/* Phare */}
-          <circle cx="50" cy="32" r="2" className={variant === 'light' ? 'fill-accent-400' : 'fill-white'} />
+      {/* Icône de voiture - Style mobile moderne */}
+      <div className={`${sizeClasses[size]} relative flex items-center justify-center`}>
+        <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+          {/* Fond du logo */}
+          <rect width="40" height="40" rx="8" className={variant === 'light' ? 'fill-white/10' : 'fill-gray-100'} />
+          
+          {/* Icône voiture simplifiée */}
+          <g transform="translate(8, 12)">
+            {/* Carrosserie */}
+            <path
+              d="M2 8L3.5 4H20.5L22 8V14C22 14.5 21.5 15 21 15H3C2.5 15 2 14.5 2 14V8Z"
+              className={variant === 'light' ? 'fill-white' : 'fill-accent-500'}
+            />
+            {/* Toit */}
+            <path
+              d="M5 4L6.5 1H17.5L19 4H5Z"
+              className={variant === 'light' ? 'fill-white opacity-80' : 'fill-accent-600'}
+            />
+            {/* Roues */}
+            <circle cx="7" cy="15" r="2" className={variant === 'light' ? 'fill-gray-700' : 'fill-gray-800'} />
+            <circle cx="17" cy="15" r="2" className={variant === 'light' ? 'fill-gray-700' : 'fill-gray-800'} />
+            {/* Fenêtre */}
+            <rect x="6" y="2" width="12" height="2" rx="0.5" className={variant === 'light' ? 'fill-blue-300 opacity-40' : 'fill-blue-400 opacity-30'} />
+          </g>
         </svg>
       </div>
 
       {/* Texte du logo */}
       {showText && (
-        <div className="hidden sm:flex flex-col leading-tight">
-          <span className={`text-lg font-bold ${textColor} group-hover:${accentColor} transition-colors`}>
-            Annonce<span className={accentColor}>Auto</span>.ci
-          </span>
-          <span className={`text-[10px] ${variant === 'light' ? 'text-white/70' : 'text-gray-600'} -mt-1`}>
-            La plateforme auto des particuliers
+        <div className="flex items-center">
+          <span className={`text-xl font-bold ${textColor}`}>
+            Annonce<span className={accentColor}>Auto</span><span className={textColor}>.ci</span>
           </span>
         </div>
       )}
