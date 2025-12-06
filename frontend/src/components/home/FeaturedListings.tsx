@@ -34,9 +34,9 @@ export default function FeaturedListings() {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-6">
         {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="card p-4 skeleton h-80"></div>
+          <div key={i} className="bg-white rounded-2xl p-4 skeleton h-64 sm:h-72"></div>
         ))}
       </div>
     );
@@ -44,14 +44,14 @@ export default function FeaturedListings() {
 
   if (listings.length === 0) {
     return (
-      <div className="text-center py-12 text-gray-600">
+      <div className="text-center py-12 text-gray-400">
         <p>Aucune annonce premium pour le moment</p>
       </div>
     );
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4 lg:gap-6">
       {listings.map((listing: any) => (
         <ListingCard key={listing.id} listing={listing} />
       ))}

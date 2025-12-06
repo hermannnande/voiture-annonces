@@ -43,65 +43,55 @@ export default function ListingCard({ listing }: ListingCardProps) {
 
   return (
     <Link href={`/listings/${listing.id}`} className="group">
-      <div className="card-hover overflow-hidden">
+      <div className="bg-white rounded-2xl overflow-hidden shadow-card hover:shadow-card-hover transition-all duration-300 transform hover:-translate-y-1">
         {/* Image */}
-        <div className="relative h-44 sm:h-48 md:h-52 bg-gray-100 overflow-hidden">
+        <div className="relative h-36 sm:h-44 md:h-48 bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
           <Image
             src={imageUrl}
             alt={listing.title}
             fill
-            className="object-contain group-hover:scale-105 transition-transform duration-300"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+            className="object-contain group-hover:scale-110 transition-transform duration-500"
+            sizes="(max-width: 768px) 50vw, (max-width: 1200px) 33vw, 25vw"
           />
           
-          {/* Badges */}
-          <div className="absolute top-2 left-2 flex flex-col gap-1.5 sm:gap-2">
+          {/* Icône favoris - Style affiche */}
+          <button className="absolute top-2 right-2 w-8 h-8 bg-white/90 hover:bg-white rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110">
+            <svg className="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+            </svg>
+          </button>
+          
+          {/* Badge État - Coins supérieurs */}
+          <div className="absolute top-2 left-2">
             {isBoosted && (
-              <span className="bg-gradient-to-r from-yellow-500 via-orange-500 to-red-500 text-white text-[10px] sm:text-xs px-2 sm:px-3 py-1 sm:py-1.5 rounded-full shadow-lg font-bold flex items-center space-x-1 animate-pulse">
-                <Rocket className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                <span>🚀 Boost</span>
+              <span className="bg-gradient-to-r from-accent-500 to-accent-600 text-white text-[10px] sm:text-xs px-2 sm:px-3 py-1 rounded-full shadow-lg font-bold flex items-center space-x-1">
+                <Rocket className="w-3 h-3" />
+                <span>Boost</span>
               </span>
             )}
-            {listing.isSponsored && !isBoosted && (
-              <span className="badge-primary text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 sm:py-1">
-                ⭐ Premium
-              </span>
-            )}
-            <span className={`badge ${listing.state === 'NEUF' ? 'badge-success' : 'badge-info'} text-[10px] sm:text-xs px-1.5 sm:px-2 py-0.5 sm:py-1`}>
-              {listing.state === 'NEUF' ? 'Neuf' : 'Occasion'}
-            </span>
-          </div>
-
-          {/* Prix */}
-          <div className="absolute bottom-2 left-2 bg-white px-2 sm:px-3 py-1 rounded-lg shadow-md">
-            <span className="font-bold text-primary-600 text-sm sm:text-base">{formatPrice(listing.priceFcfa)} FCFA</span>
           </div>
         </div>
 
-        {/* Contenu */}
+        {/* Contenu - Style affiche */}
         <div className="p-3 sm:p-4">
-          <h3 className="font-bold text-base sm:text-lg text-gray-900 mb-2 line-clamp-2 group-hover:text-primary-600 transition-colors">
+          {/* Titre - Plus grand et bold */}
+          <h3 className="font-bold text-sm sm:text-base text-navy-900 mb-1 line-clamp-2 group-hover:text-accent-600 transition-colors min-h-[2.5rem]">
             {listing.title}
           </h3>
 
-          <div className="flex items-center text-xs sm:text-sm text-gray-600 mb-2 sm:mb-3">
-            <MapPin className="w-3 h-3 sm:w-4 sm:h-4 mr-1 flex-shrink-0" />
-            <span className="truncate">{listing.locationCity}</span>
+          {/* Année - Style affiche */}
+          <p className="text-xs text-gray-500 mb-2">{listing.year}</p>
+
+          {/* Prix - Plus visible, style affiche */}
+          <div className="mb-3">
+            <span className="text-lg sm:text-xl font-bold text-navy-900">{formatPrice(listing.priceFcfa)}</span>
+            <span className="text-sm text-gray-600 ml-1">XOF</span>
           </div>
 
-          <div className="grid grid-cols-3 gap-1.5 sm:gap-2 text-[10px] sm:text-xs text-gray-600">
-            <div className="flex items-center space-x-0.5 sm:space-x-1">
-              <Calendar className="w-3 h-3 flex-shrink-0" />
-              <span>{listing.year}</span>
-            </div>
-            <div className="flex items-center space-x-0.5 sm:space-x-1">
-              <Gauge className="w-3 h-3 flex-shrink-0" />
-              <span className="truncate">{formatPrice(listing.mileageKm)} km</span>
-            </div>
-            <div className="flex items-center space-x-0.5 sm:space-x-1">
-              <Fuel className="w-3 h-3 flex-shrink-0" />
-              <span className="truncate">{listing.fuel}</span>
-            </div>
+          {/* Localisation - Style affiche */}
+          <div className="flex items-center text-xs text-gray-600 border-t border-gray-100 pt-2">
+            <MapPin className="w-3.5 h-3.5 mr-1 flex-shrink-0 text-gray-400" />
+            <span className="truncate">{listing.locationCity}</span>
           </div>
         </div>
       </div>

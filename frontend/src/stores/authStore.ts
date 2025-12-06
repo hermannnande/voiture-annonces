@@ -243,14 +243,7 @@ if (typeof window !== 'undefined') {
         }
       } catch (error) {
         console.error('❌ Erreur parsing user lors du focus:', error);
-        // En cas d'erreur, déconnecter par sécurité
-        localStorage.clear();
-        window.location.href = '/auth/login';
       }
-    } else if (currentUser && !storedUserStr) {
-      // Si on a un user en mémoire mais pas dans localStorage
-      console.warn('⚠️  Session en mémoire mais pas dans localStorage, déconnexion');
-      useAuthStore.getState().logout();
     }
   });
 }

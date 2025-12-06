@@ -8,9 +8,16 @@ export class InitService implements OnModuleInit {
   constructor(private prisma: PrismaService) {}
 
   async onModuleInit() {
-    console.log('🔧 Initialisation de l\'application...');
-    await this.ensureAdminExists();
-    await this.createMissingWallets();
+    // Ne pas bloquer le démarrage : exécuter en arrière-plan
+    setTimeout(async () => {
+      console.log('🔧 Initialisation de l\'application (background)...');
+      try {
+        await this.ensureAdminExists();
+        await this.createMissingWallets();
+      } catch (error) {
+        console.error('❌ Erreur critique init background:', error);
+      }
+    }, 1000);
   }
 
   async ensureAdminExists() {

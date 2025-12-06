@@ -37,9 +37,9 @@ export default function ListingsGrid() {
 
   if (loading) {
     return (
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-3 md:gap-4 lg:gap-6">
         {[1, 2, 3, 4, 5, 6].map((i) => (
-          <div key={i} className="card p-4 skeleton h-80"></div>
+          <div key={i} className="bg-white rounded-2xl p-4 skeleton h-64 sm:h-72"></div>
         ))}
       </div>
     );
@@ -47,11 +47,11 @@ export default function ListingsGrid() {
 
   if (listings.length === 0) {
     return (
-      <div className="card p-6 sm:p-12 text-center">
+      <div className="bg-white rounded-2xl p-6 sm:p-12 text-center shadow-card">
         <p className="text-gray-600 mb-4 text-sm sm:text-base">
           Aucune annonce ne correspond à vos critères
         </p>
-        <a href="/listings" className="btn-primary text-sm sm:text-base">
+        <a href="/listings" className="inline-block bg-accent-500 hover:bg-accent-600 text-white px-6 py-3 rounded-lg font-semibold transition-colors">
           Voir toutes les annonces
         </a>
       </div>
@@ -61,7 +61,7 @@ export default function ListingsGrid() {
   return (
     <>
       {/* Résultats */}
-      <div className="mb-3 sm:mb-4 text-xs sm:text-sm text-gray-600 px-1">
+      <div className="mb-3 sm:mb-4 text-xs sm:text-sm text-gray-300 px-1">
         {pagination && (
           <p>
             {pagination.total} annonce{pagination.total > 1 ? 's' : ''} trouvée{pagination.total > 1 ? 's' : ''}
@@ -69,8 +69,8 @@ export default function ListingsGrid() {
         )}
       </div>
 
-      {/* Grille */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+      {/* Grille - 2 colonnes mobile (style affiche) */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-3 md:gap-4 lg:gap-6">
         {listings.map((listing: any) => (
           <ListingCard key={listing.id} listing={listing} />
         ))}
@@ -83,10 +83,10 @@ export default function ListingsGrid() {
             <a
               key={page}
               href={`?${new URLSearchParams({ ...Object.fromEntries(searchParams), page: page.toString() })}`}
-              className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-sm ${
+              className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg text-sm font-medium transition-colors ${
                 page === pagination.page
-                  ? 'bg-primary-600 text-white'
-                  : 'bg-white text-gray-700 hover:bg-gray-100'
+                  ? 'bg-accent-500 text-white shadow-lg'
+                  : 'bg-white text-gray-700 hover:bg-accent-50 hover:text-accent-600'
               }`}
             >
               {page}
