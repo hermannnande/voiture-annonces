@@ -2,19 +2,12 @@ import { ImageResponse } from 'next/og';
 
 export const runtime = 'edge';
 
-export const size = {
-  width: 192,
-  height: 192,
-};
-
-export const contentType = 'image/png';
-
-export default function Icon192() {
+export async function GET() {
   return new ImageResponse(
     (
       <div
         style={{
-          fontSize: 95,
+          fontSize: 240,
           background: '#1e3a8a',
           width: '100%',
           height: '100%',
@@ -22,7 +15,7 @@ export default function Icon192() {
           alignItems: 'center',
           justifyContent: 'center',
           fontWeight: 900,
-          borderRadius: '32px',
+          borderRadius: '64px',
         }}
       >
         <span style={{ color: 'white' }}>A</span>
@@ -30,7 +23,8 @@ export default function Icon192() {
       </div>
     ),
     {
-      ...size,
+      width: 512,
+      height: 512,
     }
   );
 }
