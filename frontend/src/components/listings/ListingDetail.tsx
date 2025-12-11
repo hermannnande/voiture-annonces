@@ -83,7 +83,7 @@ Voir l'annonce : ${listingUrl}`;
           {/* Galerie d'images */}
           <div className="card overflow-hidden">
             {/* Image principale */}
-            <div className="relative h-96 bg-gray-100">
+            <div className="relative h-64 sm:h-80 md:h-96 bg-gray-100">
               {listing.images && listing.images.length > 0 ? (
                 <Image
                   src={getImageUrl(listing.images[selectedImage]?.url)}
@@ -111,12 +111,12 @@ Voir l'annonce : ${listingUrl}`;
 
             {/* Miniatures */}
             {listing.images && listing.images.length > 1 && (
-              <div className="p-4 flex gap-2 overflow-x-auto">
+              <div className="p-2 sm:p-4 flex gap-1.5 sm:gap-2 overflow-x-auto scrollbar-hide">
                 {listing.images.map((image: any, index: number) => (
                   <button
                     key={index}
                     onClick={() => setSelectedImage(index)}
-                    className={`relative w-20 h-20 flex-shrink-0 rounded-lg overflow-hidden border-2 transition-all ${
+                    className={`relative w-14 h-14 sm:w-20 sm:h-20 flex-shrink-0 rounded-md sm:rounded-lg overflow-hidden border-2 transition-all ${
                       selectedImage === index ? 'border-primary-600 scale-105' : 'border-gray-200'
                     }`}
                   >
