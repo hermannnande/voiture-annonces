@@ -6,7 +6,7 @@
 export function getImageUrl(url: string | null | undefined): string {
   // Si pas d'URL, retourner le placeholder
   if (!url) {
-    return '/images/placeholder-car.jpg';
+    return '/images/placeholder.svg';
   }
 
   // Si l'URL est déjà complète (commence par http), la retourner telle quelle
