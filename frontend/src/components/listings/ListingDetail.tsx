@@ -265,8 +265,8 @@ Voir l'annonce : ${listingUrl}`;
         </div>
       </div>
 
-      {/* Annonces similaires - Temporairement désactivé */}
-      {/* <SimilarListings listingId={listing.id} /> */}
+      {/* Annonces similaires */}
+      <SimilarListings listingId={listing.id} />
     </div>
   );
 }
