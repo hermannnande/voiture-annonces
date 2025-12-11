@@ -11,6 +11,7 @@ import { formatPrice, formatDate, getWhatsAppLink, getPhoneLink } from '@/lib/ut
 import { getImageUrl } from '@/lib/imageUtils';
 import { useAuthStore } from '@/stores/authStore';
 import api from '@/lib/api';
+import SimilarListings from './SimilarListings';
 
 interface ListingDetailProps {
   listing: any;
@@ -263,6 +264,9 @@ Voir l'annonce : ${listingUrl}`;
           </div>
         </div>
       </div>
+
+      {/* Annonces similaires */}
+      <SimilarListings listingId={listing.id} />
     </div>
   );
 }
