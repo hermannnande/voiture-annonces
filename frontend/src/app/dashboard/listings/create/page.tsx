@@ -6,7 +6,7 @@ import { useAuthStore } from '@/stores/authStore';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
 import api from '@/lib/api';
-import { Upload, X } from 'lucide-react';
+import { Upload, X, CheckCircle, Clock } from 'lucide-react';
 
 export default function CreateListingPage() {
   const router = useRouter();
@@ -19,6 +19,12 @@ export default function CreateListingPage() {
   const [error, setError] = useState('');
   const [images, setImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  
+  // États pour la progression
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [totalImages, setTotalImages] = useState(0);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -99,6 +105,9 @@ export default function CreateListingPage() {
     e.preventDefault();
     setError('');
     setLoading(true);
+    setUploadProgress(0);
+    setCurrentImageIndex(0);
+    setTotalImages(images.length);
 
     try {
       // Upload des images d'abord
@@ -106,7 +115,10 @@ export default function CreateListingPage() {
       
       if (images.length > 0) {
         // Upload chaque image vers le backend
-        for (const image of images) {
+        for (let i = 0; i < images.length; i++) {
+          const image = images[i];
+          setCurrentImageIndex(i + 1);
+          
           const formDataImg = new FormData();
           formDataImg.append('file', image);
 
@@ -114,6 +126,13 @@ export default function CreateListingPage() {
             const uploadResponse = await api.post('/uploads/listing-image', formDataImg, {
               headers: {
                 'Content-Type': 'multipart/form-data',
+              },
+              onUploadProgress: (progressEvent) => {
+                if (progressEvent.total) {
+                  const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                  const overallProgress = Math.round(((i + (percentCompleted / 100)) / images.length) * 100);
+                  setUploadProgress(overallProgress);
+                }
               },
             });
             
@@ -127,6 +146,7 @@ export default function CreateListingPage() {
       }
 
       // Créer l'annonce avec les URLs des images uploadées
+      setUploadProgress(95);
       const listingData = {
         ...formData,
         priceFcfa: parseInt(formData.priceFcfa),
@@ -142,11 +162,10 @@ export default function CreateListingPage() {
 
       await api.post('/listings', listingData);
       
-      alert('✅ Annonce créée avec succès ! Elle sera visible après validation par un administrateur.');
-      router.push('/dashboard/listings');
+      setUploadProgress(100);
+      setShowSuccessModal(true);
     } catch (err: any) {
       setError(err.response?.data?.message || 'Erreur lors de la création de l\'annonce');
-    } finally {
       setLoading(false);
     }
   };
@@ -525,6 +544,103 @@ export default function CreateListingPage() {
       </main>
 
       <Footer />
+
+      {/* Barre de progression pendant l'upload */}
+      {loading && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl p-8 max-w-md w-full mx-4 shadow-2xl">
+            <div className="text-center mb-6">
+              <div className="inline-flex items-center justify-center w-16 h-16 bg-primary-100 rounded-full mb-4">
+                <Upload className="w-8 h-8 text-primary-600 animate-pulse" />
+              </div>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">
+                Publication en cours...
+              </h3>
+              <p className="text-gray-600 text-sm">
+                {totalImages > 0 
+                  ? `Upload des images (${currentImageIndex}/${totalImages})`
+                  : 'Création de votre annonce'
+                }
+              </p>
+            </div>
+
+            {/* Barre de progression */}
+            <div className="space-y-3">
+              <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                <div 
+                  className="h-full bg-gradient-to-r from-primary-500 to-primary-600 rounded-full transition-all duration-300 ease-out"
+                  style={{ width: `${uploadProgress}%` }}
+                ></div>
+              </div>
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Progression</span>
+                <span className="font-semibold text-primary-600">{uploadProgress}%</span>
+              </div>
+            </div>
+
+            <p className="text-xs text-gray-500 text-center mt-4">
+              Veuillez ne pas fermer cette fenêtre...
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de succès */}
+      {showSuccessModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl p-8 max-w-lg w-full shadow-2xl animate-[slide-in-up_0.3s_ease-out]">
+            <div className="text-center">
+              {/* Icône de succès animée */}
+              <div className="inline-flex items-center justify-center w-20 h-20 bg-green-100 rounded-full mb-6">
+                <CheckCircle className="w-12 h-12 text-green-600" />
+              </div>
+
+              {/* Titre */}
+              <h2 className="text-2xl font-bold text-gray-900 mb-3">
+                Annonce publiée avec succès ! 🎉
+              </h2>
+
+              {/* Message */}
+              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+                <div className="flex items-start space-x-3">
+                  <Clock className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                  <div className="text-left">
+                    <p className="text-sm font-medium text-blue-900 mb-1">
+                      En attente de validation
+                    </p>
+                    <p className="text-sm text-blue-700">
+                      Votre annonce sera visible sur le site après vérification par notre équipe. 
+                      Vous recevrez une notification dès sa publication.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Informations supplémentaires */}
+              <div className="text-sm text-gray-600 mb-6 space-y-2">
+                <p className="flex items-center justify-center space-x-2">
+                  <span className="inline-block w-2 h-2 bg-green-500 rounded-full"></span>
+                  <span>{totalImages} image{totalImages > 1 ? 's' : ''} téléchargée{totalImages > 1 ? 's' : ''}</span>
+                </p>
+                <p className="text-xs text-gray-500">
+                  Temps de validation moyen : 2-24 heures
+                </p>
+              </div>
+
+              {/* Bouton */}
+              <button
+                onClick={() => {
+                  setShowSuccessModal(false);
+                  router.push('/dashboard/listings');
+                }}
+                className="btn-primary w-full"
+              >
+                Voir mes annonces
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
