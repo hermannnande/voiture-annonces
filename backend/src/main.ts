@@ -29,17 +29,23 @@ async function bootstrap() {
     'https://voiture-annonces-production.up.railway.app', // Temporaire pour debug
   ].filter((value, index, self) => value && self.indexOf(value) === index); // Remove duplicates and empty values
   
-  console.log('🔒 CORS Origins autorisés:', allowedOrigins);
+  console.log('🔒 [CORS] Origins autorisés:', allowedOrigins);
+  console.log('🔒 [CORS] FRONTEND_URL brute:', process.env.FRONTEND_URL);
   
   app.enableCors({
     origin: (origin, callback) => {
       // Autoriser les requêtes sans origin (ex: Postman, curl)
-      if (!origin) return callback(null, true);
+      if (!origin) {
+        console.log('✅ [CORS] Requête sans origin autorisée');
+        return callback(null, true);
+      }
       
       if (allowedOrigins.indexOf(origin) !== -1) {
+        console.log('✅ [CORS] Autorisé:', origin);
         callback(null, true);
       } else {
-        console.warn('⚠️  CORS bloqué pour:', origin);
+        console.warn('⚠️  [CORS] BLOQUÉ pour:', origin);
+        console.warn('⚠️  [CORS] Origins valides:', allowedOrigins);
         callback(new Error(`Origin ${origin} not allowed by CORS`));
       }
     },
