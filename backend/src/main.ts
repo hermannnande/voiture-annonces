@@ -3,7 +3,8 @@ import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
-  console.log('🚀 [STARTUP] Début du bootstrap...');
+  console.log('🚀 [STARTUP] Début du bootstrap... (v2.0)');
+  console.log('⏰ [STARTUP] Timestamp:', new Date().toISOString());
   console.log('🔍 [STARTUP] Variables d\'env:', {
     NODE_ENV: process.env.NODE_ENV,
     PORT: process.env.PORT,
