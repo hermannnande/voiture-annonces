@@ -76,17 +76,18 @@ export default function BoostsPage() {
     if (!pendingProductId) return;
 
     try {
-      await api.post('/boosts/purchase', {
+      // ✅ Utiliser l'endpoint sécurisé avec vérification des crédits
+      await api.post('/boosts/purchase-with-credits', {
         listingId: selectedListing,
         boostProductId: pendingProductId,
-        paymentProvider: 'mock',
       });
 
       setShowSuccessModal(true);
-      fetchData();
+      fetchData(); // Recharger pour mettre à jour le solde et les boosts
       setPendingProductId(null);
     } catch (error: any) {
-      setErrorMessage(error.response?.data?.message || 'Erreur lors de l\'achat du boost');
+      const message = error.response?.data?.message || 'Erreur lors de l\'achat du boost';
+      setErrorMessage(message);
       setShowErrorModal(true);
       setPendingProductId(null);
     }

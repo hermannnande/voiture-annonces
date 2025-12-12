@@ -46,6 +46,12 @@ export class BoostsService {
     paymentProvider: string,
     ip?: string,
   ) {
+    // 🔒 SÉCURITÉ : Si paymentProvider est 'mock' ou 'credits', utiliser le système de crédits
+    if (paymentProvider === 'mock' || paymentProvider === 'credits') {
+      return this.purchaseBoostWithCredits(userId, listingId, boostProductId, ip);
+    }
+
+    // Pour les vrais paiements (Orange Money, Wave, etc.)
     // Vérifier que l'annonce existe et appartient à l'utilisateur
     const listing = await this.prisma.listing.findUnique({
       where: { id: listingId },
@@ -68,6 +74,12 @@ export class BoostsService {
       throw new NotFoundException('Produit de boost introuvable ou inactif');
     }
 
+    // TODO: Intégrer vraie API de paiement (Orange Money, Wave, etc.)
+    // Pour l'instant, on ne permet que le paiement par crédits
+    throw new BadRequestException(
+      'Seul le paiement par crédits est actuellement disponible. Veuillez acheter des crédits d\'abord.'
+    );
+
     // Calculer les dates de début et de fin
     const startsAt = new Date();
     const endsAt = new Date();
@@ -81,7 +93,7 @@ export class BoostsService {
         buyerId: userId,
         startsAt,
         endsAt,
-        paymentStatus: 'COMPLETED',
+        paymentStatus: 'PENDING', // ⚠️ PENDING jusqu'à confirmation paiement
         paymentAmount: boostProduct.priceFcfa,
         paymentProvider,
       },
@@ -176,7 +188,7 @@ export class BoostsService {
       throw new BadRequestException('Wallet introuvable');
     }
 
-    // Vérifier le solde
+    // ✅ Première vérification du solde (avant transaction)
     if (wallet.balanceCredits < boostProduct.creditsCost) {
       throw new BadRequestException(
         `Solde insuffisant. Vous avez ${wallet.balanceCredits} crédits, il en faut ${boostProduct.creditsCost}`,
@@ -188,9 +200,35 @@ export class BoostsService {
     const endsAt = new Date();
     endsAt.setDate(endsAt.getDate() + boostProduct.durationDays);
 
-    // Transaction atomique : créer le boost ET débiter le wallet
+    // 🔒 Transaction atomique : créer le boost ET débiter le wallet
     const result = await this.prisma.$transaction(async (prisma) => {
-      // 1. Créer le boost
+      // ✅ Vérifier à nouveau le solde DANS la transaction (protection race condition)
+      const currentWallet = await prisma.wallet.findUnique({
+        where: { id: wallet.id },
+      });
+
+      if (!currentWallet || currentWallet.balanceCredits < boostProduct.creditsCost) {
+        throw new BadRequestException(
+          `Solde insuffisant. Vous avez ${currentWallet?.balanceCredits || 0} crédits, il en faut ${boostProduct.creditsCost}`,
+        );
+      }
+
+      // 1. Débiter le wallet (AVANT de créer le boost pour éviter fraude)
+      const updatedWallet = await prisma.wallet.update({
+        where: { id: wallet.id },
+        data: {
+          balanceCredits: {
+            decrement: boostProduct.creditsCost,
+          },
+        },
+      });
+
+      // ✅ Vérifier que le débit n'a pas rendu le solde négatif
+      if (updatedWallet.balanceCredits < 0) {
+        throw new BadRequestException('Transaction refusée : solde insuffisant');
+      }
+
+      // 2. Créer le boost
       const boost = await prisma.boost.create({
         data: {
           listingId,
@@ -213,23 +251,13 @@ export class BoostsService {
         },
       });
 
-      // 2. Débiter le wallet
-      await prisma.wallet.update({
-        where: { id: wallet.id },
-        data: {
-          balanceCredits: {
-            decrement: boostProduct.creditsCost,
-          },
-        },
-      });
-
       // 3. Créer la transaction wallet
       await prisma.walletTransaction.create({
         data: {
           walletId: wallet.id,
           type: 'DEBIT',
           amount: boostProduct.creditsCost,
-          reason: `Achat pack boost: ${boostProduct.name}`,
+          reason: `Achat pack boost: ${boostProduct.name} (Annonce: ${listing.title})`,
           relatedEntityType: 'BOOST',
           relatedEntityId: boost.id,
           actorId: userId,
@@ -246,7 +274,7 @@ export class BoostsService {
         },
       });
 
-      return boost;
+      return { boost, updatedWallet };
     });
 
     // Log d'audit
@@ -259,13 +287,15 @@ export class BoostsService {
         boostProductId,
         creditsCost: boostProduct.creditsCost.toString(),
         durationDays: boostProduct.durationDays,
+        newBalance: result.updatedWallet.balanceCredits.toString(),
       },
       ip,
     });
 
     return {
-      ...result,
-      paymentAmount: result.paymentAmount.toString(),
+      ...result.boost,
+      paymentAmount: result.boost.paymentAmount.toString(),
+      newWalletBalance: result.updatedWallet.balanceCredits.toString(),
       boostProduct: {
         ...result.boostProduct,
         priceFcfa: result.boostProduct.priceFcfa.toString(),
