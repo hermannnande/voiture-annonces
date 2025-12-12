@@ -43,10 +43,11 @@ export class CreateListingDto {
   @Type(() => Number)
   year: number;
 
+  @IsOptional()
   @IsNumber({}, { message: 'Le kilométrage doit être un nombre' })
   @Min(0, { message: 'Le kilométrage doit être positif' })
   @Type(() => Number)
-  mileageKm: number;
+  mileageKm?: number;
 
   @IsString({ message: 'La couleur doit être une chaîne de caractères' })
   @IsNotEmpty({ message: 'La couleur est obligatoire' })

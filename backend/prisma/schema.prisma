@@ -143,7 +143,7 @@ model Listing {
   fuel              FuelType
   gearbox           GearboxType
   year              Int
-  mileageKm         Int           @map("mileage_km")
+  mileageKm         Int?          @map("mileage_km")
   color             String
   doors             Int?
   powerCv           Int?          @map("power_cv")

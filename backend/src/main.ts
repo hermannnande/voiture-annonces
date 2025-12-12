@@ -1,9 +1,10 @@
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
+import { PrismaService } from './prisma/prisma.service';
 
 async function bootstrap() {
-  console.log('🚀 [STARTUP] Début du bootstrap... (v2.0)');
+  console.log('🚀 [STARTUP] Début du bootstrap... (v3.0 - Optimisé)');
   console.log('⏰ [STARTUP] Timestamp:', new Date().toISOString());
   console.log('🔍 [STARTUP] Variables d\'env:', {
     NODE_ENV: process.env.NODE_ENV,
@@ -13,8 +14,17 @@ async function bootstrap() {
     JWT_SECRET: process.env.JWT_SECRET ? '✅ Présent' : '❌ Manquant',
   });
   
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: process.env.NODE_ENV === 'production' 
+      ? ['error', 'warn', 'log'] 
+      : ['error', 'warn', 'log', 'debug'],
+  });
   console.log('✅ [STARTUP] AppModule créé');
+
+  // ✅ Activer les hooks de fermeture Prisma
+  const prismaService = app.get(PrismaService);
+  await prismaService.enableShutdownHooks(app);
+  console.log('✅ [STARTUP] Prisma shutdown hooks activés');
 
   // Configuration CORS
   const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';

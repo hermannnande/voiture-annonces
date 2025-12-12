@@ -403,15 +403,14 @@ export default function EditListingPage() {
 
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-2">
-                      Kilométrage (km) *
+                      Kilométrage (km)
                     </label>
                     <input
                       type="number"
-                      required
                       value={formData.mileageKm}
                       onChange={(e) => setFormData({ ...formData, mileageKm: e.target.value })}
                       className="input"
-                      placeholder="68000"
+                      placeholder="68000 (optionnel)"
                     />
                   </div>
 
