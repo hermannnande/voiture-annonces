@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/authStore';
 import Header from '@/components/layout/Header';
 import Footer from '@/components/layout/Footer';
+import Modal from '@/components/common/Modal';
 import api from '@/lib/api';
 import { formatPrice, formatDate } from '@/lib/utils';
 import { TrendingUp, Zap, Star, Crown } from 'lucide-react';
@@ -18,6 +19,14 @@ export default function BoostsPage() {
   const [loading, setLoading] = useState(true);
   const [selectedListing, setSelectedListing] = useState('');
   const [selectedProduct, setSelectedProduct] = useState('');
+  
+  // États pour les modals
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showErrorModal, setShowErrorModal] = useState(false);
+  const [showWarningModal, setShowWarningModal] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [pendingProductId, setPendingProductId] = useState<number | null>(null);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -54,25 +63,32 @@ export default function BoostsPage() {
 
   const handlePurchase = async (productId: number) => {
     if (!selectedListing) {
-      alert('Veuillez sélectionner une annonce');
+      setShowWarningModal(true);
       return;
     }
 
-    if (!confirm('Confirmer l\'achat de ce boost ?')) {
-      return;
-    }
+    // Ouvrir le modal de confirmation
+    setPendingProductId(productId);
+    setShowConfirmModal(true);
+  };
+
+  const confirmPurchase = async () => {
+    if (!pendingProductId) return;
 
     try {
       await api.post('/boosts/purchase', {
         listingId: selectedListing,
-        boostProductId: productId,
+        boostProductId: pendingProductId,
         paymentProvider: 'mock',
       });
 
-      alert('✅ Boost acheté avec succès ! Votre annonce bénéficie maintenant d\'une visibilité accrue.');
+      setShowSuccessModal(true);
       fetchData();
+      setPendingProductId(null);
     } catch (error: any) {
-      alert(error.response?.data?.message || 'Erreur lors de l\'achat du boost');
+      setErrorMessage(error.response?.data?.message || 'Erreur lors de l\'achat du boost');
+      setShowErrorModal(true);
+      setPendingProductId(null);
     }
   };
 
@@ -306,6 +322,45 @@ export default function BoostsPage() {
       </main>
 
       <Footer />
+
+      {/* Modals professionnels */}
+      <Modal
+        isOpen={showWarningModal}
+        onClose={() => setShowWarningModal(false)}
+        title="Sélection requise"
+        message="Veuillez d'abord sélectionner une annonce à booster avant de choisir un pack."
+        type="warning"
+      />
+
+      <Modal
+        isOpen={showConfirmModal}
+        onClose={() => {
+          setShowConfirmModal(false);
+          setPendingProductId(null);
+        }}
+        onConfirm={confirmPurchase}
+        title="Confirmer l'achat"
+        message="Êtes-vous sûr de vouloir acheter ce boost ? Votre annonce bénéficiera d'une visibilité accrue pendant la durée du pack."
+        type="confirm"
+        confirmText="Acheter"
+        cancelText="Annuler"
+      />
+
+      <Modal
+        isOpen={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        title="Boost acheté !"
+        message="Votre annonce bénéficie maintenant d'une visibilité accrue. Elle apparaîtra en priorité dans les résultats de recherche."
+        type="success"
+      />
+
+      <Modal
+        isOpen={showErrorModal}
+        onClose={() => setShowErrorModal(false)}
+        title="Erreur"
+        message={errorMessage || 'Une erreur est survenue lors de l\'achat du boost. Veuillez réessayer.'}
+        type="error"
+      />
     </div>
   );
 }
