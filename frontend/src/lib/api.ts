@@ -9,12 +9,61 @@ export const api = axios.create({
   },
 });
 
-// Intercepteur pour ajouter le token d'authentification
+// Fonction helper pour décoder le JWT et obtenir l'expiration
+function getTokenExpiry(token: string): number | null {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return payload.exp * 1000; // Convertir en millisecondes
+  } catch (error) {
+    return null;
+  }
+}
+
+// Fonction de refresh des tokens
+async function refreshTokens(): Promise<string | null> {
+  const refreshToken = localStorage.getItem('refreshToken');
+  if (!refreshToken) {
+    return null;
+  }
+
+  try {
+    const response = await axios.post(`${API_URL}/auth/refresh`, {
+      refreshToken,
+    });
+
+    const { accessToken, refreshToken: newRefreshToken, user } = response.data;
+
+    localStorage.setItem('accessToken', accessToken);
+    localStorage.setItem('refreshToken', newRefreshToken);
+    if (user) {
+      localStorage.setItem('user', JSON.stringify(user));
+    }
+
+    console.log('✅ Token refreshed automatiquement');
+    return accessToken;
+  } catch (error) {
+    console.error('❌ Échec du refresh automatique');
+    return null;
+  }
+}
+
+// ✅ Intercepteur amélioré : refresh automatique AVANT expiration
 api.interceptors.request.use(
-  (config) => {
+  async (config) => {
     if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('accessToken');
+      let token = localStorage.getItem('accessToken');
+      
       if (token) {
+        const expiryTime = getTokenExpiry(token);
+        const now = Date.now();
+        
+        // ✅ Si le token expire dans moins de 5 minutes, le refresh automatiquement
+        if (expiryTime && (expiryTime - now < 5 * 60 * 1000)) {
+          console.log('⏰ Token va expirer bientôt, refresh automatique...');
+          const newToken = await refreshTokens();
+          token = newToken || token; // Utiliser le nouveau token si le refresh a réussi
+        }
+        
         config.headers.Authorization = `Bearer ${token}`;
       }
     }
