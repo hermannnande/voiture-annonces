@@ -297,9 +297,9 @@ export class BoostsService {
       paymentAmount: result.boost.paymentAmount.toString(),
       newWalletBalance: result.updatedWallet.balanceCredits.toString(),
       boostProduct: {
-        ...result.boostProduct,
-        priceFcfa: result.boostProduct.priceFcfa.toString(),
-        creditsCost: result.boostProduct.creditsCost.toString(),
+        ...result.boost.boostProduct,
+        priceFcfa: result.boost.boostProduct.priceFcfa.toString(),
+        creditsCost: result.boost.boostProduct.creditsCost.toString(),
       },
     };
   }

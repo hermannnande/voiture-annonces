@@ -36,22 +36,6 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
         }
       }
 
-      // ✅ Middleware pour logger les requêtes lentes
-      this.$use(async (params, next) => {
-        const start = Date.now();
-        const result = await next(params);
-        const duration = Date.now() - start;
-
-        // Logger si requête > 1 seconde
-        if (duration > 1000) {
-          this.logger.warn(
-            `⚠️  Requête lente: ${params.model}.${params.action} - ${duration}ms`
-          );
-        }
-
-        return result;
-      });
-
     } catch (error) {
       this.logger.error('❌ Erreur de connexion à la base de données:', error);
       throw error;
@@ -69,9 +53,9 @@ export class PrismaService extends PrismaClient implements OnModuleInit, OnModul
 
   // ✅ Helper pour nettoyer les connexions
   async enableShutdownHooks(app: any) {
-    this.$on('beforeExit', async () => {
-      await app.close();
-    });
+    // Prisma v6+ gère automatiquement le cleanup
+    // Pas besoin de hook manuel
+    this.logger.log('Shutdown hooks configurés (gérés automatiquement par Prisma)');
   }
 }
 
