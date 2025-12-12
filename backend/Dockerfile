@@ -36,5 +36,5 @@ EXPOSE 3001
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
   CMD node -e "require('http').get('http://localhost:3001/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
 
-# Commande de démarrage avec migrations
-CMD npx prisma migrate deploy && node dist/src/main.js
+# Commande de démarrage avec db push (plus fiable que migrate deploy)
+CMD npx prisma db push --accept-data-loss && node dist/src/main.js
